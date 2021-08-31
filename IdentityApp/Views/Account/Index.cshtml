@@ -1,0 +1,59 @@
+﻿@model IdentityApp.Models.User
+
+@{
+    ViewData["Title"] = Model.UserName;
+}
+
+<link href="~/css/account_profile.css" rel="stylesheet" />
+
+@*<table class="table">
+        <tr>
+            <td>
+                <img id="profile-pic" class="border border-4 border-secondary rounded"
+                     src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.ProfilePicture))"
+                     alt="profile_picture" />
+            </td>
+            <td>@Model.UserName</td>
+            <td>@Model.Email</td>
+            <td>@Model?.Year</td>
+            <td>@Model.Country</td>
+        </tr>
+    </table>*@
+<img id="profile-pic" class="border border-4 border-secondary rounded"
+     src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.ProfilePicture))"
+     alt="profile_picture" />
+
+<span class="align-top">@Model.UserName</span>
+<span>@Model.Email</span>
+<span>@Model?.Year</span>
+<span>@Model.Country</span>
+
+<div>
+    <a asp-action="Create" asp-controller="Post" asp-route-userId="@Model.Id"
+       class="btn btn-primary">Create Post</a>
+    <a asp-action="Edit" asp-controller="Account" asp-route-userId="@Model.Id"
+       class="btn btn-primary float-right">Edit Profile</a>
+</div>
+
+@if (Model.Posts.Count() > 0)
+{
+    @foreach (Post post in Model.Posts)
+    {
+        <div class="border border-secondary rounded p-2 my-2">
+            <p>@post.Content</p>
+
+            <a href="#" class="btn btn-sm btn-outline-primary px-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart align-middle" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                </svg>
+                <span id="likes-count">@post.Likes</span>
+            </a>
+
+            <div class="d-inline float-right">
+                <sub class="posted-time">@post.PostedTime</sub>
+                <a asp-action="Edit" asp-controller="Post" asp-route-postId="@post.Id"
+                   class="btn btn-outline-secondary">Edit</a>
+            </div>
+        </div>
+    }
+}

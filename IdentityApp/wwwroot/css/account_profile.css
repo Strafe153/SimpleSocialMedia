@@ -1,0 +1,13 @@
+﻿#profile-pic {
+    object-fit: cover;
+    width: 150px;
+    height: 150px;
+}
+
+#likes-count {
+    font-size: 17px;
+}
+
+.posted-time {
+    font-size: 13px;
+}

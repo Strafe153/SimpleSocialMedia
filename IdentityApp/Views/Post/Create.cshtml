@@ -1,0 +1,20 @@
+﻿@model IdentityApp.ViewModels.CreatePostViewModel 
+
+@{
+    ViewData["Title"] = "Creating a post";
+}
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="Post.PostedTime" value="@DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")" />
+    <input type="hidden" asp-for="Post.User.UserName" value="@Model.User.UserName" />
+    <input type="hidden" asp-for="Post.User.Id" value="@Model.User.Id" />
+    <input type="hidden" asp-for="Post.Id" value="@System.Guid.NewGuid().ToString()" />
+
+    <div class="form-group">
+        <label for="post">Post</label><br />
+        <textarea id="post" asp-for="Post.Content" class="form-control" rows="8"></textarea>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Post" class="btn btn-primary" />
+    </div>
+</form>
