@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -63,6 +64,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Edit(string postId)
         {
             Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
@@ -84,6 +86,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
             if (ModelState.IsValid)
@@ -92,13 +95,14 @@ namespace IdentityApp.Controllers
 
                 if (post != null)
                 {
+                    User user = await _userManager.FindByIdAsync(model.UserId);
+
                     post.Content = model.Content;
                     post.PostedTime = model.PostedTime;
-
+                    post.IsEdited = true;
                     _context.Update(post);
                     await _context.SaveChangesAsync();
 
-                    User user = await _userManager.FindByIdAsync(model.UserId);
 
                     return RedirectToAction("Index", "Account", new { userName = user.UserName });
                 }
@@ -109,6 +113,44 @@ namespace IdentityApp.Controllers
             }
 
             return View(model);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Delete(string postId)
+        {
+            Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+            User user = await _userManager.FindByIdAsync(post.UserId);
+
+            if (post != null)
+            {
+                _context.Posts.Remove(post);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Account", new { userName = user.UserName });
+        }
+
+        public async Task<IActionResult> Like(string postId)
+        {
+            Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post != null)
+            {
+                if (post.IsLiked)
+                {
+                    post.IsLiked = false;
+                    post.Likes -= 1;
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    post.IsLiked = true;
+                    post.Likes += 1;
+                    _context.SaveChanges();
+                }
+            }
+
+            return RedirectToAction("Index", "Account", new { userName = post.UserId });
         }
     }
 }

@@ -17,14 +17,25 @@ namespace IdentityApp.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>()
+            /*modelBuilder.Entity<User>()
                 .HasMany(u => u.Posts)
                 .WithOne();
+            
+             modelBuilder.Entity<Post>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId); */
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Posts)
+                .WithOne(p => p.User)
+                .IsRequired();
 
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Posts)
-                .HasForeignKey(p => p.UserId);
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
