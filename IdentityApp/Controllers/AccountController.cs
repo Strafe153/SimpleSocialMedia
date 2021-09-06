@@ -18,16 +18,7 @@ namespace IdentityApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IWebHostEnvironment _appEnvironment;
-
         private readonly ApplicationDbContext _context;
-
-        /*public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,
-            IWebHostEnvironment appeEnvironment)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _appEnvironment = appeEnvironment;
-        }*/
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,
             IWebHostEnvironment appeEnvironment, ApplicationDbContext context)
         {
@@ -44,9 +35,13 @@ namespace IdentityApp.Controllers
 
             if (user != null)
             {
-                user.Posts = (from post in _context.Posts
-                              where post.UserId == user.Id
-                              orderby post.PostedTime descending
+                user.Posts = (from post in user.Posts
+                              orderby post.PostedTime.Year descending,
+                                      post.PostedTime.Month descending,
+                                      post.PostedTime.Day descending,
+                                      post.PostedTime.Hour descending,
+                                      post.PostedTime.Minute descending,
+                                      post.PostedTime.Second descending
                               select post).ToList();
 
                 return View(user);
@@ -162,7 +157,7 @@ namespace IdentityApp.Controllers
                 Status = user.Status,
                 Country = user.Country,
                 City = user.City,
-                Company = user.Company,
+                Company = user.Company
             };
 
             Stream stream = new MemoryStream(user.ProfilePicture);

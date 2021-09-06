@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,27 @@ namespace IdentityApp.Controllers
             if (ModelState.IsValid)
             {
                 User user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == model.Post.User.Id);
+
+                if (model.PostPictures != null)
+                {
+                    foreach (IFormFile postPic in model.PostPictures)
+                    {
+                        byte[] pictureData = null;
+
+                        using (BinaryReader binaryReader = new BinaryReader(postPic.OpenReadStream()))
+                        {
+                            pictureData = binaryReader.ReadBytes((int)postPic.Length);
+                        }
+
+                        PostPicture postPicture = new PostPicture()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            PictureData = pictureData
+                        };
+
+                        model.Post.PostPictures.Add(postPicture);
+                    }
+                }
 
                 if (user != null)
                 {
