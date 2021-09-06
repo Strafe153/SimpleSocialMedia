@@ -12,11 +12,6 @@ namespace IdentityApp.Models
         public string Company { get; set; }
         public string Status { get; set; }
         public byte[] ProfilePicture { get; set; }
-        public List<Post> Posts { get; set; }
-
-        public User()
-        {
-            Posts = new List<Post>();
-        }
+        public virtual List<Post> Posts { get; set; } = new List<Post>();
     }
 }

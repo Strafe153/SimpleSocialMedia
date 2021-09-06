@@ -40,6 +40,7 @@ namespace IdentityApp
                 options.User.AllowedUserNameCharacters =
                     @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_.?=+`~!#$;()[]{}*&^:%,\/<> ";
             }).AddEntityFrameworkStores<ApplicationDbContext>();
+   
             services.AddControllersWithViews();
         }
 
