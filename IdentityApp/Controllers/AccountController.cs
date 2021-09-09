@@ -36,12 +36,7 @@ namespace IdentityApp.Controllers
             if (user != null)
             {
                 user.Posts = (from post in user.Posts
-                              orderby post.PostedTime.Year descending,
-                                      post.PostedTime.Month descending,
-                                      post.PostedTime.Day descending,
-                                      post.PostedTime.Hour descending,
-                                      post.PostedTime.Minute descending,
-                                      post.PostedTime.Second descending
+                              orderby post.PostedTime descending
                               select post).ToList();
 
                 return View(user);
@@ -65,8 +60,7 @@ namespace IdentityApp.Controllers
 
             if (ModelState.IsValid)
             {
-                User user = new User()
-                {
+                User user = new User() {
                     Email = model.Email,
                     UserName = model.UserName
                 };
