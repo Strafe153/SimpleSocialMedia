@@ -33,9 +33,9 @@ namespace IdentityApp.Controllers
 
                 if (user != null)
                 {
-                    CreatePostViewModel model = new CreatePostViewModel()
-                    {
-                        User = user
+                    CreatePostViewModel model = new CreatePostViewModel() 
+                    { 
+                        User = user 
                     };
 
                     return View(model);
@@ -66,7 +66,8 @@ namespace IdentityApp.Controllers
                         PostPicture postPicture = new PostPicture()
                         {
                             Id = Guid.NewGuid().ToString(),
-                            PictureData = pictureData
+                            PictureData = pictureData,
+                            UploadedTime = DateTime.Now
                         };
 
                         model.Post.PostPictures.Add(postPicture);
@@ -101,7 +102,10 @@ namespace IdentityApp.Controllers
                 Id = post.Id,
                 Content = post.Content,
                 PostedTime = post.PostedTime,
-                UserId = post.UserId
+                UserId = post.UserId,
+                PostPictures = (from postPic in post.PostPictures
+                                orderby postPic.UploadedTime descending
+                                select postPic).ToList()
             };
 
             return View(model);
@@ -119,12 +123,33 @@ namespace IdentityApp.Controllers
                 {
                     User user = await _userManager.FindByIdAsync(model.UserId);
 
+                    if (model.AppendedPostPictures != null)
+                    {
+                        foreach (IFormFile postPic in model.AppendedPostPictures)
+                        {
+                            byte[] pictureData = null;
+
+                            using (BinaryReader binaryReader = new BinaryReader(postPic.OpenReadStream()))
+                            {
+                                pictureData = binaryReader.ReadBytes((int)postPic.Length);
+                            }
+
+                            PostPicture postPicture = new PostPicture()
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                PictureData = pictureData,
+                                UploadedTime = DateTime.Now
+                            };
+
+                            post.PostPictures.Add(postPicture);
+                        }
+                    }
+
                     post.Content = model.Content;
                     post.PostedTime = model.PostedTime;
                     post.IsEdited = true;
                     _context.Update(post);
                     await _context.SaveChangesAsync();
-
 
                     return RedirectToAction("Index", "Account", new { userName = user.UserName });
                 }
