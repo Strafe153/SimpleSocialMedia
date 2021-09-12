@@ -103,7 +103,7 @@ namespace IdentityApp.Controllers
                 PostedTime = post.PostedTime,
                 UserId = post.UserId,
                 PostPictures = (from postPic in post.PostPictures
-                                orderby postPic.UploadedTime descending
+                                orderby postPic.UploadedTime
                                 select postPic).ToList()
             };
 
@@ -185,18 +185,18 @@ namespace IdentityApp.Controllers
                 if (post.IsLiked)
                 {
                     post.IsLiked = false;
-                    post.Likes -= 1;
-                    _context.SaveChanges();
+                    post.Likes--;
                 }
                 else
                 {
                     post.IsLiked = true;
-                    post.Likes += 1;
-                    _context.SaveChanges();
+                    post.Likes++;
                 }
+
+                _context.SaveChanges();
             }
 
-            return RedirectToAction("Index", "Account", new { userName = post.UserId });
+            return RedirectToAction("Index", "Account", new { userName = post.User.UserName });
         }
     }
 }

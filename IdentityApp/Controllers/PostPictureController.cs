@@ -15,7 +15,6 @@ namespace IdentityApp.Controllers
             _context = context;
         }
 
-        [HttpGet]
         public async Task<IActionResult> Delete(string postPictureId, string postId)
         {
             PostPicture postPicture = await _context.PostPictures.FirstOrDefaultAsync(p => p.Id == postPictureId);
