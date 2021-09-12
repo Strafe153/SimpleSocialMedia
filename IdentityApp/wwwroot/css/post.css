@@ -21,3 +21,7 @@
 .post-picture-container:hover .visible-on-hover-delete-button {
     visibility: visible;
 }
+
+.visible-on-hover-delete-button {
+    color: #fff;
+}
