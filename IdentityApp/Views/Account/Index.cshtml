@@ -65,21 +65,3 @@
         </div>
     }
 }
-
-@section Scripts
-{
-    <script type="text/javascript">
-        $("#like-button").on("click", function (event) {
-            let postId = $(event.target).attr("value");
-
-            $.ajax({
-                type: "POST",
-                url: "@Url.Action("Like", "Post")",
-                data: {postId: postId},
-                dataType: "text",
-                success: msg => console.log(msg),
-                error: (req, status, error) => console.log(msg)
-            });
-        });
-    </script>
-}
