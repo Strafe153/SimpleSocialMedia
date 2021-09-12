@@ -1,25 +1,25 @@
-﻿@model IdentityApp.Models.User
+﻿@model IdentityApp.ViewModels.UserProfileViewModel
 
 @{
-    ViewData["Title"] = Model.UserName;
+    ViewData["Title"] = Model.User.UserName;
 }
 
 <link href="~/css/account_profile.css" rel="stylesheet" />
 
 <img id="profile-pic" class="border border-4 border-secondary rounded mb-2"
-     src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.ProfilePicture))"
+     src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.User.ProfilePicture))"
      alt="profile_picture" />
 
 <div class="d-inline">
-    <span class="align-top ">@Model.UserName</span><br />
-    <span class="align-top">@Model.Email</span>
-    <span>@Model.Status</span>
+    <span class="align-top ">@Model.User.UserName</span><br />
+    <span class="align-top">@Model.User.Email</span>
+    <span>@Model.User.Status</span>
 </div>
 
 <div>
-    <a asp-action="Create" asp-controller="Post" asp-route-userId="@Model.Id"
+    <a asp-action="Create" asp-controller="Post" asp-route-userId="@Model.User.Id"
        class="btn btn-primary">Create Post</a>
-    <a asp-action="Edit" asp-controller="Account" asp-route-userId="@Model.Id"
+    <a asp-action="Edit" asp-controller="Account" asp-route-userId="@Model.User.Id"
        class="btn btn-primary float-right">Edit Profile</a>
 </div>
 
@@ -60,4 +60,28 @@
             </div>
         </div>
     }
+}
+
+@if (Model.PageViewModel.HasPreviousPage)
+{
+    <a asp-action="Index"
+       asp-route-userName="@Model.User.UserName"
+       asp-route-page="@(Model.PageViewModel.CurrentPageNumber - 1)"
+       class="btn btn-outline-dark">
+        <i class="glyphicon glyphicon-chevron-left"></i>
+        Previous
+    </a>
+}  
+
+<input type="submit" value="@Model.PageViewModel.CurrentPageNumber" class="btn btn-outline-dark" disabled />
+
+@if (Model.PageViewModel.HasNextPage)
+{
+    <a asp-action="Index"
+       asp-route-userName="@Model.User.UserName"
+       asp-route-page="@(Model.PageViewModel.CurrentPageNumber + 1)"
+       class="btn btn-outline-dark">
+        <i class="glyphicon glyphicon-chevron-right"></i>
+        Next
+    </a>
 }

@@ -12,9 +12,10 @@ a {
   color: #0366d6;
 }
 
-.btn {
+/* try to experiment with border-raius for .btn, textarea, input */
+/*.btn {
     border-radius: 20px;
-}
+}*/
 
 .btn-primary {
   color: #fff;

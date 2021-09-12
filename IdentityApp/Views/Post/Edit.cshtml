@@ -9,7 +9,7 @@
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="Id" value="@Model.Id" />
     <input type="hidden" asp-for="UserId" value="@Model.UserId" />
-    <input type="hidden" asp-for="PostedTime" value="@DateTime.Now" />
+    <input type="hidden" asp-for="PostedTime" value="@Model.PostedTime" />
 
     <div class="form-group">
         <label for="post">Post</label><br />

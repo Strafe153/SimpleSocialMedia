@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
@@ -18,19 +19,18 @@ namespace IdentityApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IWebHostEnvironment _appEnvironment;
-        private readonly ApplicationDbContext _context;
         public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,
-            IWebHostEnvironment appeEnvironment, ApplicationDbContext context)
+            IWebHostEnvironment appeEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _appEnvironment = appeEnvironment;
-            _context = context;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string userName)
+        public async Task<IActionResult> Index(string userName, int page = 1)
         {
+            const int PAGE_SIZE = 5;
             User user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 
             if (user != null)
@@ -39,7 +39,18 @@ namespace IdentityApp.Controllers
                               orderby post.PostedTime descending
                               select post).ToList();
 
-                return View(user);
+                IEnumerable<Post> allPosts = user.Posts;
+                int postsNumber = allPosts.Count();
+                IEnumerable<Post> currentUserPosts = allPosts.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
+
+                UserProfileViewModel viewModel = new UserProfileViewModel()
+                {
+                    User = user,
+                    Posts = currentUserPosts,
+                    PageViewModel = new PageViewModel(page, postsNumber, PAGE_SIZE)
+                };
+
+                return View(viewModel);
             }
 
             return NotFound();
