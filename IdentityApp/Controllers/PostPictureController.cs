@@ -8,12 +8,10 @@ namespace IdentityApp.Controllers
 {
     public class PostPictureController : Controller
     {
-        private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public PostPictureController (UserManager<User> userManager, ApplicationDbContext context)
+        public PostPictureController (ApplicationDbContext context)
         {
-            _userManager = userManager;
             _context = context;
         }
 
