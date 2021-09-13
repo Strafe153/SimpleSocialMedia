@@ -8,20 +8,6 @@ namespace IdentityApp.Controllers
 {
     public class HomeController : Controller
     {
-        /*private readonly UserManager<User> _userManager;
-
-        public HomeController(UserManager<User> userManager)
-        {
-            _userManager = userManager;
-        }
-
-        public async Task<IActionResult> Index(string userId)
-        {
-            User user = await _userManager.FindByIdAsync(userId);
-
-            return View();
-        }*/
-
         public IActionResult Index()
         {
             return View();
