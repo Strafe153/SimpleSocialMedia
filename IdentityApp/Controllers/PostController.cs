@@ -176,27 +176,37 @@ namespace IdentityApp.Controllers
             return RedirectToAction("Index", "Account", new { userName = user.UserName });
         }
 
-        public async Task<IActionResult> Like(string postId)
+        public async Task<IActionResult> Like(string postId, string userId)
         {
             Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+            User user = await _userManager.FindByIdAsync(userId);
 
             if (post != null)
             {
-                if (post.IsLiked)
+                if (user != null)
                 {
-                    post.IsLiked = false;
-                    post.Likes--;
+                    if (post.PostIsLikedBy.FirstOrDefault(u => u.Id == userId) != null)
+                    {
+                        post.PostIsLikedBy.Remove(user);
+                        post.Likes--;
+                    }
+                    else
+                    {
+                        post.PostIsLikedBy.Add(user);
+                        post.Likes++;
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction("Index", "Account", new { userName = user.UserName });
                 }
                 else
                 {
-                    post.IsLiked = true;
-                    post.Likes++;
+                    return NotFound();
                 }
-
-                _context.SaveChanges();
             }
-
-            return RedirectToAction("Index", "Account", new { userName = post.User.UserName });
+            
+            return NotFound();
         }
     }
 }
