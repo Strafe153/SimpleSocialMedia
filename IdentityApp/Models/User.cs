@@ -13,5 +13,6 @@ namespace IdentityApp.Models
         public string Status { get; set; }
         public byte[] ProfilePicture { get; set; }
         public virtual List<Post> Posts { get; set; } = new List<Post>();
+        public virtual List<LikedPosts> LikedPosts { get; set; } = new List<LikedPosts>();
     }
 }

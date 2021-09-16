@@ -176,37 +176,46 @@ namespace IdentityApp.Controllers
             return RedirectToAction("Index", "Account", new { userName = user.UserName });
         }
 
-        public async Task<IActionResult> Like(string postId, string userId)
+        public async Task<IActionResult> Like(string postId, string userId, string returnUrl)
         {
-            Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
             User user = await _userManager.FindByIdAsync(userId);
 
-            if (post != null)
+            if (user != null)
             {
-                if (user != null)
+                Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+
+                if (post != null)
                 {
-                    if (post.PostIsLikedBy.FirstOrDefault(u => u.Id == userId) != null)
+                    LikedPosts postToCheck = user.LikedPosts.FirstOrDefault(pl => pl.UserId == userId
+                        && pl.PostId == postId);
+
+                    if (postToCheck != null)
                     {
-                        post.PostIsLikedBy.Remove(user);
+                        user.LikedPosts.Remove(postToCheck);
                         post.Likes--;
                     }
                     else
                     {
-                        post.PostIsLikedBy.Add(user);
+                        user.LikedPosts.Add(
+                            new LikedPosts()
+                            {
+                                UserId = user.Id,
+                                User = user,
+                                PostId = post.Id,
+                                Post = post
+                            });
                         post.Likes++;
                     }
 
                     await _context.SaveChangesAsync();
+                }
 
-                    return RedirectToAction("Index", "Account", new { userName = user.UserName });
-                }
-                else
-                {
-                    return NotFound();
-                }
+                return RedirectToAction("Index", "Account", new { userName = user.UserName });
             }
-            
-            return NotFound();
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

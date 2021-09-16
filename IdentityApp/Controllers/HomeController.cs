@@ -20,7 +20,6 @@ namespace IdentityApp.Controllers
         public IActionResult Index()
         {
             IEnumerable<User> users = _userManager.Users;
-
             return View(users);
         }
     }

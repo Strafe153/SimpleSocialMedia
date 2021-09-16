@@ -12,7 +12,7 @@ namespace IdentityApp.Models
         public int Likes { get; set; }
         public bool IsEdited { get; set; }
         public virtual List<PostPicture> PostPictures { get; set; } = new List<PostPicture>();
-        public virtual List<User> PostIsLikedBy { get; set; } = new List<User>();
+        public virtual List<LikedPosts> LikedPosts { get; set; } = new List<LikedPosts>();
 
         public string UserId { get; set; }
         public virtual User User { get; set; }

@@ -46,6 +46,7 @@ namespace IdentityApp.Controllers
                 UserProfileViewModel viewModel = new UserProfileViewModel()
                 {
                     User = user,
+                    UserManager = _userManager,
                     Posts = currentUserPosts,
                     PageViewModel = new PageViewModel(page, postsNumber, PAGE_SIZE)
                 };

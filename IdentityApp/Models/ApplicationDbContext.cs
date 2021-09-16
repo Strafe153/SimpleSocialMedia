@@ -9,6 +9,7 @@ namespace IdentityApp.Models
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostPicture> PostPictures { get; set; }
 
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -40,6 +41,21 @@ namespace IdentityApp.Models
                 .WithMany(p => p.PostPictures)
                 .HasForeignKey(pp => pp.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LikedPosts>()
+                .HasKey(pl => new { pl.UserId, pl.PostId });
+
+            modelBuilder.Entity<LikedPosts>()
+                .HasOne(pl => pl.User)
+                .WithMany(u => u.LikedPosts)
+                .HasForeignKey(pl => pl.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LikedPosts>()
+                .HasOne(pl => pl.Post)
+                .WithMany(p => p.LikedPosts)
+                .HasForeignKey(pl => pl.PostId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
