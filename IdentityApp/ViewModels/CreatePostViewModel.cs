@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
-using System.IO;
 using IdentityApp.Models;
 
 namespace IdentityApp.ViewModels

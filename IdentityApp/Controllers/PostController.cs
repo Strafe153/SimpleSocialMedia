@@ -175,19 +175,19 @@ namespace IdentityApp.Controllers
 
             return RedirectToAction("Index", "Account", new { userName = user.UserName });
         }
-
-        public async Task<IActionResult> Like(string postId, string userId, string returnUrl)
+        
+        public async Task<IActionResult> Like(PostLikeViewModel model)
         {
-            User user = await _userManager.FindByIdAsync(userId);
+            User user = await _userManager.FindByIdAsync(model.UserId);
 
             if (user != null)
             {
-                Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+                Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == model.PostId);
 
                 if (post != null)
                 {
-                    LikedPosts postToCheck = user.LikedPosts.FirstOrDefault(pl => pl.UserId == userId
-                        && pl.PostId == postId);
+                    LikedPosts postToCheck = user.LikedPosts.FirstOrDefault(
+                        pl => pl.UserId == model.UserId && pl.PostId == model.PostId);
 
                     if (postToCheck != null)
                     {
@@ -210,7 +210,12 @@ namespace IdentityApp.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return RedirectToAction("Index", "Account", new { userName = user.UserName });
+                if (model.ReturnAction.Contains("Account"))
+                {
+                    return RedirectToAction("Index", "Account", new { userName = model.LikedPostUserName });
+                }
+
+                return RedirectToAction("Index", "Home");
             }
             else
             {

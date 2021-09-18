@@ -11,42 +11,43 @@
     User currentUser = Model.FirstOrDefault(u => u.UserName == User.Identity.Name);
 }
 
+<link href="~/css/home_page.css" rel="stylesheet" />
+
 @foreach (Post post in posts)
 {
     <div class="border border-secondary rounded p-2 my-2">
-        <p>@post.Content</p>
+        <a id="user-profile-link" asp-action="Index" asp-controller="Account" 
+            asp-route-userName="@post.User.UserName">@post.User.UserName</a>
+        <p class="text-break">@post.Content</p>
 
         @foreach (PostPicture postPicture in post.PostPictures)
         {
-            <img height="150" src="data:image/jpeg;base64,@(Convert.ToBase64String(postPicture.PictureData))"
-                 alt="post_picture" />
+            <img height="150" alt="post_picture" class="mb-1"
+                 src="data:image/jpeg;base64,@(Convert.ToBase64String(postPicture.PictureData))" />
         }
 
     <div class="mt-2">
         @if (currentUser != null)
         {
-            @if (currentUser.LikedPosts.FirstOrDefault(p => p.Post.Id == post.Id) != null)
-            {
-                <a asp-action="Like" asp-controller="Post" asp-route-postId="@post.Id"
-                   asp-route-userId="@currentUser.Id"
-                   class="btn btn-sm btn-primary px-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart align-middle" viewBox="0 0 16 16">
-                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
-                    </svg>
-                    <span id="likes-count">@post.Likes</span>
-                </a>
-            }
-            else
-            {
-                <a asp-action="Like" asp-controller="Post" asp-route-postId="@post.Id"
-                   asp-route-userId="@currentUser.Id"
-                   class="btn btn-sm btn-outline-primary px-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart align-middle" viewBox="0 0 16 16">
-                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
-                    </svg>
-                    <span id="likes-count">@post.Likes</span>
-                </a>
-            }
+            <a asp-action="Like" asp-controller="Post" asp-route-PostId="@post.Id"
+               asp-route-UserId="@currentUser.Id" asp-route-ReturnAction="@Context.Request.Path"
+                class="btn btn-sm px-3 @(currentUser.LikedPosts.FirstOrDefault(
+                    p => p.Post.Id == post.Id) != null ? "btn-primary" : "btn-outline-primary")">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart align-middle" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                </svg>
+                <span id="likes-count">@post.Likes</span>
+            </a>
+        }
+        else
+        {
+            <a asp-action="Login" asp-controller="Account"
+               class="btn btn-sm btn-outline-primary px-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart align-middle" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                </svg>
+                <span id="likes-count">@post.Likes</span>
+            </a>
         }
 
         <div class="d-inline float-right">
@@ -55,8 +56,11 @@
             {
                 <sub class="posted-time">(edited)</sub>
             }
-            <a asp-action="Edit" asp-controller="Post" asp-route-postId="@post.Id"
-               class="btn btn-outline-secondary">Edit</a>
+            @if (currentUser != null && currentUser.Id == post.UserId)
+            {
+                <a asp-action="Edit" asp-controller="Post" asp-route-postId="@post.Id"
+                    class="btn btn-outline-secondary">Edit</a>
+            }
         </div>
     </div>
     </div>

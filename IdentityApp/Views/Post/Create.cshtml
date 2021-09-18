@@ -4,15 +4,21 @@
     ViewData["Title"] = "Creating a post";
 }
 
+@*asp-validation in label and span, asp-validation-summary don' work'*@
 <form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="Post.PostedTime" value="@DateTime.Now" />
     <input type="hidden" asp-for="Post.User.UserName" value="@Model.User.UserName" />
     <input type="hidden" asp-for="Post.User.Id" value="@Model.User.Id" />
     <input type="hidden" asp-for="Post.Id" value="@System.Guid.NewGuid().ToString()" />
 
     <div class="form-group">
-        <label for="post">Post</label><br />
-        <textarea id="post" asp-for="Post.Content" class="form-control" rows="6"></textarea>
+        <label asp-for="Post.Content" class="control-label"></label><br />
+        <textarea asp-for="Post.Content" placeholder="Your thoughts..."
+                  class="form-control" rows="6"></textarea>
+        <span asp-validation-for="Post.Content"></span>
+    </div>
+    <div class="form-group">
         <input type="file" asp-for="PostPictures" multiple />
     </div>
     <div class="form-group">

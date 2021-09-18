@@ -12,11 +12,6 @@ a {
   color: #0366d6;
 }
 
-/* try to experiment with border-raius for .btn, textarea, input */
-/*.btn {
-    border-radius: 20px;
-}*/
-
 .btn-primary {
   color: #fff;
   background-color: #1b6ec2;

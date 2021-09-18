@@ -4,10 +4,43 @@
     height: 150px;
 }
 
+.post-picture-container {
+    position: relative;
+    width: 50%;
+}
+
+.post-picture-container .visible-on-hover-delete-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 16px;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    opacity: .9;
+    visibility: hidden;
+}
+
+.post-picture-container:hover .visible-on-hover-delete-button {
+    visibility: visible;
+}
+
+#user-profile-link, #user-profile-link:visited, #user-profile-link:active {
+    font-size: 15px;
+    font-weight: bold;
+}
+
 #likes-count {
-    font-size: 17px;
+    font-size: 16px;
 }
 
 .posted-time {
     font-size: 13px;
+}
+
+svg {
+    margin-bottom: 3px;
 }
