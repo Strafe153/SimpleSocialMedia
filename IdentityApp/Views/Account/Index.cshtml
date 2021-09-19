@@ -46,8 +46,8 @@
                 @if (currentUser != null)
                 {
                     <a asp-action="Like" asp-controller="Post" asp-route-PostId="@post.Id"
-                        asp-route-UserId="@currentUser.Id" asp-route-ReturnAction="@Context.Request.Path"
-                        asp-route-LikedPostUserName="@Context.Request.Query["userName"]"
+                       asp-route-UserId="@currentUser.Id" asp-route-ReturnAction="@Context.Request.Path"
+                       asp-route-LikedPostUserName="@Context.Request.Query["userName"]"
                         class="btn btn-sm px-3 @(currentUser.LikedPosts.FirstOrDefault(
                             p => p.Post.Id == post.Id) != null ? "btn-primary" : "btn-outline-primary")">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart align-middle" viewBox="0 0 16 16">

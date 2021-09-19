@@ -4,7 +4,6 @@
     ViewData["Title"] = "Creating a post";
 }
 
-@*asp-validation in label and span, asp-validation-summary don' work'*@
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="Post.PostedTime" value="@DateTime.Now" />

@@ -27,12 +27,11 @@
 
     <div class="form-group">
         <label asp-for="ProfilePicture" class="control-label"></label><br />
-
         <img id="profile-pic" class="border border-4 border-secondary rounded"
              src="data:image/jpeg;base64,@(Convert.ToBase64String(imageData))"
              alt="profile_picture" /><br />
-
-        <input asp-for="ProfilePicture" type="file" />
+        <input id="change-profile-pic" asp-for="ProfilePicture" type="file" 
+               class="mt-2" accept="image/jpeg,image/png" onchange="loadFile(event)" />
     </div>
 
     <div class="form-group">
@@ -76,3 +75,15 @@
         </a>
     </div>
 </form>
+
+@section Scripts
+{
+    <script type="text/javascript">
+       function loadFile(event) {
+           let output = document.querySelector("#profile-pic");
+
+           output.src = URL.createObjectURL(event.target.files[0]);
+           output.onload = () => URL.revokeObjectURL(output.src);
+        };
+    </script>
+}
