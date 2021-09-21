@@ -12,10 +12,10 @@ namespace IdentityApp.ViewModels
         public bool HasPreviousPage { get { return CurrentPageNumber > 1; } }
         public bool HasNextPage { get { return CurrentPageNumber < TotalPages; } }
 
-        public PageViewModel(int currentPageNumber, int totalUsers, int pageSize)
+        public PageViewModel(int currentPageNumber, int totalItems, int pageSize)
         {
             CurrentPageNumber = currentPageNumber;
-            TotalPages = (int)(Math.Ceiling(totalUsers / (double)pageSize));
+            TotalPages = (int)(Math.Ceiling(totalItems / (double)pageSize));
         }
     }
 }

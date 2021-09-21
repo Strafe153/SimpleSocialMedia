@@ -4,7 +4,7 @@
     ViewBag.Title = "Users list";
 }
 
-<link href="~/css/admin_panel.css" rel="stylesheet" />
+<link href="~/css/pagination.css" rel="stylesheet" />
 
 <h2>Users List</h2>
 
@@ -71,7 +71,8 @@
             <td>@user.Country</td>
             <td>
                 <form asp-action="Delete" method="post" asp-route-userId="@user.Id">
-                    <a asp-action="Edit" asp-route-userId="@user.Id" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Edit" asp-route-userId="@user.Id" 
+                       class="btn btn-sm btn-primary">Edit</a>
                     <input type="submit" value="Delete" class="btn btn-sm btn-danger" />
                 </form>
             </td>
@@ -94,7 +95,8 @@
     </a>
 }
 
-<input type="submit" value="@Model.PageViewModel.CurrentPageNumber" class="btn btn-outline-dark" disabled />
+<input type="submit" value="@Model.PageViewModel.CurrentPageNumber" 
+       class="btn btn-outline-dark" disabled />
 
 @if (Model.PageViewModel.HasNextPage)
 {
