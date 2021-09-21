@@ -3,7 +3,8 @@
 @{
     ViewData["Title"] = Model.User.UserName;
 
-    User currentUser = Model.UserManager.Users.FirstOrDefault(u => u.UserName == User.Identity.Name);
+    User currentUser = Model.UserManager.Users.
+        FirstOrDefault(u => u.UserName == User.Identity.Name);
 }
 
 <link href="~/css/account_profile.css" rel="stylesheet" />

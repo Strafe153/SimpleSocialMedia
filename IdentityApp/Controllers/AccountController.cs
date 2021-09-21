@@ -185,7 +185,7 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _userManager.FindByIdAsync(model.Id);
+                /*User user = await _userManager.FindByIdAsync(model.Id);
 
                 if (user != null)
                 {
@@ -213,6 +213,7 @@ namespace IdentityApp.Controllers
 
                     if (result.Succeeded)
                     {
+                        await _userManager.UpdateAsync(user);
                         return RedirectToAction("Index", new { userName = user.UserName });
                     }
                     else
@@ -222,9 +223,9 @@ namespace IdentityApp.Controllers
                             ModelState.AddModelError("", error.Description);
                         }
                     }
-                }
+                }*/
 
-                /*User existingUser = await _userManager.FindByNameAsync(model.UserName);
+                User existingUser = await _userManager.FindByNameAsync(model.UserName);
 
                 if (existingUser == null)
                 {
@@ -244,7 +245,8 @@ namespace IdentityApp.Controllers
                         {
                             byte[] imageData = null;
 
-                            using (BinaryReader binaryReader = new BinaryReader(model.ProfilePicture.OpenReadStream()))
+                            using (BinaryReader binaryReader = new BinaryReader(
+                                model.ProfilePicture.OpenReadStream()))
                             {
                                 imageData = binaryReader.ReadBytes((int)model.ProfilePicture.Length);
                             }
@@ -256,6 +258,7 @@ namespace IdentityApp.Controllers
 
                         if (result.Succeeded)
                         {
+                            await _userManager.UpdateAsync(user);
                             return RedirectToAction("Index", new { userName = user.UserName });
                         }
                         else
@@ -270,7 +273,7 @@ namespace IdentityApp.Controllers
                 else
                 {
                     ModelState.AddModelError("", "This username is already taken");
-                }*/
+                }
             }
 
             return View(model);

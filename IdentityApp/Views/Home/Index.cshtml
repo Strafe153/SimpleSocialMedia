@@ -3,12 +3,12 @@
 @{
     ViewData["Title"] = "Home Page";
 
+    User currentUser = Model.FirstOrDefault(
+        u => u.UserName == User.Identity.Name);
     List<Post> posts = (from user in Model
                         from post in user.Posts
                         orderby post.PostedTime descending
                         select post).ToList();
-
-    User currentUser = Model.FirstOrDefault(u => u.UserName == User.Identity.Name);
 }
 
 <link href="~/css/home_page.css" rel="stylesheet" />
