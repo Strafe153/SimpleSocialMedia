@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
-using System.IO;
 
 namespace IdentityApp.Controllers
 {
@@ -17,7 +17,8 @@ namespace IdentityApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public PostController(UserManager<User> userManager, ApplicationDbContext context)
+        public PostController(UserManager<User> userManager, 
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _context = context;
@@ -28,7 +29,8 @@ namespace IdentityApp.Controllers
         {
             if (!string.IsNullOrEmpty(userId))
             {
-                User user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                User user = await _userManager.Users
+                    .FirstOrDefaultAsync(user => user.Id == userId);
 
                 if (user != null)
                 {
@@ -49,7 +51,8 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == model.Post.User.Id);
+                User user = await _userManager.Users
+                    .FirstOrDefaultAsync(user => user.Id == model.Post.User.Id);
 
                 if (model.PostPictures != null)
                 {
@@ -57,9 +60,11 @@ namespace IdentityApp.Controllers
                     {
                         byte[] pictureData = null;
 
-                        using (BinaryReader binaryReader = new BinaryReader(postPic.OpenReadStream()))
+                        using (BinaryReader binaryReader = new BinaryReader(
+                            postPic.OpenReadStream()))
                         {
-                            pictureData = binaryReader.ReadBytes((int)postPic.Length);
+                            pictureData = binaryReader.ReadBytes(
+                                (int)postPic.Length);
                         }
 
                         PostPicture postPicture = new PostPicture()
@@ -78,7 +83,8 @@ namespace IdentityApp.Controllers
                     user.Posts.Add(model.Post);
                     await _userManager.UpdateAsync(user);
 
-                    return RedirectToAction("Index", "Account", new { userName = user.UserName });
+                    return RedirectToAction("Index", "Account", 
+                        new { userName = user.UserName });
                 }
             }
 
@@ -89,7 +95,8 @@ namespace IdentityApp.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(string postId)
         {
-            Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+            Post post = await _context.Posts
+                .FirstOrDefaultAsync(post => post.Id == postId);
 
             if (post == null)
             {
@@ -116,7 +123,8 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == model.Id);
+                Post post = await _context.Posts
+                    .FirstOrDefaultAsync(post => post.Id == model.Id);
 
                 if (post != null)
                 {
@@ -128,9 +136,11 @@ namespace IdentityApp.Controllers
                         {
                             byte[] pictureData = null;
 
-                            using (BinaryReader binaryReader = new BinaryReader(postPic.OpenReadStream()))
+                            using (BinaryReader binaryReader = new BinaryReader(
+                                postPic.OpenReadStream()))
                             {
-                                pictureData = binaryReader.ReadBytes((int)postPic.Length);
+                                pictureData = binaryReader.ReadBytes(
+                                    (int)postPic.Length);
                             }
 
                             PostPicture postPicture = new PostPicture()
@@ -150,7 +160,8 @@ namespace IdentityApp.Controllers
                     _context.Update(post);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction("Index", "Account", new { userName = user.UserName });
+                    return RedirectToAction("Index", "Account", 
+                        new { userName = user.UserName });
                 }
                 else
                 {
@@ -164,16 +175,18 @@ namespace IdentityApp.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(string postId)
         {
-            Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+            Post post = await _context.Posts
+                .FirstOrDefaultAsync(post => post.Id == postId);
             User user = await _userManager.FindByIdAsync(post.UserId);
 
             if (post != null)
             {
                 _context.Posts.Remove(post);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index", "Account", new { userName = user.UserName });
+            return RedirectToAction("Index", "Account", 
+                new { userName = user.UserName });
         }
         
         public async Task<IActionResult> Like(PostLikeViewModel model)
@@ -182,12 +195,14 @@ namespace IdentityApp.Controllers
 
             if (user != null)
             {
-                Post post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == model.PostId);
+                Post post = await _context.Posts
+                    .FirstOrDefaultAsync(post => post.Id == model.PostId);
 
                 if (post != null)
                 {
-                    LikedPosts postToCheck = user.LikedPosts.FirstOrDefault(
-                        pl => pl.UserId == model.UserId && pl.PostId == model.PostId);
+                    LikedPosts postToCheck = user.LikedPosts
+                        .FirstOrDefault(post => post.UserId == model.UserId 
+                                        && post.PostId == model.PostId);
 
                     if (postToCheck != null)
                     {
@@ -212,7 +227,8 @@ namespace IdentityApp.Controllers
 
                 if (model.ReturnAction.Contains("Account"))
                 {
-                    return RedirectToAction("Index", "Account", new { userName = model.LikedPostUserName });
+                    return RedirectToAction("Index", "Account", 
+                        new { userName = model.LikedPostUserName });
                 }
 
                 return RedirectToAction("Index", "Home");

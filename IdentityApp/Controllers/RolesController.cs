@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 
@@ -15,7 +15,8 @@ namespace IdentityApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public RolesController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public RolesController(UserManager<User> userManager, 
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -37,7 +38,8 @@ namespace IdentityApp.Controllers
         {
             if (!string.IsNullOrEmpty(name))
             {
-                IdentityResult result = await _roleManager.CreateAsync(new IdentityRole(name));
+                IdentityResult result = await _roleManager
+                    .CreateAsync(new IdentityRole(name));
 
                 if (result.Succeeded)
                 {

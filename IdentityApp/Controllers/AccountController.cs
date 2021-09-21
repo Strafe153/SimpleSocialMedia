@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 
@@ -17,40 +16,40 @@ namespace IdentityApp.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly IWebHostEnvironment _appEnvironment;
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _appEnvironment;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,
-            IWebHostEnvironment appeEnvironment, ApplicationDbContext context)
+        public AccountController(UserManager<User> userManager, 
+            SignInManager<User> signInManager, ApplicationDbContext context,
+            IWebHostEnvironment appeEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _appEnvironment = appeEnvironment;
             _context = context;
+            _appEnvironment = appeEnvironment;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(string userName, int page = 1)
         {
             const int PAGE_SIZE = 5;
-            User user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+            User user = await _userManager.Users
+                .FirstOrDefaultAsync(user => user.UserName == userName);
 
             if (user != null)
             {
-                user.Posts = (from post in user.Posts
-                              orderby post.PostedTime descending
-                              select post).ToList();
-
-                IEnumerable<Post> allPosts = user.Posts;
-                int postsNumber = allPosts.Count();
-                IEnumerable<Post> currentUserPosts = allPosts.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
+                IEnumerable<Post> allPosts = user.Posts
+                    .OrderByDescending(post => post.PostedTime);
+                IEnumerable<Post> currentUserPosts = allPosts
+                    .Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
 
                 UserProfileViewModel viewModel = new UserProfileViewModel()
                 {
                     User = user,
                     UserManager = _userManager,
                     Posts = currentUserPosts,
-                    PageViewModel = new PageViewModel(page, postsNumber, PAGE_SIZE)
+                    PageViewModel = new PageViewModel(
+                        page, allPosts.Count(), PAGE_SIZE)
                 };
 
                 return View(viewModel);
@@ -68,12 +67,14 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            string defaultProfilePicPath = $"{_appEnvironment.WebRootPath}/Files/default_profile_pic.jpg";
+            string defaultProfilePicPath = $"{_appEnvironment.WebRootPath}" +
+                "/Files/default_profile_pic.jpg";
 
             if (ModelState.IsValid)
             {
-                User existingUser = await _context.Users.FirstOrDefaultAsync(
-                    u => u.UserName == model.UserName || u.Email == model.Email);
+                User existingUser = await _context.Users
+                    .FirstOrDefaultAsync(user => user.UserName == model.UserName
+                                         || user.Email == model.Email);
 
                 if (existingUser == null)
                 {
@@ -83,14 +84,17 @@ namespace IdentityApp.Controllers
                         UserName = model.UserName
                     };
 
-                    using (FileStream fileStream = new FileStream(defaultProfilePicPath,
-                        FileMode.Open, FileAccess.Read))
+                    using (FileStream fileStream = new FileStream(
+                        defaultProfilePicPath, FileMode.Open, FileAccess.Read))
                     {
-                        user.ProfilePicture = System.IO.File.ReadAllBytes(defaultProfilePicPath);
-                        fileStream.Read(user.ProfilePicture, 0, System.Convert.ToInt32(fileStream.Length));
+                        user.ProfilePicture = System.IO.File
+                            .ReadAllBytes(defaultProfilePicPath);
+                        fileStream.Read(user.ProfilePicture, 0,
+                            System.Convert.ToInt32(fileStream.Length));
                     }
 
-                    IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+                    IdentityResult result = await _userManager
+                        .CreateAsync(user, model.Password);
 
                     if (result.Succeeded)
                     {
@@ -108,7 +112,8 @@ namespace IdentityApp.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "User with such an email and/or username already exists");
+                    ModelState.AddModelError("", "User with such an email " +
+                        "and/or username already exists");
                 }
             }
 
@@ -137,7 +142,8 @@ namespace IdentityApp.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Incorrect login and/or password");
+                    ModelState.AddModelError("", "Incorrect login " +
+                        "and/or password");
                 }
             }
 
@@ -175,7 +181,8 @@ namespace IdentityApp.Controllers
             };
 
             Stream stream = new MemoryStream(user.ProfilePicture);
-            model.ProfilePicture = new FormFile(stream, 0, user.ProfilePicture.Length, "name", "filename");
+            model.ProfilePicture = new FormFile(stream, 0, 
+                user.ProfilePicture.Length, "name", "filename");
 
             return View(model);
         }
@@ -185,7 +192,7 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                /*User user = await _userManager.FindByIdAsync(model.Id);
+                User user = await _userManager.FindByIdAsync(model.Id);
 
                 if (user != null)
                 {
@@ -201,9 +208,11 @@ namespace IdentityApp.Controllers
                     {
                         byte[] imageData = null;
 
-                        using (BinaryReader binaryReader = new BinaryReader(model.ProfilePicture.OpenReadStream()))
+                        using (BinaryReader binaryReader = new BinaryReader(
+                            model.ProfilePicture.OpenReadStream()))
                         {
-                            imageData = binaryReader.ReadBytes((int)model.ProfilePicture.Length);
+                            imageData = binaryReader.ReadBytes(
+                                (int)model.ProfilePicture.Length);
                         }
 
                         user.ProfilePicture = imageData;
@@ -214,7 +223,8 @@ namespace IdentityApp.Controllers
                     if (result.Succeeded)
                     {
                         await _userManager.UpdateAsync(user);
-                        return RedirectToAction("Index", new { userName = user.UserName });
+                        return RedirectToAction("Index", 
+                            new { userName = user.UserName });
                     }
                     else
                     {
@@ -223,9 +233,9 @@ namespace IdentityApp.Controllers
                             ModelState.AddModelError("", error.Description);
                         }
                     }
-                }*/
+                }
 
-                User existingUser = await _userManager.FindByNameAsync(model.UserName);
+                /*User existingUser = await _userManager.FindByNameAsync(model.UserName);
 
                 if (existingUser == null)
                 {
@@ -273,7 +283,7 @@ namespace IdentityApp.Controllers
                 else
                 {
                     ModelState.AddModelError("", "This username is already taken");
-                }
+                }*/
             }
 
             return View(model);
