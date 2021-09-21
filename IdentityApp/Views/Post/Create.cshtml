@@ -18,7 +18,7 @@
         <span asp-validation-for="Post.Content"></span>
     </div>
     <div class="form-group">
-        <input type="file" asp-for="PostPictures" multiple />
+        <input type="file" asp-for="PostPictures" accept="image/jpeg,image/png" multiple />
     </div>
     <div class="form-group">
         <input type="submit" value="Post" class="btn btn-primary" />
