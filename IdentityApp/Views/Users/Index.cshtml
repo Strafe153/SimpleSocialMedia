@@ -11,16 +11,20 @@
 <form method="get">
     <div class="form-inline">
         <label for="name" class="control-label">Name:</label>
-        <input type="text" name="userName" value="@Model.FilterViewModel.SelectedUserName" class="form-control" />
+        <input type="text" name="userName" class="form-control"
+               value="@Model.FilterViewModel.SelectedUserName" />
 
         <label for="email" class="control-label">Email:</label>
-        <input type="text" name="email" value="@Model.FilterViewModel.SelectedEmail" class="form-control" />
+        <input type="text" name="email" class="form-control"
+               value="@Model.FilterViewModel.SelectedEmail" />
 
         <label for="year" class="control-label">Year:</label>
-        <input type="number" name="year" value="@Model.FilterViewModel.SelectedYear" class="form-control" />
+        <input type="number" name="year" class="form-control"
+               value="@Model.FilterViewModel.SelectedYear" />
 
         <label for="country" class="control-label">Country:</label>
-        <input type="text" name="country" value="@Model.FilterViewModel.SelectedCountry" class="form-control" />
+        <input type="text" name="country" class="form-control"
+               value="@Model.FilterViewModel.SelectedCountry" />
 
         <input type="submit" value="Filter" class="btn btn-outline-dark" />
     </div>
@@ -34,7 +38,9 @@
                asp-route-userName="@Model.FilterViewModel.SelectedUserName"
                asp-route-email="@Model.FilterViewModel.SelectedEmail"
                asp-route-year="@Model.FilterViewModel.SelectedYear"
-               asp-route-country="@Model.FilterViewModel.SelectedCountry">Username</a>
+               asp-route-country="@Model.FilterViewModel.SelectedCountry">
+                Username
+            </a>
         </th>
         <th>
             <a asp-action="Index"
@@ -42,7 +48,9 @@
                asp-route-userName="@Model.FilterViewModel.SelectedUserName"
                asp-route-email="@Model.FilterViewModel.SelectedEmail"
                asp-route-year="@Model.FilterViewModel.SelectedYear"
-               asp-route-country="@Model.FilterViewModel.SelectedCountry">Email</a>
+               asp-route-country="@Model.FilterViewModel.SelectedCountry">
+                Email
+            </a>
         </th>
         <th>
             <a asp-action="Index"
@@ -50,7 +58,9 @@
                asp-route-userName="@Model.FilterViewModel.SelectedUserName"
                asp-route-email="@Model.FilterViewModel.SelectedEmail"
                asp-route-year="@Model.FilterViewModel.SelectedYear"
-               asp-route-country="@Model.FilterViewModel.SelectedCountry">Year</a>
+               asp-route-country="@Model.FilterViewModel.SelectedCountry">
+                Year
+            </a>
         </th>
         <th>
             <a asp-action="Index"
@@ -58,7 +68,9 @@
                asp-route-userName="@Model.FilterViewModel.SelectedUserName"
                asp-route-email="@Model.FilterViewModel.SelectedEmail"
                asp-route-year="@Model.FilterViewModel.SelectedYear"
-               asp-route-country="@Model.FilterViewModel.SelectedCountry">Country</a>
+               asp-route-country="@Model.FilterViewModel.SelectedCountry">
+                Country
+            </a>
         </th>
     </tr>
 
@@ -70,10 +82,14 @@
             <td>@user?.Year</td>
             <td>@user.Country</td>
             <td>
-                <form asp-action="Delete" method="post" asp-route-userId="@user.Id">
+                <form asp-action="Delete" asp-route-userId="@user.Id" 
+                      method="post">
                     <a asp-action="Edit" asp-route-userId="@user.Id" 
-                       class="btn btn-sm btn-primary">Edit</a>
-                    <input type="submit" value="Delete" class="btn btn-sm btn-danger" />
+                       class="btn btn-sm btn-primary">
+                        Edit
+                    </a>
+                    <input type="submit" value="Delete" 
+                           class="btn btn-sm btn-danger" />
                 </form>
             </td>
         </tr>

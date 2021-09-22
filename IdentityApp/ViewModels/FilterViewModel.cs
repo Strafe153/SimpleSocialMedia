@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace IdentityApp.ViewModels
+﻿namespace IdentityApp.ViewModels
 {
     public class FilterViewModel
     {
@@ -12,7 +7,8 @@ namespace IdentityApp.ViewModels
         public int? SelectedYear { get; set; }
         public string SelectedCountry { get; set; }
 
-        public FilterViewModel(string name, string email, int? year, string country)
+        public FilterViewModel(string name, string email, int? year,
+            string country)
         {
             SelectedUserName = name;
             SelectedEmail = email;

@@ -11,20 +11,23 @@ namespace IdentityApp.ViewModels
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Current password")]
-        [StringLength(20, MinimumLength = 6, ErrorMessage = "The password must be between 6 and 20 symbols long")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = 
+            "The password must be between 6 and 20 symbols long")]
         public string CurrentPassword { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
-        [StringLength(20, MinimumLength = 6, ErrorMessage = "The password must be between 6 and 20 symbols long")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = 
+            "The password must be between 6 and 20 symbols long")]
         public string NewPassword { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [Compare("NewPassword", ErrorMessage = "The passwords do not match")]
-        [StringLength(20, MinimumLength = 6, ErrorMessage = "The password must be between 6 and 20 symbols long")]
         [Display(Name = "Confirm new password")]
+        [Compare("NewPassword", ErrorMessage = "The passwords do not match")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = 
+            "The password must be between 6 and 20 symbols long")]
         public string ConfirmNewPassword { get; set; }
 
         public string ReturnUrl { get; set; }

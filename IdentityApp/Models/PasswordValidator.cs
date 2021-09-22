@@ -7,7 +7,8 @@ namespace IdentityApp.Models
 {
     public class PasswordValidator : IPasswordValidator<User>
     {
-        public Task<IdentityResult> ValidateAsync(UserManager<User> manager, User user, string password)
+        public Task<IdentityResult> ValidateAsync(UserManager<User> manager,
+            User user, string password)
         {
             List<IdentityError> errors = new List<IdentityError>();
 
@@ -15,12 +16,13 @@ namespace IdentityApp.Models
             {
                 errors.Add(new IdentityError()
                 {
-                    Description = $"The year must be between 1900 and {DateTime.Now.Year}"
+                    Description = "The year must be between 1900 and " + 
+                        DateTime.Now.Year
                 });
             }
 
-            return Task.FromResult(errors.Count == 0
-                ? IdentityResult.Success : IdentityResult.Failed(errors.ToArray()));
+            return Task.FromResult(errors.Count == 0 ? IdentityResult.Success
+                : IdentityResult.Failed(errors.ToArray()));
         }
     }
 }
