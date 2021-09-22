@@ -7,9 +7,11 @@
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="Post.PostedTime" value="@DateTime.Now" />
-    <input type="hidden" asp-for="Post.User.UserName" value="@Model.User.UserName" />
+    <input type="hidden" asp-for="Post.User.UserName" 
+           value="@Model.User.UserName" />
     <input type="hidden" asp-for="Post.User.Id" value="@Model.User.Id" />
-    <input type="hidden" asp-for="Post.Id" value="@System.Guid.NewGuid().ToString()" />
+    <input type="hidden" asp-for="Post.Id" 
+           value="@System.Guid.NewGuid().ToString()" />
 
     <div class="form-group">
         <label asp-for="Post.Content" class="control-label"></label><br />
@@ -18,7 +20,8 @@
         <span asp-validation-for="Post.Content"></span>
     </div>
     <div class="form-group">
-        <input type="file" asp-for="PostPictures" accept="image/jpeg,image/png" multiple />
+        <input type="file" asp-for="PostPictures" 
+               accept="image/jpeg,image/png" multiple />
     </div>
     <div class="form-group">
         <input type="submit" value="Post" class="btn btn-primary" />

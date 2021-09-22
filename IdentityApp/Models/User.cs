@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace IdentityApp.Models
@@ -12,7 +11,13 @@ namespace IdentityApp.Models
         public string Company { get; set; }
         public string Status { get; set; }
         public byte[] ProfilePicture { get; set; }
-        public virtual List<Post> Posts { get; set; } = new List<Post>();
-        public virtual List<LikedPosts> LikedPosts { get; set; } = new List<LikedPosts>();
+        public virtual List<Post> Posts { get; set; } 
+        public virtual List<LikedPosts> LikedPosts { get; set; } 
+
+        public User()
+        {
+            Posts = new List<Post>();
+            LikedPosts = new List<LikedPosts>();
+        }
     }
 }

@@ -1,20 +1,23 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Hosting;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace IdentityApp.Models
 {
     public class RoleInitializer
     {
-        public static async Task InitializeAsync(UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManager, IWebHostEnvironment appEnvironment)
+        public static async Task InitializeAsync(UserManager<User> userManager,
+            RoleManager<IdentityRole> roleManager, 
+            IWebHostEnvironment appEnvironment)
         {
             const string ADMIN_NAME = "strafe";
             const string ADMIN_EMAIL = "strafe@gmail.com";
             const string ADMIN_PASSWORD = "qwer1234zxcv";
 
-            string defaultProfilePicPath = $"{appEnvironment.WebRootPath}/Files/default_profile_pic.jpg";
+            string defaultProfilePicPath = 
+                $"{appEnvironment.WebRootPath}/Files/default_profile_pic.jpg";
 
             if (await roleManager.FindByNameAsync("admin") == null)
             {
@@ -34,14 +37,17 @@ namespace IdentityApp.Models
                     Email = ADMIN_EMAIL
                 };
 
-                using (FileStream fileStream = new FileStream(defaultProfilePicPath,
-                    FileMode.Open, FileAccess.Read))
+                using (FileStream fileStream = new FileStream(
+                    defaultProfilePicPath, FileMode.Open, FileAccess.Read))
                 {
-                    admin.ProfilePicture = File.ReadAllBytes(defaultProfilePicPath);
-                    fileStream.Read(admin.ProfilePicture, 0, System.Convert.ToInt32(fileStream.Length));
+                    admin.ProfilePicture = 
+                        File.ReadAllBytes(defaultProfilePicPath);
+                    fileStream.Read(admin.ProfilePicture, 0, 
+                        Convert.ToInt32(fileStream.Length));
                 }
 
-                IdentityResult result = await userManager.CreateAsync(admin, ADMIN_PASSWORD);
+                IdentityResult result = await userManager
+                    .CreateAsync(admin, ADMIN_PASSWORD);
 
                 if (result.Succeeded)
                 {

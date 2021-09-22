@@ -12,11 +12,14 @@ namespace IdentityApp.ViewModels
 
         public SortViewModel(SortState sortOrder)
         {
-            NameSort = sortOrder == SortState.NameAscending ? SortState.NameDescending : SortState.NameAscending;
-            EmailSort = sortOrder == SortState.EmailAscending ? SortState.EmailDescending : SortState.EmailAscending;
-            YearSort = sortOrder == SortState.YearAscending ? SortState.YearDescending : SortState.YearAscending;
-            CountrySort = sortOrder == SortState.CountryAscending ? SortState.CountryDescending
-                : SortState.CountryAscending;
+            NameSort = sortOrder == SortState.NameAscending 
+                ? SortState.NameDescending : SortState.NameAscending;
+            EmailSort = sortOrder == SortState.EmailAscending 
+                ? SortState.EmailDescending : SortState.EmailAscending;
+            YearSort = sortOrder == SortState.YearAscending 
+                ? SortState.YearDescending : SortState.YearAscending;
+            CountrySort = sortOrder == SortState.CountryAscending 
+                ? SortState.CountryDescending : SortState.CountryAscending;
             CurrentSort = sortOrder;
         }
     }

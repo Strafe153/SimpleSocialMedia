@@ -52,11 +52,15 @@
         <input type="submit" value="Save" class="btn btn-primary" />
         
         <div class="float-right">
-            <a asp-action="ChangePassword" asp-route-userId="@Model.Id"
-               asp-route-returnUrl="@Context.Request.Path" class="btn btn-secondary">
+            <a asp-action="ChangePassword" 
+               asp-route-userId="@Model.Id"
+               asp-route-returnUrl="@Context.Request.Path" 
+               class="btn btn-secondary">
                 Change Password
             </a>
-            <a asp-action="Edit" asp-controller="Roles" asp-route-userId="@Model.Id"
+            <a asp-action="Edit" 
+               asp-controller="Roles" 
+               asp-route-userId="@Model.Id"
                class="btn btn-secondary">
                 Change Roles
             </a>

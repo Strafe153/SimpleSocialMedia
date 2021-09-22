@@ -8,7 +8,8 @@
 
     if (Model.ProfilePicture != null)
     {
-        using (BinaryReader binaryReader = new BinaryReader(Model.ProfilePicture.OpenReadStream()))
+        using (BinaryReader binaryReader = new BinaryReader(
+            Model.ProfilePicture.OpenReadStream()))
         {
             imageData = binaryReader.ReadBytes((int)Model.ProfilePicture.Length);
         }
@@ -28,8 +29,9 @@
         <img id="profile-pic" class="border border-4 border-secondary rounded"
              src="data:image/jpeg;base64,@(Convert.ToBase64String(imageData))"
              alt="profile_picture" /><br />
-        <input id="change-profile-pic" asp-for="ProfilePicture" type="file"
-               class="mt-2" accept="image/jpeg,image/png" onchange="loadFile(event)" />
+        <input asp-for="ProfilePicture" type="file" id="change-profile-pic" 
+               class="mt-2" accept="image/jpeg,image/png" 
+               onchange="loadFile(event)" />
     </div>
 
     <div class="form-group">
@@ -64,9 +66,15 @@
     </div>
 
     <div class="form-group">
-        <a asp-action="Index" asp-route-userName="@Model.UserName" class="btn btn-outline-secondary">Cancel</a>
+        <a asp-action="Index" asp-route-userName="@Model.UserName"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
         <input type="submit" value="Save" class="btn btn-primary" />
-        <a asp-action="ChangePassword" asp-controller="Users" asp-route-userId="@Model.Id"
+
+        <a asp-action="ChangePassword" 
+           asp-controller="Users" 
+           asp-route-userId="@Model.Id"
            asp-route-returnUrl="@Context.Request.Path"
            class="btn btn-secondary float-right">
             Change Password
