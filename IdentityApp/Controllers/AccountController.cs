@@ -136,14 +136,23 @@ namespace IdentityApp.Controllers
 
                 if (user != null)
                 {
-                    await _signInManager.PasswordSignInAsync(user.UserName,
-                        model.Password, model.RememberMe, false);
-                    return RedirectToAction("Index", "Home");
+                    var result = await _signInManager.PasswordSignInAsync(
+                        user.UserName, model.Password, model.RememberMe, false);
+
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.PasswordSignInAsync(user.UserName,
+                            model.Password, model.RememberMe, false);
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Incorrect password");
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Incorrect login " +
-                        "and/or password");
+                    ModelState.AddModelError("", "Incorrect email");
                 }
             }
 
@@ -159,7 +168,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string userId)
+        public async Task<IActionResult> Edit(string userId, string returnUrl)
         {
             User user = await _userManager.FindByIdAsync(userId);
 
@@ -177,7 +186,11 @@ namespace IdentityApp.Controllers
                 Status = user.Status,
                 Country = user.Country,
                 City = user.City,
-                Company = user.Company
+                Company = user.Company,
+                ReturnAction = "Index",
+                ReturnController = !string.IsNullOrEmpty(returnUrl)
+                    ? "Users" : "Account",
+                Roles = await _userManager.GetRolesAsync(user)
             };
 
             Stream stream = new MemoryStream(user.ProfilePicture);

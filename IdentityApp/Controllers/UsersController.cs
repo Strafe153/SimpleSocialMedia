@@ -103,87 +103,6 @@ namespace IdentityApp.Controllers
             };
         }
 
-        [HttpGet]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Edit(string userId)
-        {
-            User user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            EditUserViewModel model = new EditUserViewModel()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                Year = user.Year,
-                Status = user.Status,
-                Country = user.Country,
-                City = user.City,
-                Company = user.Company,
-            };
-
-            Stream stream = new MemoryStream(user.ProfilePicture);
-            model.ProfilePicture = new FormFile(
-                stream, 0, user.ProfilePicture.Length, "name", "filename");
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Edit(EditUserViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                User user = await _userManager.FindByIdAsync(model.Id);
-
-                if (user != null)
-                {
-                    user.Email = model.Email;
-                    user.UserName = model.UserName;
-                    user.Year = model.Year;
-                    user.Status = model.Status;
-                    user.Country = model.Country;
-                    user.City = model.City;
-                    user.Company = model.Company;
-
-                    if (model.ProfilePicture != null)
-                    {
-                        byte[] imageData = null;
-
-                        using (BinaryReader binaryReader = new BinaryReader(
-                            model.ProfilePicture.OpenReadStream()))
-                        {
-                            imageData = binaryReader.ReadBytes(
-                                (int)model.ProfilePicture.Length);
-                        }
-
-                        user.ProfilePicture = imageData;
-                    }
-
-                    IdentityResult result = await _userManager.UpdateAsync(user);
-
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        foreach (IdentityError error in result.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
-                    }
-                }
-            }
-
-            return View(model);
-        }
-
         [HttpPost]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(string userId)
@@ -198,7 +117,7 @@ namespace IdentityApp.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet]
+        /*[HttpGet]
         [Authorize]
         public async Task<IActionResult> ChangePassword(string userId, 
             string returnUrl)
@@ -213,6 +132,29 @@ namespace IdentityApp.Controllers
             if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
             {
                 return BadRequest();
+            }
+
+            ChangePasswordViewModel model = new ChangePasswordViewModel()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }*/
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(string userId,
+            string returnUrl)
+        {
+            User user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
             }
 
             ChangePasswordViewModel model = new ChangePasswordViewModel()

@@ -109,6 +109,7 @@ namespace IdentityApp.Controllers
                 Content = post.Content,
                 PostedTime = post.PostedTime,
                 UserId = post.UserId,
+                UserName = post.User.UserName,
                 PostPictures = (from postPic in post.PostPictures
                                 orderby postPic.UploadedTime
                                 select postPic).ToList()
