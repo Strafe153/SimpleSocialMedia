@@ -6,22 +6,24 @@
 
 <link href="~/css/pagination.css" rel="stylesheet" />
 
+<h2>Users List</h2>
+
 <form method="get">
     <div class="form-inline">
-        <label for="name" class="control-label mr-1">Name:</label>
-        <input type="text" name="userName" class="form-control mr-2"
+        <label for="name" class="control-label">Name:</label>
+        <input type="text" name="userName" class="form-control"
                value="@Model.FilterViewModel.SelectedUserName" />
 
-        <label for="email" class="control-label mr-1">Email:</label>
-        <input type="text" name="email" class="form-control mr-2"
+        <label for="email" class="control-label">Email:</label>
+        <input type="text" name="email" class="form-control"
                value="@Model.FilterViewModel.SelectedEmail" />
 
-        <label for="year" class="control-label mr-1">Year:</label>
-        <input type="number" name="year" class="form-control mr-2"
+        <label for="year" class="control-label">Year:</label>
+        <input type="number" name="year" class="form-control"
                value="@Model.FilterViewModel.SelectedYear" />
 
-        <label for="country" class="control-label mr-1">Country:</label>
-        <input type="text" name="country" class="form-control mr-2"
+        <label for="country" class="control-label">Country:</label>
+        <input type="text" name="country" class="form-control"
                value="@Model.FilterViewModel.SelectedCountry" />
 
         <input type="submit" value="Filter" class="btn btn-outline-dark" />
@@ -82,10 +84,7 @@
             <td>
                 <form asp-action="Delete" asp-route-userId="@user.Id" 
                       method="post">
-                    <a asp-action="Edit" 
-                       asp-controller="Account" 
-                       asp-route-userId="@user.Id"
-                       asp-route-returnUrl="@Context.Request.Path"
+                    <a asp-action="Edit" asp-route-userId="@user.Id" 
                        class="btn btn-sm btn-primary">
                         Edit
                     </a>

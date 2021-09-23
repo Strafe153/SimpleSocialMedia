@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Linq;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using IdentityApp.Models;
 
 namespace IdentityApp.ViewModels
 {
@@ -28,17 +25,13 @@ namespace IdentityApp.ViewModels
             "The city name must be between 1 and 20 symbols long")]
         public string City { get; set; }
 
-        [StringLength(40, MinimumLength = 1, ErrorMessage = 
-            "The company name must be between 1 and 40 symbols long")]
+        [StringLength(20, MinimumLength = 1, ErrorMessage = 
+            "The company name must be between 1 and 20 symbols long")]
         public string Company { get; set; }
 
         public string Status { get; set; }
 
         [Display(Name = "Profile Picture")]
         public IFormFile ProfilePicture { get; set; }
-
-        public IList<string> Roles { get; set; }
-        public string ReturnAction { get; set; }
-        public string ReturnController { get; set; }
     }
 }

@@ -4,8 +4,6 @@
     ViewData["Title"] = "Creating a post";
 }
 
-<link href="~/css/account_profile.css" rel="stylesheet" />
-
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="Post.PostedTime" value="@DateTime.Now" />
@@ -21,33 +19,11 @@
                   class="form-control" rows="6"></textarea>
         <span asp-validation-for="Post.Content"></span>
     </div>
-    <div class="form-group custom-file w-50 mb-3">
-        <label class="custom-file-label" for="custom-file">
-            Choose pictures
-        </label>
-        <input type="file" asp-for="PostPictures" class="custom-file-input"
-               id="custom-file" accept="image/jpeg,image/png" multiple />
+    <div class="form-group">
+        <input type="file" asp-for="PostPictures" 
+               accept="image/jpeg,image/png" multiple />
     </div>
     <div class="form-group">
-        <a asp-action="Index"
-           asp-controller="Account"
-           asp-route-userName="@Model.User.UserName"
-           class="btn btn-outline-secondary">
-            Cancel
-        </a>
         <input type="submit" value="Post" class="btn btn-primary" />
     </div>
 </form>
-
-@section Scripts
-{
-    <script type="text/javascript">
-        // work in progress
-        $(".custom-file-input").on("change", function() {
-            let fileName = $(this).split("\\").pop();
-            let numFiles = $("input:file", this)[0].files.length;
-            $(this).siblings(".custom-file-label")
-                .addClass("selected").html(fileName);
-        });
-    </script>
-}

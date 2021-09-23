@@ -21,21 +21,23 @@ namespace IdentityApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IUserValidator<User>, CustomUserValidator>();
+            services.AddTransient<IPasswordValidator<User>, PasswordValidator>();
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(Configuration
                     .GetConnectionString("DefaultConnection")));
             services.AddIdentity<User, IdentityRole>(options =>
             {
-                options.Password.RequireDigit = false;
+                options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 6;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
                 options.User.RequireUniqueEmail = true;
                 options.User.AllowedUserNameCharacters = "1234567890" +
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                     @"-_.?=+`~!#$;()[]{}*&^:%,\/<>@ ";
             }).AddEntityFrameworkStores<ApplicationDbContext>();
+   
             services.AddControllersWithViews();
         }
 
