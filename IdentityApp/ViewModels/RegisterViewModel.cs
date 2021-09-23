@@ -11,7 +11,7 @@ namespace IdentityApp.ViewModels
         [Required]
         [Display(Name = "Username")]
         [StringLength(20, MinimumLength = 1, ErrorMessage = 
-            "The username must be between 6 and 20 symbols long")]
+            "The username must be between 1 and 20 symbols long")]
         public string UserName { get; set; }
 
         [Required]
