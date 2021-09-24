@@ -71,7 +71,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string userId)
+        public async Task<IActionResult> Edit(string userId, string returnUrl)
         {
             User user = await _userManager.FindByIdAsync(userId);
 
@@ -82,7 +82,8 @@ namespace IdentityApp.Controllers
                     UserId = user.Id,
                     UserName = user.UserName,
                     UserRoles = await _userManager.GetRolesAsync(user),
-                    AllRoles = _roleManager.Roles.ToList()
+                    AllRoles = _roleManager.Roles.ToList(),
+                    ReturnUrl = returnUrl
                 };
 
                 return View(model);
@@ -92,7 +93,8 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(string userId, List<string> roles)
+        public async Task<IActionResult> Edit(string userId, 
+            List<string> roles, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -107,7 +109,11 @@ namespace IdentityApp.Controllers
                     await _userManager.AddToRolesAsync(user, addedRoles);
                     await _userManager.RemoveFromRolesAsync(user, removedRoles);
 
-                    return RedirectToAction("Index", "Users");
+                    if (!string.IsNullOrEmpty(returnUrl) 
+                        && Url.IsLocalUrl(returnUrl))
+                    {
+                        return LocalRedirect(returnUrl);
+                    }
                 }
             }
 

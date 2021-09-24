@@ -187,9 +187,7 @@ namespace IdentityApp.Controllers
                 Country = user.Country,
                 City = user.City,
                 Company = user.Company,
-                ReturnAction = "Index",
-                ReturnController = !string.IsNullOrEmpty(returnUrl)
-                    ? "Users" : "Account",
+                CalledFromAction = returnUrl[0..],
                 Roles = await _userManager.GetRolesAsync(user)
             };
 
@@ -236,8 +234,16 @@ namespace IdentityApp.Controllers
                     if (result.Succeeded)
                     {
                         await _userManager.UpdateAsync(user);
-                        return RedirectToAction("Index", 
-                            new { userName = user.UserName });
+
+                        if (model.CalledFromAction.Contains("Account"))
+                        {
+                            return RedirectToAction("Index",
+                                new { userName = user.UserName });
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Users");
+                        }
                     }
                     else
                     {

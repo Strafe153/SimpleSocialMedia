@@ -38,7 +38,7 @@ namespace IdentityApp.ViewModels
         public IFormFile ProfilePicture { get; set; }
 
         public IList<string> Roles { get; set; }
-        public string ReturnAction { get; set; }
-        public string ReturnController { get; set; }
+
+        public string CalledFromAction { get; set; }
     }
 }

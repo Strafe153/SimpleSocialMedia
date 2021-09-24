@@ -1,6 +1,6 @@
 ﻿namespace IdentityApp.Models
 {
-    public class LikedPosts
+    public class LikedPost
     {
         public string UserId { get; set; }
         public virtual User User { get; set; }

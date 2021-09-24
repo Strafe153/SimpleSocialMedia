@@ -21,7 +21,7 @@ namespace IdentityApp.Models
 
         // [MaxLength(5)]
         public virtual List<PostPicture> PostPictures { get; set; } 
-        public virtual List<LikedPosts> LikedPosts { get; set; } 
+        public virtual List<LikedPost> LikedPosts { get; set; } 
 
         public string UserId { get; set; }
         public virtual User User { get; set; }
@@ -29,7 +29,7 @@ namespace IdentityApp.Models
         public Post()
         {
             PostPictures = new List<PostPicture>();
-            LikedPosts = new List<LikedPosts>();
+            LikedPosts = new List<LikedPost>();
         }
     }
 }

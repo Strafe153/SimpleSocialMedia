@@ -117,37 +117,9 @@ namespace IdentityApp.Controllers
             return RedirectToAction("Index");
         }
 
-        /*[HttpGet]
-        [Authorize]
-        public async Task<IActionResult> ChangePassword(string userId, 
-            string returnUrl)
-        {
-            User user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
-            {
-                return BadRequest();
-            }
-
-            ChangePasswordViewModel model = new ChangePasswordViewModel()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                ReturnUrl = returnUrl
-            };
-
-            return View(model);
-        }*/
-
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ChangePassword(string userId,
+        public async Task<IActionResult> ChangePassword(string userId, 
             string returnUrl)
         {
             User user = await _userManager.FindByIdAsync(userId);

@@ -201,7 +201,7 @@ namespace IdentityApp.Controllers
 
                 if (post != null)
                 {
-                    LikedPosts postToCheck = user.LikedPosts
+                    LikedPost postToCheck = user.LikedPosts
                         .FirstOrDefault(post => post.UserId == model.UserId 
                                         && post.PostId == model.PostId);
 
@@ -213,7 +213,7 @@ namespace IdentityApp.Controllers
                     else
                     {
                         user.LikedPosts.Add(
-                            new LikedPosts()
+                            new LikedPost()
                             {
                                 UserId = user.Id,
                                 User = user,

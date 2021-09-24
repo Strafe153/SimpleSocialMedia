@@ -32,6 +32,7 @@
     <a asp-action="Edit" 
        asp-controller="Account" 
        asp-route-userId="@Model.User.Id"
+       asp-route-returnUrl="@Context.Request.Path"
        class="btn btn-primary float-right">
         Edit Profile
     </a>

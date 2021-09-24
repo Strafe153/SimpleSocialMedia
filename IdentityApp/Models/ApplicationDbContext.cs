@@ -34,22 +34,28 @@ namespace IdentityApp.Models
                 .WithOne(pp => pp.Post)
                 .IsRequired();
 
+            modelBuilder.Entity<Post>()
+                .HasMany(post => post.LikedPosts)
+                .WithOne(likedPost => likedPost.Post)
+                .HasForeignKey(likedPost => likedPost.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<PostPicture>()
                 .HasOne(pp => pp.Post)
                 .WithMany(p => p.PostPictures)
                 .HasForeignKey(pp => pp.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<LikedPosts>()
+            modelBuilder.Entity<LikedPost>()
                 .HasKey(pl => new { pl.UserId, pl.PostId });
 
-            modelBuilder.Entity<LikedPosts>()
+            modelBuilder.Entity<LikedPost>()
                 .HasOne(pl => pl.User)
                 .WithMany(u => u.LikedPosts)
                 .HasForeignKey(pl => pl.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<LikedPosts>()
+            modelBuilder.Entity<LikedPost>()
                 .HasOne(pl => pl.Post)
                 .WithMany(p => p.LikedPosts)
                 .HasForeignKey(pl => pl.PostId)
