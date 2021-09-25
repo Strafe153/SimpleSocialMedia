@@ -2,7 +2,7 @@
 @model IdentityApp.ViewModels.EditUserViewModel
 
 @{
-    ViewBag.Title = "Editing a user";
+    ViewBag.Title = $"Editing {Model.UserName}";
 
     byte[] imageData = null;
 
@@ -23,7 +23,10 @@
 
     <input type="hidden" asp-for="Id" value="@Model.Id" />
     <input type="hidden" asp-for="Email" value="@Model.Email" />
-    <input type="hidden" asp-for="ProfilePicture" value="@Model.ProfilePicture" />
+    <input type="hidden" asp-for="ProfilePicture" 
+           value="@Model.ProfilePicture" />
+    <input type="hidden" asp-for="CalledFromAction" 
+           value="@Model.CalledFromAction" />
 
     <div class="form-group">
         <label asp-for="ProfilePicture" class="control-label"></label><br />
@@ -95,6 +98,7 @@
                class="btn btn-secondary">
                 Change Password
             </a>
+
             @if (Model.Roles.Contains("admin"))
             {
                 <a asp-action="Edit"

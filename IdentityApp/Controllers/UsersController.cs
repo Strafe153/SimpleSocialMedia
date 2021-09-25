@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityApp.Models;
@@ -21,31 +19,33 @@ namespace IdentityApp.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Index(string userName, string email,
-            int? year, string country, int page = 1, 
-            SortState sortOrder = SortState.NameAscending)
+        public async Task<IActionResult> Index(AdminPanelViewModel model)
         {
             const int PAGE_SIZE = 5;
             int usersNumber;
 
             IQueryable<User> users = _userManager.Users;
-            FilterUsers(ref users, userName, email, year, country);
-            users = ChooseSort(sortOrder, users);
+            FilterUsers(ref users, model.UserName, model.Email,
+                model.Year, model.Country);
+            users = ChooseSort(model.SortOrder, users);
 
             usersNumber = await users.CountAsync();
             var currentPageUsers = await users
-                .Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToListAsync();
+                .Skip((model.Page - 1) * PAGE_SIZE)
+                .Take(PAGE_SIZE)
+                .ToListAsync();
 
-            FilterSortPageViewModel model = new FilterSortPageViewModel()
+            var filterSortPageViewModel = new FilterSortPageViewModel()
             {
                 Users = currentPageUsers,
                 FilterViewModel = new FilterViewModel(
-                    userName, email, year, country),
-                SortViewModel = new SortViewModel(sortOrder),
-                PageViewModel = new PageViewModel(page, usersNumber, PAGE_SIZE)
+                    model.UserName, model.Email, model.Year, model.Country),
+                SortViewModel = new SortViewModel(model.SortOrder),
+                PageViewModel = new PageViewModel(
+                    model.Page, usersNumber, PAGE_SIZE)
             };
 
-            return View(model);
+            return View(filterSortPageViewModel);
         }
 
         private void FilterUsers(ref IQueryable<User> users, string userName, 
