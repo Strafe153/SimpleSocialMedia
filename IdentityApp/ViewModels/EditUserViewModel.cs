@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using IdentityApp.Models;
 
 namespace IdentityApp.ViewModels
 {
@@ -37,7 +39,7 @@ namespace IdentityApp.ViewModels
         [Display(Name = "Profile Picture")]
         public IFormFile ProfilePicture { get; set; }
 
-        public IList<string> Roles { get; set; }
+        public IList<string> AuthenticatedUserRoles { get; set; }
         public string CalledFromAction { get; set; }
     }
 }

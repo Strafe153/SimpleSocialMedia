@@ -72,9 +72,9 @@ namespace IdentityApp.Controllers
 
             if (ModelState.IsValid)
             {
-                User existingUser = await _context.Users
-                    .FirstOrDefaultAsync(user => user.UserName == model.UserName
-                                         || user.Email == model.Email);
+                User existingUser = await _context.Users.FirstOrDefaultAsync(
+                    user => user.UserName == model.UserName 
+                    || user.Email == model.Email);
 
                 if (existingUser == null)
                 {
@@ -171,6 +171,8 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(string userId, string returnUrl)
         {
             User user = await _userManager.FindByIdAsync(userId);
+            User authenticatedUser = await _userManager
+                .FindByNameAsync(User.Identity.Name);
 
             if (user == null)
             {
@@ -188,7 +190,9 @@ namespace IdentityApp.Controllers
                 City = user.City,
                 Company = user.Company,
                 CalledFromAction = returnUrl[0..],
-                Roles = await _userManager.GetRolesAsync(user)
+                AuthenticatedUserRoles = authenticatedUser != null 
+                    ? await _userManager.GetRolesAsync(authenticatedUser)
+                    : new List<string> { "user" }
             };
 
             Stream stream = new MemoryStream(user.ProfilePicture);

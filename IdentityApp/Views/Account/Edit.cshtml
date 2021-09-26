@@ -11,7 +11,8 @@
         using (BinaryReader binaryReader = new BinaryReader(
             Model.ProfilePicture.OpenReadStream()))
         {
-            imageData = binaryReader.ReadBytes((int)Model.ProfilePicture.Length);
+            imageData = binaryReader.ReadBytes(
+                (int)Model.ProfilePicture.Length);
         }
     }
 }
@@ -99,7 +100,7 @@
                 Change Password
             </a>
 
-            @if (Model.Roles.Contains("admin"))
+            @if (Model.AuthenticatedUserRoles.Contains("admin"))
             {
                 <a asp-action="Edit"
                    asp-controller="Roles"
