@@ -63,6 +63,7 @@
                        asp-controller="Post"
                        asp-route-PostId="@post.Id"
                        asp-route-UserId="@currentUser.Id"
+                       asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                        asp-route-ReturnAction="@Context.Request.Path"
                        asp-route-LikedPostUserName=
                             "@Context.Request.Query["userName"]"

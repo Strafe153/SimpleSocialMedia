@@ -203,7 +203,7 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _userManager.FindByIdAsync(model.Id);
+                /*User user = await _userManager.FindByIdAsync(model.Id);
 
                 if (user != null)
                 {
@@ -233,7 +233,58 @@ namespace IdentityApp.Controllers
 
                     if (result.Succeeded)
                     {
-                        await _userManager.UpdateAsync(user);
+                        if (model.CalledFromAction.Contains("Account"))
+                        {
+                            return RedirectToAction("Index",
+                                new { userName = user.UserName });
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Users");
+                        }
+                    }
+                    else
+                    {
+                        foreach (IdentityError error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                    }
+                }*/
+
+                User user = await _userManager.FindByIdAsync(model.Id);
+                string userName = user.UserName;
+
+                if (user != null)
+                {
+                    user.Email = model.Email;
+                    user.UserName = model.UserName;
+                    user.Year = model.Year;
+                    user.Status = model.Status;
+                    user.Country = model.Country;
+                    user.City = model.City;
+                    user.Company = model.Company;
+
+                    if (model.ProfilePicture != null)
+                    {
+                        byte[] imageData = null;
+
+                        using (BinaryReader binaryReader = new BinaryReader(
+                            model.ProfilePicture.OpenReadStream()))
+                        {
+                            imageData = binaryReader.ReadBytes(
+                                (int)model.ProfilePicture.Length);
+                        }
+
+                        user.ProfilePicture = imageData;
+                    }
+
+                    IdentityResult result = await _userManager.UpdateAsync(user);
+
+                    if (result.Succeeded)
+                    {
+                        // Test it. dunno if it gonna work
+                        // HttpContext.User.Identity.Name.Replace(userName, user.UserName);
 
                         if (model.CalledFromAction.Contains("Account"))
                         {
@@ -253,56 +304,6 @@ namespace IdentityApp.Controllers
                         }
                     }
                 }
-
-                /*User existingUser = await _userManager.FindByNameAsync(model.UserName);
-
-                if (existingUser == null)
-                {
-                    User user = await _userManager.FindByIdAsync(model.Id);
-
-                    if (user != null)
-                    {
-                        user.Email = model.Email;
-                        user.UserName = model.UserName;
-                        user.Year = model.Year;
-                        user.Status = model.Status;
-                        user.Country = model.Country;
-                        user.City = model.City;
-                        user.Company = model.Company;
-
-                        if (model.ProfilePicture != null)
-                        {
-                            byte[] imageData = null;
-
-                            using (BinaryReader binaryReader = new BinaryReader(
-                                model.ProfilePicture.OpenReadStream()))
-                            {
-                                imageData = binaryReader.ReadBytes((int)model.ProfilePicture.Length);
-                            }
-
-                            user.ProfilePicture = imageData;
-                        }
-
-                        IdentityResult result = await _userManager.UpdateAsync(user);
-
-                        if (result.Succeeded)
-                        {
-                            await _userManager.UpdateAsync(user);
-                            return RedirectToAction("Index", new { userName = user.UserName });
-                        }
-                        else
-                        {
-                            foreach (IdentityError error in result.Errors)
-                            {
-                                ModelState.AddModelError("", error.Description);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "This username is already taken");
-                }*/
             }
 
             return View(model);
