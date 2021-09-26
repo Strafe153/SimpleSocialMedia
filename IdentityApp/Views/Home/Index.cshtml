@@ -35,6 +35,7 @@
                    asp-controller="Post"
                    asp-route-PostId="@post.Id"
                    asp-route-UserId="@currentUser.Id"
+                   asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                    asp-route-ReturnAction="@Context.Request.Path"
                    class="btn btn-sm px-3 @(currentUser.LikedPosts
                         .FirstOrDefault(p => p.Post.Id == post.Id) != null 

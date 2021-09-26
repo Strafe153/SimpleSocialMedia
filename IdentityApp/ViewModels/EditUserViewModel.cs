@@ -14,31 +14,32 @@ namespace IdentityApp.ViewModels
         [Required]
         [Display(Name = "Username")]
         [StringLength(20, MinimumLength = 1, ErrorMessage = 
-            "The username must be between 6 and 20 symbols long")]
+            "The username must be between 1 and 20 symbols long")]
         public string UserName { get; set; }
 
         [Display(Name = "Year of birth")]
         public int? Year { get; set; }
 
-        [StringLength(20, MinimumLength = 1, ErrorMessage = 
-            "The country name must be between 1 and 20 symbols long")]
+        [MaxLength(30, ErrorMessage = 
+            "The country name must up to 30 symbols long")]
         public string Country { get; set; }
 
-        [StringLength(20, MinimumLength = 1, ErrorMessage = 
-            "The city name must be between 1 and 20 symbols long")]
+        [MaxLength(30, ErrorMessage = 
+            "The city name must be up to 20 symbols long")]
         public string City { get; set; }
 
-        [StringLength(40, MinimumLength = 1, ErrorMessage = 
-            "The company name must be between 1 and 40 symbols long")]
+        [MaxLength(40, ErrorMessage = 
+            "The company name must be up to 40 symbols long")]
         public string Company { get; set; }
 
+        [MaxLength(100, ErrorMessage =
+            "The status length must be up to 100 symbols long")]
         public string Status { get; set; }
 
         [Display(Name = "Profile Picture")]
         public IFormFile ProfilePicture { get; set; }
 
-        public IList<string> Roles { get; set; }
-
+        public IList<string> AuthenticatedUserRoles { get; set; }
         public string CalledFromAction { get; set; }
     }
 }

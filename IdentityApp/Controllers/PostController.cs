@@ -229,10 +229,12 @@ namespace IdentityApp.Controllers
                 if (model.ReturnAction.Contains("Account"))
                 {
                     return RedirectToAction("Index", "Account", 
-                        new { userName = model.LikedPostUserName });
+                        new { userName = model.LikedPostUserName,
+                              page = model.Page });
                 }
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home", 
+                    new { page = model.Page });
             }
             else
             {
