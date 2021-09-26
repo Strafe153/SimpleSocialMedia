@@ -33,8 +33,9 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Index(string userName, int page = 1)
         {
             const int PAGE_SIZE = 5;
-            User user = await _userManager.Users
-                .FirstOrDefaultAsync(user => user.UserName == userName);
+            User user = await _userManager.FindByNameAsync(userName);
+            User authenticatedUser = await _userManager
+                .FindByNameAsync(User.Identity.Name);
 
             if (user != null)
             {
@@ -49,7 +50,11 @@ namespace IdentityApp.Controllers
                     UserManager = _userManager,
                     Posts = currentUserPosts,
                     PageViewModel = new PageViewModel(
-                        page, allPosts.Count(), PAGE_SIZE)
+                        page, allPosts.Count(), PAGE_SIZE),
+                    AuthenticatedUser = authenticatedUser,
+                    AuthenticatedUserRoles = authenticatedUser != null
+                        ? await _userManager.GetRolesAsync(authenticatedUser)
+                        : new List<string> { "user" }
                 };
 
                 return View(viewModel);
@@ -287,9 +292,6 @@ namespace IdentityApp.Controllers
 
                     if (result.Succeeded)
                     {
-                        // Test it. dunno if it gonna work
-                        // HttpContext.User.Identity.Name.Replace(userName, user.UserName);
-
                         if (model.CalledFromAction.Contains("Account"))
                         {
                             return RedirectToAction("Index",
