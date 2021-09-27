@@ -38,3 +38,13 @@
         <input type="submit" value="Post" class="btn btn-primary" />
     </div>
 </form>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(".custom-file-input").on("change", function () {
+            $(".custom-file-label").text(
+                `Pictures chosen: ${$(this)[0].files.length}`);
+        });
+    </script>
+}

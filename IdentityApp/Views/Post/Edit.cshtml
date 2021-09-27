@@ -32,12 +32,12 @@
             }
         </div>
 
-        <div class="form-group custom-file mb-3">
+        <div class="form-group custom-file mt-1">
             <label class="custom-file-label" for="custom-file">
                 Choose pictures
             </label>
             <input type="file" asp-for="AppendedPostPictures" id="custom-file"
-                   class="custom-file-input mt-1" accept="image/jpeg,image/png" 
+                   class="custom-file-input" accept="image/jpeg,image/png" 
                    multiple />
         </div>
     </div>
@@ -71,6 +71,11 @@
                 data: {postPictureId: postPictureId, postId: postId},
                 dataType: "text"
             });
+        });
+
+        $(".custom-file-input").on("change", function () {
+            $(".custom-file-label").text(
+                `Pictures chosen: ${$(this)[0].files.length}`);
         });
     </script>
 }

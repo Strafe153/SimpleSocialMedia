@@ -5,11 +5,10 @@
 }
 
 <link href="~/css/account_profile.css" rel="stylesheet" />
-<link href="~/css/pagination.css" rel="stylesheet" />
 
-<img id="profile-pic" class="border border-4 border-secondary rounded mb-2"
-     src="data:image/jpeg;base64,@(Convert.ToBase64String(
-                                    Model.User.ProfilePicture))"
+<img class="border border-4 border-secondary rounded-circle mb-2"
+     id="profile-pic" src="data:image/jpeg;base64,@(Convert.ToBase64String(
+                                                  Model.User.ProfilePicture))"
      alt="profile_picture" />
 
 <div class="d-inline">
