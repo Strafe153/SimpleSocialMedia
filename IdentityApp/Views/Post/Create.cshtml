@@ -21,7 +21,7 @@
                   class="form-control" rows="6"></textarea>
         <span asp-validation-for="Post.Content"></span>
     </div>
-    <div class="form-group custom-file w-50 mb-3">
+    <div class="form-group custom-file mb-3">
         <label class="custom-file-label" for="custom-file">
             Choose pictures
         </label>
@@ -38,16 +38,3 @@
         <input type="submit" value="Post" class="btn btn-primary" />
     </div>
 </form>
-
-@section Scripts
-{
-    <script type="text/javascript">
-        // work in progress
-        $(".custom-file-input").on("change", function() {
-            let fileName = $(this).split("\\").pop();
-            let numFiles = $("input:file", this)[0].files.length;
-            $(this).siblings(".custom-file-label")
-                .addClass("selected").html(fileName);
-        });
-    </script>
-}
