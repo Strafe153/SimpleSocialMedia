@@ -6,15 +6,28 @@
 
 <link href="~/css/account_profile.css" rel="stylesheet" />
 
-<img class="border border-4 border-secondary rounded-circle mb-2"
-     id="profile-pic" src="data:image/jpeg;base64,@(Convert.ToBase64String(
-                                                  Model.User.ProfilePicture))"
-     alt="profile_picture" />
-
-<div class="d-inline">
-    <span class="align-top ">@Model.User.UserName</span><br />
-    <span class="align-top">@Model.User.Email</span>
-    <span>@Model.User.Status</span>
+<div class="container">
+    <div class="row">
+        <div class="mb-2 mr-3">
+            <img class="border border-3 border-secondary rounded-circle"
+                 id="profile-pic" src="data:image/jpeg;base64,
+                        @(Convert.ToBase64String(Model.User.ProfilePicture))"
+                 alt="profile_picture" />
+        </div>
+        <div class="col mt-2">
+            <h3>@Model.User.UserName</h3>
+            <p class="text-break">@Model.User.Email</p>
+        </div>
+        <div class="col mt-2">
+            <p>Year: @Model.User.Year</p>
+            <p>Country: @Model.User.Country</p>
+        </div>
+        <div class="col mt-2">
+            <p>City: @Model.User.City</p>
+            <p>Company: @Model.User.Company</p>
+        </div>
+        <p class="mt-1 text-break">@Model.User.Status</p>
+    </div>
 </div>
 
 @if (Model.AuthenticatedUserRoles.Contains("admin")
