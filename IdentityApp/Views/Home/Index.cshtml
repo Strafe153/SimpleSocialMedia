@@ -7,6 +7,8 @@
         user => user.UserName == User.Identity.Name);
 }
 
+<link href="~/css/account_profile.css" rel="stylesheet" />
+
 @foreach (Post post in Model.Posts)
 {
     <div class="border border-secondary rounded p-2 my-2">
@@ -70,7 +72,7 @@
                 </a>
             }
 
-            <div class="d-inline float-right">
+            <div class="d-inline float-right mb-1">
                 <sub class="posted-time">
                     @post.PostedTime.ToString("HH:mm:ss dd.MM.yyyy")
                 </sub>
