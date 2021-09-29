@@ -8,7 +8,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="mb-2 mr-3">
+        <div class="mb-2 mr-1">
             <img class="border border-3 border-secondary rounded-circle"
                  id="profile-pic" src="data:image/jpeg;base64,
                         @(Convert.ToBase64String(Model.User.ProfilePicture))"
@@ -26,6 +26,8 @@
             <p>City: @Model.User.City</p>
             <p>Company: @Model.User.Company</p>
         </div>
+    </div>
+    <div class="row">
         <p class="mt-1 text-break">@Model.User.Status</p>
     </div>
 </div>

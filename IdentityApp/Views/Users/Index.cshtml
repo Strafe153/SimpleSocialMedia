@@ -1,30 +1,30 @@
 ﻿@model IdentityApp.ViewModels.FilterSortPageViewModel
 
 @{
-    ViewBag.Title = "Users list";
+    ViewBag.Title = "All users";
 }
 
 <link href="~/css/pagination.css" rel="stylesheet" />
 
 <form method="get">
-    <div class="form-inline">
-        <label for="name" class="control-label mr-1">Name:</label>
+    <div class="form-inline mb-2">
+        <label for="name" class="control-label">Name:</label>
         <input type="text" name="UserName" class="form-control mr-2"
                value="@Model.FilterViewModel.SelectedUserName" />
 
-        <label for="email" class="control-label mr-1">Email:</label>
+        <label for="email" class="control-label">Email:</label>
         <input type="text" name="Email" class="form-control mr-2"
                value="@Model.FilterViewModel.SelectedEmail" />
 
-        <label for="year" class="control-label mr-1">Year:</label>
+        <label for="year" class="control-label">Year:</label>
         <input type="number" name="Year" class="form-control mr-2"
                value="@Model.FilterViewModel.SelectedYear" />
 
-        <label for="country" class="control-label mr-1">Country:</label>
+        <label for="country" class="control-label">Country:</label>
         <input type="text" name="Country" class="form-control mr-2"
                value="@Model.FilterViewModel.SelectedCountry" />
 
-        <input type="submit" value="Filter" class="btn btn-outline-dark" />
+        <input type="submit" value="Filter" class="btn btn btn-outline-dark" />
     </div>
 </form>
 

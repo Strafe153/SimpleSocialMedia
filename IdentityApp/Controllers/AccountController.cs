@@ -157,7 +157,8 @@ namespace IdentityApp.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Incorrect email");
+                    ModelState.AddModelError("", 
+                        "User with such an email doesn't exist");
                 }
             }
 
@@ -292,6 +293,8 @@ namespace IdentityApp.Controllers
 
                     if (result.Succeeded)
                     {
+                        await _context.SaveChangesAsync();
+
                         if (model.CalledFromAction.Contains("Account"))
                         {
                             return RedirectToAction("Index",
