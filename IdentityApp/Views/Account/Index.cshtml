@@ -1,7 +1,7 @@
 ﻿@model IdentityApp.ViewModels.UserProfileViewModel
 
 @{
-    ViewData["Title"] = Model.User.UserName;
+    ViewData["Title"] = $"Profile: {Model.User.UserName}";
 }
 
 <link href="~/css/account_profile.css" rel="stylesheet" />
@@ -57,14 +57,11 @@
 {
     @foreach (Post post in Model.Posts)
     {
-        post.PostPictures = (from postPic in post.PostPictures
-                             orderby postPic.UploadedTime
-                             select postPic).ToList();
-
         <div class="border border-secondary rounded p-2 my-2">
             <p class="text-break">@post.Content</p>
 
-            @foreach (PostPicture postPicture in post.PostPictures)
+            @foreach (PostPicture postPicture in post.PostPictures
+                .OrderByDescending(postPic => postPic.UploadedTime))
             {
                 <img height="150" alt="post_picture" class="mb-1"
                      src="data:image/jpeg;base64,

@@ -47,7 +47,6 @@ namespace IdentityApp.Controllers
                 UserProfileViewModel viewModel = new UserProfileViewModel()
                 {
                     User = user,
-                    UserManager = _userManager,
                     Posts = currentUserPosts,
                     PageViewModel = new PageViewModel(
                         page, allPosts.Count(), PAGE_SIZE),
@@ -132,7 +131,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -166,7 +165,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
