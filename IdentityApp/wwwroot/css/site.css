@@ -83,3 +83,8 @@ body {
     list-style-type: none;
     padding-left: 0;
 }
+
+div ul li form .btn,
+div ul li form .btn:active:focus {
+    box-shadow: none !important;
+}
