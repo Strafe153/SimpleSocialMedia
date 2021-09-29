@@ -74,3 +74,17 @@ body {
 .border-3 {
     border-width: 3px !important;
 }
+
+.validation {
+    padding-bottom: 0;
+}
+
+.validation ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+div ul li form .btn,
+div ul li form .btn:active:focus {
+    box-shadow: none !important;
+}

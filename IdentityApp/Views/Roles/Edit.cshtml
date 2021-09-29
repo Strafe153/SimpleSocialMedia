@@ -11,7 +11,7 @@
 <h2>Changing roles for @Model.UserName</h2>
 
 <form asp-action="Edit" method="post">
-    <input type="hidden" name="userId" value="@Model.UserId" />
+    <input type="hidden" asp-for="UserId" value="@Model.UserId" />
     <input type="hidden" asp-for="ReturnUrl" value="@returnUrl" />
 
     <div class="form-group">

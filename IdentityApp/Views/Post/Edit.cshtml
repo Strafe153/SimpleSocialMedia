@@ -7,6 +7,9 @@
 <link href="~/css/account_profile.css" rel="stylesheet" />
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly"
+         class="validation alert alert-danger" role="alert"></div>
+
     <input type="hidden" asp-for="Id" value="@Model.Id" />
     <input type="hidden" asp-for="UserId" value="@Model.UserId" />
     <input type="hidden" asp-for="PostedTime" value="@Model.PostedTime" />
@@ -37,7 +40,7 @@
                 Choose pictures
             </label>
             <input type="file" asp-for="AppendedPostPictures" id="custom-file"
-                   class="custom-file-input" accept="image/jpeg,image/png" 
+                   class="custom-file-input" accept="image/jpeg,image/png"
                    multiple />
         </div>
     </div>

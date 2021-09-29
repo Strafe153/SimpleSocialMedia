@@ -7,11 +7,13 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 
 namespace IdentityApp.Controllers
 {
+    [Authorize]
     public class PostController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -92,7 +94,6 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> Edit(string postId)
         {
             Post post = await _context.Posts
@@ -110,16 +111,15 @@ namespace IdentityApp.Controllers
                 PostedTime = post.PostedTime,
                 UserId = post.UserId,
                 UserName = post.User.UserName,
-                PostPictures = (from postPic in post.PostPictures
-                                orderby postPic.UploadedTime
-                                select postPic).ToList()
+                PostPictures = post.PostPictures
+                    .OrderByDescending(postPic => postPic.UploadedTime)
+                    .ToList()
             };
 
             return View(model);
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
             if (ModelState.IsValid)
@@ -173,7 +173,6 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
-        [Authorize]
         public async Task<IActionResult> Delete(string postId)
         {
             Post post = await _context.Posts
@@ -182,6 +181,15 @@ namespace IdentityApp.Controllers
 
             if (post != null)
             {
+                List<LikedPost> likedPosts = await _context.LikedPosts
+                    .Where(likedPost => likedPost.PostId == post.Id)
+                    .ToListAsync();
+
+                if (likedPosts != null)
+                {
+                    _context.LikedPosts.RemoveRange(likedPosts);
+                }
+
                 _context.Posts.Remove(post);
                 await _context.SaveChangesAsync();
             }

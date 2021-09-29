@@ -7,6 +7,7 @@ namespace IdentityApp.Models
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostPicture> PostPictures { get; set; }
+        public DbSet<LikedPost> LikedPosts { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -33,12 +34,6 @@ namespace IdentityApp.Models
                 .HasMany(p => p.PostPictures)
                 .WithOne(pp => pp.Post)
                 .IsRequired();
-
-            modelBuilder.Entity<Post>()
-                .HasMany(post => post.LikedPosts)
-                .WithOne(likedPost => likedPost.Post)
-                .HasForeignKey(likedPost => likedPost.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PostPicture>()
                 .HasOne(pp => pp.Post)

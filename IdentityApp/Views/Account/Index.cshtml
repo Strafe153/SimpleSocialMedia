@@ -1,14 +1,14 @@
 ﻿@model IdentityApp.ViewModels.UserProfileViewModel
 
 @{
-    ViewData["Title"] = Model.User.UserName;
+    ViewData["Title"] = $"Profile: {Model.User.UserName}";
 }
 
 <link href="~/css/account_profile.css" rel="stylesheet" />
 
 <div class="container">
     <div class="row">
-        <div class="mb-2 mr-3">
+        <div class="mb-2 mr-1">
             <img class="border border-3 border-secondary rounded-circle"
                  id="profile-pic" src="data:image/jpeg;base64,
                         @(Convert.ToBase64String(Model.User.ProfilePicture))"
@@ -26,6 +26,8 @@
             <p>City: @Model.User.City</p>
             <p>Company: @Model.User.Company</p>
         </div>
+    </div>
+    <div class="row">
         <p class="mt-1 text-break">@Model.User.Status</p>
     </div>
 </div>
@@ -55,14 +57,11 @@
 {
     @foreach (Post post in Model.Posts)
     {
-        post.PostPictures = (from postPic in post.PostPictures
-                             orderby postPic.UploadedTime
-                             select postPic).ToList();
-
         <div class="border border-secondary rounded p-2 my-2">
             <p class="text-break">@post.Content</p>
 
-            @foreach (PostPicture postPicture in post.PostPictures)
+            @foreach (PostPicture postPicture in post.PostPictures
+                .OrderByDescending(postPic => postPic.UploadedTime))
             {
                 <img height="150" alt="post_picture" class="mb-1"
                      src="data:image/jpeg;base64,

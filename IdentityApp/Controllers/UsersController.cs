@@ -27,7 +27,7 @@ namespace IdentityApp.Controllers
             IQueryable<User> users = _userManager.Users;
             FilterUsers(ref users, model.UserName, model.Email,
                 model.Year, model.Country);
-            users = ChooseSort(model.SortOrder, users);
+            users = ChooseSort(users, model.SortOrder);
 
             usersNumber = await users.CountAsync();
             var currentPageUsers = await users
@@ -80,8 +80,8 @@ namespace IdentityApp.Controllers
             }
         }
 
-        private IQueryable<User> ChooseSort(SortState sortOrder, 
-            IQueryable<User> users)
+        private IQueryable<User> ChooseSort(IQueryable<User> users,
+            SortState sortOrder)
         {
             return sortOrder switch
             {
