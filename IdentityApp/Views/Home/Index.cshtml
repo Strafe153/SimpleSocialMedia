@@ -2,9 +2,6 @@
 
 @{
     ViewData["Title"] = "Home page";
-
-    User currentUser = Model.Users.FirstOrDefault(
-        user => user.UserName == User.Identity.Name);
 }
 
 @foreach (Post post in Model.Posts)
@@ -27,15 +24,15 @@
         }
 
         <div class="mt-2">
-            @if (currentUser != null)
+            @if (Model.AuthenticatedUser != null)
             {
                 <a asp-action="Like"
                    asp-controller="Post"
                    asp-route-PostId="@post.Id"
-                   asp-route-UserId="@currentUser.Id"
+                   asp-route-UserId="@Model.AuthenticatedUser.Id"
                    asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                    asp-route-ReturnAction="@Context.Request.Path"
-                   class="btn btn-sm px-3 @(currentUser.LikedPosts
+                   class="btn btn-sm px-3 @(Model.AuthenticatedUser.LikedPosts
                         .FirstOrDefault(p => p.Post.Id == post.Id) != null 
                             ? "btn-primary" : "btn-outline-primary")">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16"
@@ -71,16 +68,19 @@
                 </a>
             }
 
-            <div class="d-inline float-right mb-1">
-                <sub class="posted-time">
-                    @post.PostedTime.ToString("HH:mm:ss dd.MM.yyyy")
-                </sub>
+        <div class="d-inline float-right mb-1">
+            <sub class="posted-time">
+                @post.PostedTime.ToString("HH:mm:ss dd.MM.yyyy")
+            </sub>
 
-                @if (post.IsEdited)
-                {
-                    <sub class="posted-time">(edited)</sub>
-                }
-                @if (currentUser != null && currentUser.Id == post.UserId)
+            @if (post.IsEdited)
+            {
+                <sub class="posted-time">(edited)</sub>
+            }
+            @if (Model.AuthenticatedUser != null)
+            {
+                @if (Model.AuthenticatedUser.Id == post.UserId 
+                    || Model.AuthenticatedUserRoles.Contains("admin"))
                 {
                     <a asp-action="Edit"
                        asp-controller="Post"
@@ -90,7 +90,8 @@
                         Edit
                     </a>
                 }
-            </div>
+            }
+        </div>
         </div>
     </div>
 }

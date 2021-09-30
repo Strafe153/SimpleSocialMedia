@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
@@ -21,7 +22,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1)
         {
             const int PAGE_SIZE = 10;
             IEnumerable<Post> allPosts = _context.Posts
@@ -29,13 +30,23 @@ namespace IdentityApp.Controllers
             IEnumerable<Post> currentPagePosts = allPosts
                 .Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
             IEnumerable<User> users = _userManager.Users;
+            User authenticatedUser = null;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                authenticatedUser = await _userManager
+                    .FindByNameAsync(User.Identity.Name);
+            }
 
             HomepageViewModel model = new HomepageViewModel()
             {
-                Users = users,
-                Posts = currentPagePosts,
+                AuthenticatedUser = authenticatedUser,
                 PageViewModel = new PageViewModel(
-                    page, allPosts.Count(), PAGE_SIZE)
+                    page, allPosts.Count(), PAGE_SIZE),
+                Posts = currentPagePosts,
+                AuthenticatedUserRoles = authenticatedUser != null
+                    ? await _userManager.GetRolesAsync(authenticatedUser)
+                    : new List<string> { "user" },
             };
 
             return View(model);

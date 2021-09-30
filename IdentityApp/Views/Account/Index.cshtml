@@ -122,8 +122,8 @@
                         <sub class="posted-time">(edited)</sub>
                     }
 
-                    @if (Model.AuthenticatedUser != null 
-                         && Model.AuthenticatedUser.Id == post.UserId)
+                    @if (Model.AuthenticatedUser.Id == post.UserId
+                        || Model.AuthenticatedUserRoles.Contains("admin"))
                     {
                         <a asp-action="Edit"
                            asp-controller="Post"
