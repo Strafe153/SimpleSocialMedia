@@ -4,8 +4,6 @@
     ViewData["Title"] = "Editing a post";
 }
 
-<link href="~/css/account_profile.css" rel="stylesheet" />
-
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly"
          class="validation alert alert-danger" role="alert"></div>
@@ -51,9 +49,11 @@
            class="btn btn-outline-secondary">
             Cancel
         </a>
-        <input type="submit" class="btn btn-primary" value="Save" />
+
+        <input type="submit" class="btn btn-primary save-button" value="Save" />
 
         <a asp-action="Delete" asp-route-postId="@Model.Id"
+           asp-route-returnUrl="@Model.ReturnUrl"
            class="d-inline float-right btn btn-danger">
             Delete
         </a>
@@ -62,16 +62,20 @@
 
 @section Scripts {
     <script type="text/javascript">
+        let postPicturesToDelete = [];
+
         $(".delete-button").on("click", function(event) {
-            let postId = "@Model.Id";
             let postPictureId = $(event.target).attr("value");
 
             $(event.target).parent().css("display", "none");
+            postPicturesToDelete.push(postPictureId);
+        });
 
+        $(".save-button").on("click", function() {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("Delete", "PostPicture")",
-                data: {postPictureId: postPictureId, postId: postId},
+                data: {postPictureIds: postPicturesToDelete, postId: "@Model.Id"},
                 dataType: "text"
             });
         });

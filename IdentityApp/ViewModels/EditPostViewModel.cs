@@ -14,6 +14,7 @@ namespace IdentityApp.ViewModels
         public DateTime PostedTime { get; set; }
         public virtual List<PostPicture> PostPictures { get; set; } 
         public IFormFileCollection AppendedPostPictures { get; set; }
+        public string ReturnUrl { get; set; }
 
         public EditPostViewModel()
         {

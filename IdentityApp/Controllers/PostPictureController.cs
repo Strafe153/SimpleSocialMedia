@@ -14,22 +14,23 @@ namespace IdentityApp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Delete(string postPictureId, 
+        public async Task<IActionResult> Delete(string[] postPictureIds, 
             string postId)
         {
-            PostPicture postPicture = await _context.PostPictures
-                .FirstOrDefaultAsync(picture => picture.Id == postPictureId);
-
-            if (postPicture != null)
+            foreach (string postPicId in postPictureIds)
             {
-                _context.PostPictures.Remove(postPicture);
-                await _context.SaveChangesAsync();
+                PostPicture postPicture = await _context.PostPictures
+                    .FirstOrDefaultAsync(picture => picture.Id == postPicId);
 
-                return RedirectToAction("Edit", "Post", 
-                    new { postId = postId });
+                if (postPicture != null)
+                {
+                    _context.PostPictures.Remove(postPicture);
+                }
             }
 
-            return NotFound();
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Edit", "Post",
+                new { postId = postId });
         }
     }
 }

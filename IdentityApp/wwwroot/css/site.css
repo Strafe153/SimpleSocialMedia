@@ -75,6 +75,7 @@ body {
     border-width: 3px !important;
 }
 
+/* Validation error styles*/
 .validation {
     padding-bottom: 0;
 }
@@ -84,7 +85,88 @@ body {
     padding-left: 0;
 }
 
+/* Log out button box-shadow removed */
 div ul li form .btn,
 div ul li form .btn:active:focus {
     box-shadow: none !important;
+}
+
+#profile-pic {
+    object-fit: cover;
+    width: 150px;
+    height: 150px;
+}
+
+.post-picture-container {
+    position: relative;
+    width: 50%;
+}
+
+/* Post picture delete button behavior */
+.post-picture-container .delete-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    font-size: 16px;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    opacity: .9;
+    visibility: hidden;
+}
+
+.post-picture-container:hover .delete-button {
+    visibility: visible;
+}
+
+textarea {
+    resize: none;
+}
+
+#user-profile-link, #user-profile-link:visited, #user-profile-link:active {
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#likes-count {
+    font-size: 16px;
+}
+
+.posted-time {
+    font-size: 13px;
+}
+
+svg {
+    margin-bottom: 3px;
+}
+
+.custom-file {
+    cursor: pointer;
+}
+
+/* All the styles below add arrows on pagination buttons */
+@font-face {
+    font-family: "FontAwesome";
+    src: url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2') format("woff2"), url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff") format("woff"), url("https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/fonts/fontawesome-webfont.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal
+}
+
+.glyphicon {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.glyphicon-chevron-right:before {
+    content: "\f054";
+}
+
+.glyphicon-chevron-left:before {
+    content: "\f053";
 }

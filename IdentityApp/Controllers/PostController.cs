@@ -94,7 +94,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string postId)
+        public async Task<IActionResult> Edit(string postId, string returnUrl)
         {
             Post post = await _context.Posts
                 .FirstOrDefaultAsync(post => post.Id == postId);
@@ -111,6 +111,7 @@ namespace IdentityApp.Controllers
                 PostedTime = post.PostedTime,
                 UserId = post.UserId,
                 UserName = post.User.UserName,
+                ReturnUrl = returnUrl,
                 PostPictures = post.PostPictures
                     .OrderByDescending(postPic => postPic.UploadedTime)
                     .ToList()
@@ -173,7 +174,7 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Delete(string postId)
+        public async Task<IActionResult> Delete(string postId, string returnUrl)
         {
             Post post = await _context.Posts
                 .FirstOrDefaultAsync(post => post.Id == postId);
@@ -194,8 +195,13 @@ namespace IdentityApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index", "Account", 
-                new { userName = user.UserName });
+            if (returnUrl.Contains("Account"))
+            {
+                return RedirectToAction("Index", "Account",
+                    new { userName = user.UserName });
+            }
+
+            return RedirectToAction("Index", "Home");
         }
         
         public async Task<IActionResult> Like(PostLikeViewModel model)
