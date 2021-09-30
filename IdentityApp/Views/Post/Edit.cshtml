@@ -54,6 +54,7 @@
         <input type="submit" class="btn btn-primary" value="Save" />
 
         <a asp-action="Delete" asp-route-postId="@Model.Id"
+           asp-route-returnUrl="@Model.ReturnUrl"
            class="d-inline float-right btn btn-danger">
             Delete
         </a>
