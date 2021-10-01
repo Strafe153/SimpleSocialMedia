@@ -19,15 +19,8 @@ namespace IdentityApp.Models
             string defaultProfilePicPath = 
                 $"{appEnvironment.WebRootPath}/Files/default_profile_pic.jpg";
 
-            if (await roleManager.FindByNameAsync("admin") == null)
-            {
-                await roleManager.CreateAsync(new IdentityRole("admin"));
-            }
-
-            if (await roleManager.FindByNameAsync("user") == null)
-            {
-                await roleManager.CreateAsync(new IdentityRole("user"));
-            }
+            await CheckRoleOnInitializing(roleManager, "user");
+            await CheckRoleOnInitializing(roleManager, "admin");
 
             if (await userManager.FindByNameAsync(ADMIN_NAME) == null)
             {
@@ -40,9 +33,9 @@ namespace IdentityApp.Models
                 using (FileStream fileStream = new FileStream(
                     defaultProfilePicPath, FileMode.Open, FileAccess.Read))
                 {
-                    admin.ProfilePicture = 
-                        File.ReadAllBytes(defaultProfilePicPath);
-                    fileStream.Read(admin.ProfilePicture, 0, 
+                    admin.ProfilePicture = await File
+                        .ReadAllBytesAsync(defaultProfilePicPath);
+                    await fileStream.ReadAsync(admin.ProfilePicture, 0, 
                         Convert.ToInt32(fileStream.Length));
                 }
 
@@ -53,6 +46,15 @@ namespace IdentityApp.Models
                 {
                     await userManager.AddToRoleAsync(admin, "admin");
                 }
+            }
+        }
+
+        private static async Task CheckRoleOnInitializing(
+            RoleManager<IdentityRole> roleManager, string role)
+        {
+            if (await roleManager.FindByNameAsync(role) == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
             }
         }
     }

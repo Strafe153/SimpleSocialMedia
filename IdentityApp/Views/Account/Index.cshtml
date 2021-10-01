@@ -122,17 +122,20 @@
                         <sub class="posted-time">(edited)</sub>
                     }
 
-                    @if (Model.AuthenticatedUser.Id == post.UserId
-                        || Model.AuthenticatedUserRoles.Contains("admin"))
-                    {
-                        <a asp-action="Edit"
-                           asp-controller="Post"
-                           asp-route-postId="@post.Id"
-                           asp-route-returnUrl="@Context.Request.Path"
-                           class="btn btn-outline-secondary">
-                            Edit
-                        </a>
-                    }
+                    @if (Model.AuthenticatedUser != null)
+	                {
+		                @if (Model.AuthenticatedUser.Id == post.UserId
+                            || Model.AuthenticatedUserRoles.Contains("admin"))
+                        {
+                            <a asp-action="Edit"
+                               asp-controller="Post"
+                               asp-route-postId="@post.Id"
+                               asp-route-returnUrl="@Context.Request.Path"
+                               class="btn btn-outline-secondary">
+                                Edit
+                            </a>
+                        }
+	                }
                 </div>
             </div>
         </div>

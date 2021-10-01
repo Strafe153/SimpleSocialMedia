@@ -1,5 +1,9 @@
 ﻿@model IdentityApp.ViewModels.LoginViewModel 
 
+@{
+    ViewData["Title"] = "Login";
+}
+
 <form asp-action="Login" method="post">
     <div asp-validation-summary="ModelOnly" 
          class="validation alert alert-danger" role="alert"></div>
@@ -14,9 +18,9 @@
         <input type="password" asp-for="Password" class="form-control" />
         <span asp-validation-for="Password"></span>
     </div>
-    <div class="form-group">
+    <div class="mb-1">
         <label asp-for="RememberMe" class="control-label"></label>
-        <input type="checkbox" asp-for="RememberMe" />
+        <input type="checkbox" asp-for="RememberMe" class="pt-1" />
     </div>
     <div class="form-group">
         <input type="submit" value="Log In" class="btn btn-primary" />
