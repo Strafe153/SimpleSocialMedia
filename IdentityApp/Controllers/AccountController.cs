@@ -91,9 +91,9 @@ namespace IdentityApp.Controllers
                     using (FileStream fileStream = new FileStream(
                         defaultProfilePicPath, FileMode.Open, FileAccess.Read))
                     {
-                        user.ProfilePicture = System.IO.File
-                            .ReadAllBytes(defaultProfilePicPath);
-                        fileStream.Read(user.ProfilePicture, 0,
+                        user.ProfilePicture = await System.IO.File
+                            .ReadAllBytesAsync(defaultProfilePicPath);
+                        await fileStream.ReadAsync(user.ProfilePicture, 0,
                             System.Convert.ToInt32(fileStream.Length));
                     }
 
@@ -262,7 +262,6 @@ namespace IdentityApp.Controllers
                 }*/
 
                 User user = await _userManager.FindByIdAsync(model.Id);
-                string userName = user.UserName;
 
                 if (user != null)
                 {

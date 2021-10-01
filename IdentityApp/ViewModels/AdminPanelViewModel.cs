@@ -9,6 +9,11 @@ namespace IdentityApp.ViewModels
         public int? Year { get; set; }
         public string Country { get; set; }
         public int Page { get; set; } = 1;
-        public SortState SortOrder { get; set; } = SortState.NameAscending;
+        public SortState SortOrder { get; set; } 
+
+        public AdminPanelViewModel()
+        {
+            SortOrder = SortState.NameAscending;
+        }
     }
 }
