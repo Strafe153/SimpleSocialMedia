@@ -34,8 +34,13 @@ namespace IdentityApp.Controllers
         {
             const int PAGE_SIZE = 5;
             User user = await _userManager.FindByNameAsync(userName);
-            User authenticatedUser = await _userManager
+            User authenticatedUser = null;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                authenticatedUser = await _userManager
                 .FindByNameAsync(User.Identity.Name);
+            }
 
             if (user != null)
             {

@@ -1,5 +1,9 @@
 ﻿@model IdentityApp.ViewModels.LoginViewModel 
 
+@{
+    ViewData["Title"] = "Login";
+}
+
 <form asp-action="Login" method="post">
     <div asp-validation-summary="ModelOnly" 
          class="validation alert alert-danger" role="alert"></div>
