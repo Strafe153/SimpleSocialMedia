@@ -20,40 +20,44 @@ namespace IdentityApp.Models
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<User>()
-                .HasMany(u => u.Posts)
-                .WithOne(p => p.User)
+                .HasMany(user => user.Posts)
+                .WithOne(post => post.User)
                 .IsRequired();
 
             modelBuilder.Entity<Post>()
-                .HasOne(p => p.User)
-                .WithMany(u => u.Posts)
-                .HasForeignKey(p => p.UserId)
+                .HasOne(post => post.User)
+                .WithMany(user => user.Posts)
+                .HasForeignKey(post => post.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Post>()
-                .HasMany(p => p.PostPictures)
-                .WithOne(pp => pp.Post)
+                .HasMany(post => post.PostPictures)
+                .WithOne(postPicture => postPicture.Post)
                 .IsRequired();
 
             modelBuilder.Entity<PostPicture>()
-                .HasOne(pp => pp.Post)
-                .WithMany(p => p.PostPictures)
-                .HasForeignKey(pp => pp.PostId)
+                .HasOne(postPicture => postPicture.Post)
+                .WithMany(post => post.PostPictures)
+                .HasForeignKey(postPicture => postPicture.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<LikedPost>()
-                .HasKey(pl => new { pl.UserId, pl.PostId });
+                .HasKey(likedPost => new 
+                { 
+                    likedPost.UserId, 
+                    likedPost.PostId 
+                });
 
             modelBuilder.Entity<LikedPost>()
-                .HasOne(pl => pl.User)
-                .WithMany(u => u.LikedPosts)
-                .HasForeignKey(pl => pl.UserId)
+                .HasOne(likedPost => likedPost.User)
+                .WithMany(user => user.LikedPosts)
+                .HasForeignKey(likedPost => likedPost.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<LikedPost>()
-                .HasOne(pl => pl.Post)
-                .WithMany(p => p.LikedPosts)
-                .HasForeignKey(pl => pl.PostId)
+                .HasOne(likedPost => likedPost.Post)
+                .WithMany(post => post.LikedPosts)
+                .HasForeignKey(likedPost => likedPost.PostId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

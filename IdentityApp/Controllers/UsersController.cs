@@ -115,15 +115,24 @@ namespace IdentityApp.Controllers
 
             if (user != null)
             {
-                List<LikedPost> likedPosts = new List<LikedPost>();
+                List<LikedPost> ownedOrLikedPosts = new List<LikedPost>();
 
-                foreach (Post userPost in user.Posts)
+                foreach (Post post in user.Posts)
                 {
-                    likedPosts.AddRange(_context.LikedPosts.Where(
-                        likedPost => likedPost.PostId == userPost.Id));
+                    ownedOrLikedPosts.AddRange(_context.LikedPosts.Where(
+                        likedPost => likedPost.PostId == post.Id 
+                        || likedPost.UserId == user.Id));
                 }
 
-                _context.LikedPosts.RemoveRange(likedPosts);
+                foreach (LikedPost post in ownedOrLikedPosts)
+                {
+                    if (post.UserId == user.Id)
+                    {
+                        post.Post.Likes--;
+                    }
+                }
+
+                _context.LikedPosts.RemoveRange(ownedOrLikedPosts);
                 await _userManager.DeleteAsync(user);
                 await _context.SaveChangesAsync();
             }
