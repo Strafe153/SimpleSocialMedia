@@ -114,7 +114,7 @@ namespace IdentityApp.Controllers
                 ReturnUrl = returnUrl,
                 PostPictures = post.PostPictures
                     .OrderByDescending(postPic => postPic.UploadedTime)
-                    .ToList()
+                    .AsEnumerable()
             };
 
             return View(model);

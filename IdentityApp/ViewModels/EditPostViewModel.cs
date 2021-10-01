@@ -12,7 +12,7 @@ namespace IdentityApp.ViewModels
         public string UserId { get; set; }
         public string UserName { get; set; }
         public DateTime PostedTime { get; set; }
-        public virtual List<PostPicture> PostPictures { get; set; } 
+        public virtual IEnumerable<PostPicture> PostPictures { get; set; } 
         public IFormFileCollection AppendedPostPictures { get; set; }
         public string ReturnUrl { get; set; }
 
