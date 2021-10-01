@@ -83,7 +83,7 @@ namespace IdentityApp.Controllers
                     UserId = user.Id,
                     UserName = user.UserName,
                     UserRoles = await _userManager.GetRolesAsync(user),
-                    AllRoles = _roleManager.Roles.ToList(),
+                    AllRoles = await _roleManager.Roles.ToListAsync(),
                     ReturnUrl = returnUrl
                 };
 
