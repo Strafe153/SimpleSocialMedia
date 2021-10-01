@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 
@@ -12,10 +13,13 @@ namespace IdentityApp.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<User> _userManager;
+        private readonly ApplicationDbContext _context;
 
-        public UsersController(UserManager<User> userManager)
+        public UsersController(UserManager<User> userManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         [Authorize(Roles = "admin")]
@@ -111,7 +115,17 @@ namespace IdentityApp.Controllers
 
             if (user != null)
             {
+                List<LikedPost> likedPosts = new List<LikedPost>();
+
+                foreach (Post userPost in user.Posts)
+                {
+                    likedPosts.AddRange(_context.LikedPosts.Where(
+                        likedPost => likedPost.PostId == userPost.Id));
+                }
+
+                _context.LikedPosts.RemoveRange(likedPosts);
                 await _userManager.DeleteAsync(user);
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToAction("Index");
