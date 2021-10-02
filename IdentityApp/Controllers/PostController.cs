@@ -162,8 +162,15 @@ namespace IdentityApp.Controllers
                     _context.Update(post);
                     await _context.SaveChangesAsync();
 
-                    return RedirectToAction("Index", "Account", 
-                        new { userName = user.UserName });
+                    if (model.ReturnUrl.Contains("Account"))
+                    {
+                        return RedirectToAction("Index", "Account",
+                            new { userName = user.UserName });
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
                 else
                 {

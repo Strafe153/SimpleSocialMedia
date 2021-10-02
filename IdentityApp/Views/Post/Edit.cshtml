@@ -4,7 +4,8 @@
     ViewData["Title"] = "Editing a post";
 }
 
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
+<form asp-action="Edit" asp-route-returnUrl="@Model.ReturnUrl" method="post" 
+      enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly"
          class="validation alert alert-danger" role="alert"></div>
 
@@ -43,12 +44,23 @@
         </div>
     </div>
     <div class="form-group">
-        <a asp-action="Index"
-           asp-controller="Account"
-           asp-route-userName="@Model.UserName"
-           class="btn btn-outline-secondary">
-            Cancel
-        </a>
+        @if (Model.ReturnUrl.Contains("Account"))
+        {
+            <a asp-action="Index"
+               asp-controller="Account"
+               asp-route-userName="@Model.UserName"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index"
+               asp-controller="Home"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        }
 
         <input type="submit" class="btn btn-primary save-button" value="Save" />
 
