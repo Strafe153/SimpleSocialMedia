@@ -14,12 +14,14 @@ namespace IdentityApp.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly SignInManager<User> _signInManager;
 
         public UsersController(UserManager<User> userManager,
-            ApplicationDbContext context)
+            ApplicationDbContext context, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _context = context;
+            _signInManager = signInManager;
         }
 
         [Authorize(Roles = "admin")]
@@ -133,6 +135,12 @@ namespace IdentityApp.Controllers
                 }
 
                 _context.LikedPosts.RemoveRange(ownedOrLikedPosts);
+
+                if (user.UserName == User.Identity.Name)
+                {
+                    await _signInManager.SignOutAsync();
+                }
+
                 await _userManager.DeleteAsync(user);
                 await _context.SaveChangesAsync();
             }
