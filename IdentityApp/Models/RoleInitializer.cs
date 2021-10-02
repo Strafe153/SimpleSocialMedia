@@ -12,9 +12,9 @@ namespace IdentityApp.Models
             RoleManager<IdentityRole> roleManager, 
             IWebHostEnvironment appEnvironment)
         {
-            const string ADMIN_NAME = "strafe";
-            const string ADMIN_EMAIL = "strafe@gmail.com";
-            const string ADMIN_PASSWORD = "qwer1234zxcv";
+            const string ADMIN_NAME = "admin";
+            const string ADMIN_EMAIL = "admin@gmail.com";
+            const string ADMIN_PASSWORD = "qwerty";
 
             string defaultProfilePicPath = 
                 $"{appEnvironment.WebRootPath}/Files/default_profile_pic.jpg";

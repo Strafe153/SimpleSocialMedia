@@ -4,7 +4,8 @@
     ViewData["Title"] = "Editing a post";
 }
 
-<form asp-action="Edit" method="post" enctype="multipart/form-data">
+<form asp-action="Edit" asp-route-returnUrl="@Model.ReturnUrl" method="post" 
+      enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly"
          class="validation alert alert-danger" role="alert"></div>
 
@@ -37,18 +38,29 @@
             <label class="custom-file-label" for="custom-file">
                 Choose pictures
             </label>
-            <input type="file" asp-for="AppendedPostPictures" id="custom-file"
+            <input type="file" asp-for="AppendedPostPictures" id="post-picture"
                    class="custom-file-input" accept="image/jpeg,image/png"
                    multiple />
         </div>
     </div>
     <div class="form-group">
-        <a asp-action="Index"
-           asp-controller="Account"
-           asp-route-userName="@Model.UserName"
-           class="btn btn-outline-secondary">
-            Cancel
-        </a>
+        @if (Model.ReturnUrl.Contains("Account"))
+        {
+            <a asp-action="Index"
+               asp-controller="Account"
+               asp-route-userName="@Model.UserName"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index"
+               asp-controller="Home"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+        }
 
         <input type="submit" class="btn btn-primary save-button" value="Save" />
 
@@ -62,15 +74,6 @@
 
 @section Scripts {
     <script type="text/javascript">
-        let postPicturesToDelete = [];
-
-        $(".delete-button").on("click", function(event) {
-            let postPictureId = $(event.target).attr("value");
-
-            $(event.target).parent().css("display", "none");
-            postPicturesToDelete.push(postPictureId);
-        });
-
         $(".save-button").on("click", function() {
             $.ajax({
                 type: "POST",
@@ -78,11 +81,6 @@
                 data: {postPictureIds: postPicturesToDelete, postId: "@Model.Id"},
                 dataType: "text"
             });
-        });
-
-        $(".custom-file-input").on("change", function () {
-            $(".custom-file-label").text(
-                `Pictures chosen: ${$(this)[0].files.length}`);
         });
     </script>
 }

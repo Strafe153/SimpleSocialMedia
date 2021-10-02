@@ -37,7 +37,7 @@
             <label class="custom-file-label" for="custom-file">
                 Choose a picture
             </label>
-            <input type="file" asp-for="ProfilePicture" id="change-profile-pic"
+            <input type="file" asp-for="ProfilePicture" id="profile-pic-input"
                    class="custom-file-input" accept="image/jpeg,image/png"
                    onchange="loadFile(event)" />
         </div>
@@ -117,20 +117,3 @@
         </div>
     </div>
 </form>
-
-@section Scripts
-{
-    <script type="text/javascript">
-        function loadFile(event) {
-            let output = document.querySelector("#profile-pic");
-
-            output.src = URL.createObjectURL(event.target.files[0]);
-            output.onload = () => URL.revokeObjectURL(output.src);
-        };
-
-        $(".custom-file-input").on("change", function() {
-            var fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-        });
-    </script>
-}

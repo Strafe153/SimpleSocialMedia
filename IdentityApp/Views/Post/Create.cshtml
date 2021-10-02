@@ -26,7 +26,7 @@
             Choose pictures
         </label>
         <input type="file" asp-for="PostPictures" class="custom-file-input"
-               id="custom-file" accept="image/jpeg,image/png" multiple />
+               id="post-picture" accept="image/jpeg,image/png" multiple />
     </div>
     <div class="form-group">
         <a asp-action="Index"
@@ -38,13 +38,3 @@
         <input type="submit" value="Post" class="btn btn-primary" />
     </div>
 </form>
-
-@section Scripts
-{
-    <script type="text/javascript">
-        $(".custom-file-input").on("change", function () {
-            $(".custom-file-label").text(
-                `Pictures chosen: ${$(this)[0].files.length}`);
-        });
-    </script>
-}
