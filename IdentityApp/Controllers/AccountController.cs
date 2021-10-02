@@ -270,6 +270,13 @@ namespace IdentityApp.Controllers
 
                 if (user != null)
                 {
+                    bool userNameChanged = false;
+
+                    if (model.UserName != user.UserName)
+                    {
+                        userNameChanged = true;
+                    }
+
                     user.Email = model.Email;
                     user.UserName = model.UserName;
                     user.Year = model.Year;
@@ -297,6 +304,12 @@ namespace IdentityApp.Controllers
                     if (result.Succeeded)
                     {
                         await _context.SaveChangesAsync();
+
+                        if (userNameChanged)
+                        {
+                            await _signInManager.SignOutAsync();
+                            await _signInManager.SignInAsync(user, false);
+                        }
 
                         if (model.CalledFromAction.Contains("Account"))
                         {

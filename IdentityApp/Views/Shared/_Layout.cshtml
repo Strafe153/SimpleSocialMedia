@@ -1,9 +1,4 @@
-﻿@*@inject ApplicationDbContext _context
-@{ 
-    User user = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name);
-}*@
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -38,9 +33,6 @@
                                     <a asp-action="Index" asp-controller="Account"
                                        asp-route-userName="@User.Identity.Name" class="nav-link text-dark">
                                         @User.Identity.Name</a>
-                                    @*<a asp-action="Index" asp-controller="Account"
-                                       asp-route-userName="@User.Identity.Name" class="nav-link text-dark">
-                                        @user.UserName</a>*@
                                 </li>
                                 <li class="nav-item">
                                     <form asp-action="Logout" asp-controller="Account" method="post">

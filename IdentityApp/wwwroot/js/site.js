@@ -5,6 +5,7 @@
 
 let postPicturesToDelete = [];
 
+// Hides a post picture when pressed "Delete" button
 $(".delete-button").on("click", function(event) {
     let postPictureId = $(event.target).attr("value");
 
