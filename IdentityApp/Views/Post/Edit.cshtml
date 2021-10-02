@@ -38,7 +38,7 @@
             <label class="custom-file-label" for="custom-file">
                 Choose pictures
             </label>
-            <input type="file" asp-for="AppendedPostPictures" id="custom-file"
+            <input type="file" asp-for="AppendedPostPictures" id="post-picture"
                    class="custom-file-input" accept="image/jpeg,image/png"
                    multiple />
         </div>
@@ -74,15 +74,6 @@
 
 @section Scripts {
     <script type="text/javascript">
-        let postPicturesToDelete = [];
-
-        $(".delete-button").on("click", function(event) {
-            let postPictureId = $(event.target).attr("value");
-
-            $(event.target).parent().css("display", "none");
-            postPicturesToDelete.push(postPictureId);
-        });
-
         $(".save-button").on("click", function() {
             $.ajax({
                 type: "POST",
@@ -90,11 +81,6 @@
                 data: {postPictureIds: postPicturesToDelete, postId: "@Model.Id"},
                 dataType: "text"
             });
-        });
-
-        $(".custom-file-input").on("change", function () {
-            $(".custom-file-label").text(
-                `Pictures chosen: ${$(this)[0].files.length}`);
         });
     </script>
 }
