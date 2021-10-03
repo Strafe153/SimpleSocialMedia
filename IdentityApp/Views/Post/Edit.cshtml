@@ -14,9 +14,10 @@
     <input type="hidden" asp-for="PostedTime" value="@Model.PostedTime" />
 
     <div class="form-group">
-        <label for="post">Post</label><br />
-        <textarea asp-for="Content" id="post"
+        <label asp-for="Content">Post</label><br />
+        <textarea asp-for="Content" id="post" placeholder="Your thoughts..."
                   class="form-control" rows="6"></textarea>
+        <span asp-validation-for="Content"></span>
 
         <div class="mt-3 mb-1">
             @foreach (PostPicture postPicture in Model.PostPictures)

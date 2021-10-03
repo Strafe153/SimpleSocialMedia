@@ -8,18 +8,18 @@
     <div asp-validation-summary="ModelOnly"
          class="validation alert alert-danger" role="alert"></div>
 
-    <input type="hidden" asp-for="Post.PostedTime" value="@DateTime.Now" />
-    <input type="hidden" asp-for="Post.User.UserName" 
+    <input type="hidden" asp-for="PostedTime" value="@DateTime.Now" />
+    <input type="hidden" asp-for="User.UserName"
            value="@Model.User.UserName" />
-    <input type="hidden" asp-for="Post.User.Id" value="@Model.User.Id" />
-    <input type="hidden" asp-for="Post.Id" 
+    <input type="hidden" asp-for="User.Id" value="@Model.User.Id" />
+    <input type="hidden" asp-for="Id"
            value="@System.Guid.NewGuid().ToString()" />
 
     <div class="form-group">
-        <label asp-for="Post.Content" class="control-label"></label><br />
-        <textarea asp-for="Post.Content" placeholder="Your thoughts..."
+        <label asp-for="Content" class="control-label"></label><br />
+        <textarea asp-for="Content" placeholder="Your thoughts..."
                   class="form-control" rows="6"></textarea>
-        <span asp-validation-for="Post.Content"></span>
+        <span asp-validation-for="Content"></span>
     </div>
     <div class="form-group custom-file mb-3">
         <label class="custom-file-label" for="custom-file">

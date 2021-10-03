@@ -270,12 +270,8 @@ namespace IdentityApp.Controllers
 
                 if (user != null)
                 {
-                    bool userNameChanged = false;
-
-                    if (model.UserName != user.UserName)
-                    {
-                        userNameChanged = true;
-                    }
+                    bool userNameChanged = model.UserName != user.UserName 
+                        ? true : false;
 
                     user.Email = model.Email;
                     user.UserName = model.UserName;

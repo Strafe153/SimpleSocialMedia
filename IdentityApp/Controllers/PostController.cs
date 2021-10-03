@@ -36,9 +36,9 @@ namespace IdentityApp.Controllers
 
                 if (user != null)
                 {
-                    CreatePostViewModel model = new CreatePostViewModel() 
-                    { 
-                        User = user 
+                    CreatePostViewModel model = new CreatePostViewModel()
+                    {
+                        User = user
                     };
 
                     return View(model);
@@ -54,7 +54,15 @@ namespace IdentityApp.Controllers
             if (ModelState.IsValid)
             {
                 User user = await _userManager.Users
-                    .FirstOrDefaultAsync(user => user.Id == model.Post.User.Id);
+                    .FirstOrDefaultAsync(user => user.Id == model.User.Id);
+
+                Post post = new Post()
+                {
+                    Id = model.Id,
+                    Content = model.Content,
+                    PostedTime = model.PostedTime,
+                    UserId = user.Id
+                };
 
                 if (model.PostPictures != null)
                 {
@@ -76,17 +84,25 @@ namespace IdentityApp.Controllers
                             UploadedTime = DateTime.Now
                         };
 
-                        model.Post.PostPictures.Add(postPicture);
+                        post.PostPictures.Add(postPicture);
                     }
                 }
 
                 if (user != null)
                 {
-                    user.Posts.Add(model.Post);
-                    await _userManager.UpdateAsync(user);
+                    if (post.Content == null)
+                    {
+                        ModelState.AddModelError("", "The length of your " +
+                            "post must be between 1 and 350 symbols");
+                    }
+                    else
+                    {
+                        user.Posts.Add(post);
+                        await _userManager.UpdateAsync(user);
 
-                    return RedirectToAction("Index", "Account", 
-                        new { userName = user.UserName });
+                        return RedirectToAction("Index", "Account",
+                            new { userName = user.UserName });
+                    }
                 }
             }
 
@@ -130,51 +146,64 @@ namespace IdentityApp.Controllers
 
                 if (post != null)
                 {
-                    User user = await _userManager.FindByIdAsync(model.UserId);
-
-                    if (model.AppendedPostPictures != null)
+                    if (model.Content != null)
                     {
-                        foreach (IFormFile postPic in model.AppendedPostPictures)
+                        User user = await _userManager
+                            .FindByIdAsync(model.UserId);
+
+                        if (model.AppendedPostPictures != null)
                         {
-                            byte[] pictureData = null;
-
-                            using (BinaryReader binaryReader = new BinaryReader(
-                                postPic.OpenReadStream()))
+                            foreach (var postPic in model.AppendedPostPictures)
                             {
-                                pictureData = binaryReader.ReadBytes(
-                                    (int)postPic.Length);
+                                byte[] pictureData = null;
+
+                                using (BinaryReader binaryReader = 
+                                    new BinaryReader(postPic.OpenReadStream()))
+                                {
+                                    pictureData = binaryReader.ReadBytes(
+                                        (int)postPic.Length);
+                                }
+
+                                PostPicture postPicture = new PostPicture()
+                                {
+                                    Id = Guid.NewGuid().ToString(),
+                                    PictureData = pictureData,
+                                    UploadedTime = DateTime.Now
+                                };
+
+                                post.PostPictures.Add(postPicture);
                             }
-
-                            PostPicture postPicture = new PostPicture()
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                PictureData = pictureData,
-                                UploadedTime = DateTime.Now
-                            };
-
-                            post.PostPictures.Add(postPicture);
                         }
-                    }
 
-                    post.Content = model.Content;
-                    post.PostedTime = model.PostedTime;
-                    post.IsEdited = true;
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
+                        post.Content = model.Content;
+                        post.PostedTime = model.PostedTime;
+                        post.IsEdited = true;
 
-                    if (model.ReturnUrl.Contains("Account"))
-                    {
-                        return RedirectToAction("Index", "Account",
-                            new { userName = user.UserName });
+                        _context.Update(post);
+                        await _context.SaveChangesAsync();
+
+                        if (model.ReturnUrl.Contains("Account"))
+                        {
+                            return RedirectToAction("Index", "Account",
+                                new { userName = user.UserName });
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Home");
+                        ModelState.AddModelError("", "The length of your " +
+                            "post must be between 1 and 350 symbols");
+
+                        model.PostPictures = post.PostPictures
+                            .OrderByDescending(postPic => postPic.UploadedTime);
                     }
                 }
                 else
                 {
-                    return BadRequest();
+                    return NotFound();
                 }
             }
 
