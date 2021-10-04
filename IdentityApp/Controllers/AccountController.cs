@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
@@ -200,6 +201,8 @@ namespace IdentityApp.Controllers
                 City = user.City,
                 Company = user.Company,
                 CalledFromAction = returnUrl[0..],
+                CurrentProfilePictureString = Encoding.Default
+                    .GetString(user.ProfilePicture),
                 AuthenticatedUserRoles = authenticatedUser != null 
                     ? await _userManager.GetRolesAsync(authenticatedUser)
                     : new List<string> { "user" }
@@ -207,7 +210,8 @@ namespace IdentityApp.Controllers
 
             Stream stream = new MemoryStream(user.ProfilePicture);
             model.ProfilePicture = new FormFile(stream, 0, 
-                user.ProfilePicture.Length, "name", "filename");
+                user.ProfilePicture.Length, "default_profile_picture",
+                "default_profile_pic.jpg");
 
             return View(model);
         }
@@ -215,114 +219,78 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(EditUserViewModel model)
         {
+            User user = await _userManager.FindByIdAsync(model.Id);
+
+            if (user != null)
+            {
+                IEnumerable<string> userNames = _context.Users
+                    .Select(user => user.UserName).AsEnumerable();
+
+                foreach (string userName in userNames)
+                {
+                    if (model.UserName == userName 
+                        && model.UserName != user.UserName)
+                    {
+                        ModelState.AddModelError("", 
+                            "The username is already taken");
+                    }
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                /*User user = await _userManager.FindByIdAsync(model.Id);
-
-                if (user != null)
-                {
-                    user.Email = model.Email;
-                    user.UserName = model.UserName;
-                    user.Year = model.Year;
-                    user.Status = model.Status;
-                    user.Country = model.Country;
-                    user.City = model.City;
-                    user.Company = model.Company;
-
-                    if (model.ProfilePicture != null)
-                    {
-                        byte[] imageData = null;
-
-                        using (BinaryReader binaryReader = new BinaryReader(
-                            model.ProfilePicture.OpenReadStream()))
-                        {
-                            imageData = binaryReader.ReadBytes(
-                                (int)model.ProfilePicture.Length);
-                        }
-
-                        user.ProfilePicture = imageData;
-                    }
-
-                    IdentityResult result = await _userManager.UpdateAsync(user);
-
-                    if (result.Succeeded)
-                    {
-                        if (model.CalledFromAction.Contains("Account"))
-                        {
-                            return RedirectToAction("Index",
-                                new { userName = user.UserName });
-                        }
-                        else
-                        {
-                            return RedirectToAction("Index", "Users");
-                        }
-                    }
-                    else
-                    {
-                        foreach (IdentityError error in result.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
-                    }
-                }*/
-
-                User user = await _userManager.FindByIdAsync(model.Id);
-
-                if (user != null)
-                {
-                    bool userNameChanged = model.UserName != user.UserName 
+                bool userNameChanged = model.UserName != user.UserName
                         ? true : false;
 
-                    user.Email = model.Email;
-                    user.UserName = model.UserName;
-                    user.Year = model.Year;
-                    user.Status = model.Status;
-                    user.Country = model.Country;
-                    user.City = model.City;
-                    user.Company = model.Company;
+                user.Email = model.Email;
+                user.UserName = model.UserName;
+                user.Year = model.Year;
+                user.Status = model.Status;
+                user.Country = model.Country;
+                user.City = model.City;
+                user.Company = model.Company;
 
-                    if (model.ProfilePicture != null)
+                if (model.ProfilePicture != null)
+                {
+                    byte[] imageData = null;
+
+                    using (BinaryReader binaryReader = new BinaryReader(
+                        model.ProfilePicture.OpenReadStream()))
                     {
-                        byte[] imageData = null;
-
-                        using (BinaryReader binaryReader = new BinaryReader(
-                            model.ProfilePicture.OpenReadStream()))
-                        {
-                            imageData = binaryReader.ReadBytes(
-                                (int)model.ProfilePicture.Length);
-                        }
-
-                        user.ProfilePicture = imageData;
+                        imageData = binaryReader.ReadBytes(
+                            (int)model.ProfilePicture.Length);
                     }
 
-                    IdentityResult result = await _userManager.UpdateAsync(user);
+                    user.ProfilePicture = imageData;
+                }
 
-                    if (result.Succeeded)
+                IdentityResult result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    await _context.SaveChangesAsync();
+
+                    if (userNameChanged)
                     {
-                        await _context.SaveChangesAsync();
+                        await _signInManager.SignOutAsync();
+                        await _signInManager.SignInAsync(user, false);
+                    }
 
-                        if (userNameChanged)
-                        {
-                            await _signInManager.SignOutAsync();
-                            await _signInManager.SignInAsync(user, false);
-                        }
-
-                        if (model.CalledFromAction.Contains("Account"))
-                        {
-                            return RedirectToAction("Index",
-                                new { userName = user.UserName });
-                        }
-                        else
-                        {
-                            return RedirectToAction("Index", "Users");
-                        }
+                    if (model.CalledFromAction.Contains("Account"))
+                    {
+                        return RedirectToAction("Index",
+                            new { userName = user.UserName });
                     }
                     else
                     {
-                        foreach (IdentityError error in result.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
+                        return RedirectToAction("Index", "Users");
+                    }
+                }
+                else
+                {
+                    foreach (IdentityError error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
                     }
                 }
             }

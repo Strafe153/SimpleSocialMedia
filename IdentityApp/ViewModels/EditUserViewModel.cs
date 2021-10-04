@@ -40,6 +40,7 @@ namespace IdentityApp.ViewModels
         public IFormFile ProfilePicture { get; set; }
 
         public IList<string> AuthenticatedUserRoles { get; set; }
+        public string CurrentProfilePictureString { get; set; }
         public string CalledFromAction { get; set; }
     }
 }
