@@ -59,30 +59,22 @@ namespace IdentityApp.Controllers
         {
             if (!string.IsNullOrEmpty(userName))
             {
-                users = from user in users
-                        where user.UserName.Contains(userName)
-                        select user;
+                users = users.Where(user => user.UserName.Contains(userName));
             }
 
             if (!string.IsNullOrEmpty(email))
             {
-                users = from user in users 
-                        where user.Email.Contains(email) 
-                        select user;
+                users = users.Where(user => user.Email.Contains(email));
             }
 
             if (year != null)
             {
-                users = from user in users 
-                        where user.Year == year 
-                        select user;
+                users = users.Where(user => user.Year == year);
             }
 
             if (!string.IsNullOrEmpty(country))
             {
-                users = from user in users 
-                        where user.Country.Contains(country) 
-                        select user;
+                users = users.Where(user => user.Country.Contains(country));
             }
         }
 

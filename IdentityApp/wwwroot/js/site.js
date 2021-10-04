@@ -5,6 +5,13 @@
 
 let postPicturesToDelete = [];
 
+// Inputs a loaded picture as the new profile picture
+function loadFile(event) {
+    let output = document.querySelector("#profile-pic");
+    output.src = URL.createObjectURL(event.target.files[0]);
+    output.onload = () => URL.revokeObjectURL(output.src);
+};
+
 // Hides a post picture when pressed "Delete" button
 $(".delete-button").on("click", function(event) {
     let postPictureId = $(event.target).attr("value");
