@@ -218,9 +218,9 @@ namespace IdentityApp.Controllers
 
             if (post != null)
             {
-                List<LikedPost> likedPosts = await _context.LikedPosts
+                IEnumerable<LikedPost> likedPosts = _context.LikedPosts
                     .Where(likedPost => likedPost.PostId == post.Id)
-                    .ToListAsync();
+                    .AsEnumerable();
 
                 if (likedPosts != null)
                 {

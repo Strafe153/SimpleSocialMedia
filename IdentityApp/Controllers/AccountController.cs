@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
@@ -200,17 +201,17 @@ namespace IdentityApp.Controllers
                 City = user.City,
                 Company = user.Company,
                 CalledFromAction = returnUrl[0..],
+                CurrentProfilePictureString = Encoding.Default
+                    .GetString(user.ProfilePicture),
                 AuthenticatedUserRoles = authenticatedUser != null 
                     ? await _userManager.GetRolesAsync(authenticatedUser)
-                    : new List<string> { "user" },
-                CurrentProfilePicture = user.ProfilePicture,
-                DefaultProfilePicturePath = $"{_appEnvironment.WebRootPath}" +
-                    "/Files/default_profile_pic.jpg"
+                    : new List<string> { "user" }
             };
 
             Stream stream = new MemoryStream(user.ProfilePicture);
             model.ProfilePicture = new FormFile(stream, 0, 
-                user.ProfilePicture.Length, "name", "filename");
+                user.ProfilePicture.Length, "default_profile_picture",
+                "default_profile_pic.jpg");
 
             return View(model);
         }

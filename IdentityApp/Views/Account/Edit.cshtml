@@ -1,4 +1,5 @@
 ﻿@using System.IO
+@using System.Text 
 @model IdentityApp.ViewModels.EditUserViewModel
 
 @{
@@ -17,14 +18,8 @@
     }
     else
     {
-        using (FileStream fileStream = new FileStream(
-            Model.DefaultProfilePicturePath, FileMode.Open, FileAccess.Read))
-        {
-            imageData = await System.IO.File
-                .ReadAllBytesAsync(Model.DefaultProfilePicturePath);
-            await fileStream.ReadAsync(imageData, 0,
-                System.Convert.ToInt32(fileStream.Length));
-        }
+        imageData = Encoding.Default
+            .GetBytes(Model.CurrentProfilePictureString);
     }
 }
 
@@ -36,10 +31,8 @@
     <input type="hidden" asp-for="Email" value="@Model.Email" />
     <input type="hidden" asp-for="CalledFromAction" 
            value="@Model.CalledFromAction" />
-    <input type="hidden" asp-for="CurrentProfilePicture" 
-           value="@Model.CurrentProfilePicture" />
-    <input type="hidden" asp-for="DefaultProfilePicturePath" 
-           value="@Model.DefaultProfilePicturePath" />
+    <input type="hidden" asp-for="CurrentProfilePictureString" 
+           value="@Model.CurrentProfilePictureString" />
     <input type="hidden" asp-for="AuthenticatedUserRoles" 
            value="@Model.AuthenticatedUserRoles" />
 
