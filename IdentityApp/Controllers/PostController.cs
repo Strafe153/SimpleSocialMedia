@@ -150,21 +150,15 @@ namespace IdentityApp.Controllers
         {
             if (model.AppendedPostPictures != null)
             {
-                if (model.PostPictures.Count() 
-                    + model.AppendedPostPictures.Count() > 5)
+                if (model.CopiedPostPictures != null)
                 {
-                    ModelState.AddModelError("", 
-                        "A post can contain up to 5 pictures");
-                }
-            }
-            else if (model.PostPictures != null
-                && model.AppendedPostPictures != null)
-            {
-                if (model.PostPictures.Count()
-                    + model.AppendedPostPictures.Count() > 5)
-                {
-                    ModelState.AddModelError("",
-                        "A post can contain up to 5 pictures");
+                    if (model.AppendedPostPictures.Count() > 5
+                        || model.PostPictures.Count()
+                        + model.AppendedPostPictures.Count() > 5)
+                    {
+                        ModelState.AddModelError("",
+                            "A post can contain up to 5 pictures");
+                    }
                 }
             }
 

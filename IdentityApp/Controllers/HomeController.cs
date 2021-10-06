@@ -8,7 +8,6 @@ using IdentityApp.ViewModels;
 
 namespace IdentityApp.Controllers
 {
-    [AutoValidateAntiforgeryToken]
     public class HomeController : Controller
     {
         private readonly UserManager<User> _userManager;

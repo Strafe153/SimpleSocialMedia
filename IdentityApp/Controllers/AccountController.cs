@@ -74,6 +74,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             string defaultProfilePicPath = $"{_appEnvironment.WebRootPath}" +
