@@ -51,6 +51,15 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatePostViewModel model)
         {
+            if (model.PostPictures != null)
+            {
+                if (model.PostPictures.Count > 5)
+                {
+                    ModelState.AddModelError("",
+                        "A post can contain up to 5 pictures");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 User user = await _userManager.Users
@@ -139,6 +148,26 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
+            if (model.AppendedPostPictures != null)
+            {
+                if (model.PostPictures.Count() 
+                    + model.AppendedPostPictures.Count() > 5)
+                {
+                    ModelState.AddModelError("", 
+                        "A post can contain up to 5 pictures");
+                }
+            }
+            else if (model.PostPictures != null
+                && model.AppendedPostPictures != null)
+            {
+                if (model.PostPictures.Count()
+                    + model.AppendedPostPictures.Count() > 5)
+                {
+                    ModelState.AddModelError("",
+                        "A post can contain up to 5 pictures");
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 Post post = await _context.Posts
@@ -194,11 +223,9 @@ namespace IdentityApp.Controllers
                     }
                     else
                     {
+                        model.PostPictures = post.PostPictures;
                         ModelState.AddModelError("", "The length of your " +
                             "post must be between 1 and 350 symbols");
-
-                        model.PostPictures = post.PostPictures
-                            .OrderByDescending(postPic => postPic.UploadedTime);
                     }
                 }
                 else
