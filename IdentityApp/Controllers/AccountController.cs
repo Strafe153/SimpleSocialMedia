@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
@@ -201,8 +200,6 @@ namespace IdentityApp.Controllers
                 City = user.City,
                 Company = user.Company,
                 CalledFromAction = returnUrl[0..],
-                CurrentProfilePictureString = Encoding.Default
-                    .GetString(user.ProfilePicture),
                 AuthenticatedUserRoles = authenticatedUser != null 
                     ? await _userManager.GetRolesAsync(authenticatedUser)
                     : new List<string> { "user" }
@@ -294,6 +291,13 @@ namespace IdentityApp.Controllers
                     }
                 }
             }
+
+            model.UserName = user.UserName;
+
+            Stream stream = new MemoryStream(user.ProfilePicture);
+            model.ProfilePicture = new FormFile(stream, 0,
+                user.ProfilePicture.Length, "profile_picture",
+                "user_profile_picture");
 
             return View(model);
         }

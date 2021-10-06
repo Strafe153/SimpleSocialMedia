@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using IdentityApp.Models;
 
 namespace IdentityApp.ViewModels
 {

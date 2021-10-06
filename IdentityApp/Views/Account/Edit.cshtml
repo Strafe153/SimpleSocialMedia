@@ -1,5 +1,4 @@
 ﻿@using System.IO
-@using System.Text 
 @model IdentityApp.ViewModels.EditUserViewModel
 
 @{
@@ -16,24 +15,17 @@
                 (int)Model.ProfilePicture.Length);
         }
     }
-    else
-    {
-        imageData = Encoding.Default
-            .GetBytes(Model.CurrentProfilePictureString);
-    }
 }
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
-    <div asp-validation-summary="ModelOnly" 
+    <div asp-validation-summary="ModelOnly"
          class="validation alert alert-danger" role="alert"></div>
 
     <input type="hidden" asp-for="Id" value="@Model.Id" />
     <input type="hidden" asp-for="Email" value="@Model.Email" />
-    <input type="hidden" asp-for="CalledFromAction" 
+    <input type="hidden" asp-for="CalledFromAction"
            value="@Model.CalledFromAction" />
-    <input type="hidden" asp-for="CurrentProfilePictureString" 
-           value="@Model.CurrentProfilePictureString" />
-    <input type="hidden" asp-for="AuthenticatedUserRoles" 
+    <input type="hidden" asp-for="AuthenticatedUserRoles"
            value="@Model.AuthenticatedUserRoles" />
 
     <div class="form-group">
@@ -85,7 +77,7 @@
     <div class="form-group">
         @if (Model.CalledFromAction.Contains("Users"))
         {
-            <a asp-action="Index" 
+            <a asp-action="Index"
                asp-controller="Users"
                class="btn btn-outline-secondary">
                 Cancel
