@@ -114,6 +114,13 @@
                     Change Roles
                 </a>
             }
+
+            <a asp-action="Delete" 
+               asp-controller="Users" 
+               asp-route-userId="@Model.Id"
+               class="btn btn-danger">
+                Delete
+            </a>
         </div>
     </div>
 </form>

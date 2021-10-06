@@ -101,8 +101,9 @@ namespace IdentityApp.Controllers
             };
         }
 
-        [HttpPost]
-        [Authorize(Roles = "admin")]
+        /*[HttpPost]*/
+        /*[Authorize(Roles = "admin")]*/
+        [Authorize]
         public async Task<IActionResult> Delete(string userId)
         {
             User user = await _userManager.FindByIdAsync(userId);

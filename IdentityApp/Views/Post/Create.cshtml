@@ -19,14 +19,15 @@
         <label asp-for="Content" class="control-label"></label><br />
         <textarea asp-for="Content" placeholder="Your thoughts..."
                   class="form-control" rows="6"></textarea>
-        <span asp-validation-for="Content"></span>
     </div>
     <div class="form-group custom-file mb-3">
-        <label class="custom-file-label" for="custom-file">
+        <label asp-for="PostPictures" for="custom-file" 
+               class="custom-file-label" >
             Choose pictures
         </label>
         <input type="file" asp-for="PostPictures" class="custom-file-input"
                id="post-picture" accept="image/jpeg,image/png" multiple />
+        <span asp-validation-for="PostPictures"></span>
     </div>
     <div class="form-group">
         <a asp-action="Index"
