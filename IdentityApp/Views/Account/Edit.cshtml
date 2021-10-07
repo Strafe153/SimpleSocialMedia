@@ -118,6 +118,7 @@
             <a asp-action="Delete" 
                asp-controller="Users" 
                asp-route-userId="@Model.Id"
+               asp-route-returnUrl="@Model.CalledFromAction"
                class="btn btn-danger">
                 Delete
             </a>

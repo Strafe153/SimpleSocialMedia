@@ -78,7 +78,9 @@
             <td>@user?.Year</td>
             <td>@user.Country</td>
             <td>
-                <form asp-action="Delete" asp-route-userId="@user.Id" 
+                <form asp-action="Delete" 
+                      asp-route-userId="@user.Id"
+                      asp-route-returnUrl="@Context.Request.Path"
                       method="post">
                     <a asp-action="Edit" 
                        asp-controller="Account" 

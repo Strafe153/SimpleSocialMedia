@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -101,7 +102,7 @@ namespace IdentityApp.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Delete(string userId)
+        public async Task<IActionResult> Delete(string userId, string returnUrl)
         {
             User user = await _userManager.FindByIdAsync(userId);
 
@@ -113,8 +114,8 @@ namespace IdentityApp.Controllers
 
                 foreach (Post post in user.Posts)
                 {
-                    ownedPosts.AddRange(_context.LikedPosts.Where(
-                        likedPost => likedPost.PostId == post.Id));
+                    ownedPosts.AddRange(_context.LikedPosts
+                        .Where(likedPost => likedPost.PostId == post.Id));
                 }
 
                 foreach (LikedPost likedPost in likedPosts)
@@ -134,7 +135,8 @@ namespace IdentityApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", returnUrl.Contains("users",
+                StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
         }
 
         [HttpGet]
