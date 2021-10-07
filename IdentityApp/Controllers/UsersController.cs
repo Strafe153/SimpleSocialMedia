@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -28,18 +29,17 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Index(AdminPanelViewModel model)
         {
             const int PAGE_SIZE = 5;
-            int usersNumber;
 
             IQueryable<User> users = _userManager.Users;
-            FilterUsers(ref users, model.UserName, model.Email,
-                model.Year, model.Country);
+            FilterUsers(ref users, model.UserName, model.Email,model.Year, 
+                model.Country);
             users = ChooseSort(users, model.SortOrder);
 
-            usersNumber = await users.CountAsync();
-            var currentPageUsers = await users
+            int usersNumber = await users.CountAsync();
+            IEnumerable<User> currentPageUsers = users
                 .Skip((model.Page - 1) * PAGE_SIZE)
                 .Take(PAGE_SIZE)
-                .ToListAsync();
+                .AsEnumerable();
 
             var filterSortPageViewModel = new FilterSortPageViewModel()
             {
@@ -67,9 +67,9 @@ namespace IdentityApp.Controllers
                 users = users.Where(user => user.Email.Contains(email));
             }
 
-            if (year != null)
+            if (year.HasValue)
             {
-                users = users.Where(user => user.Year == year);
+                users = users.Where(user => user.Year == year.Value);
             }
 
             if (!string.IsNullOrEmpty(country))
@@ -101,33 +101,30 @@ namespace IdentityApp.Controllers
             };
         }
 
-        /*[HttpPost]*/
-        /*[Authorize(Roles = "admin")]*/
         [Authorize]
-        public async Task<IActionResult> Delete(string userId)
+        public async Task<IActionResult> Delete(string userId, string returnUrl)
         {
             User user = await _userManager.FindByIdAsync(userId);
 
             if (user != null)
             {
-                List<LikedPost> ownedOrLikedPosts = new List<LikedPost>();
+                IEnumerable<LikedPost> likedPosts = _context.LikedPosts.Where(
+                    likedPost => likedPost.UserId == user.Id);
+                List<LikedPost> ownedPosts = new List<LikedPost>();
 
                 foreach (Post post in user.Posts)
                 {
-                    ownedOrLikedPosts.AddRange(_context.LikedPosts.Where(
-                        likedPost => likedPost.PostId == post.Id 
-                        || likedPost.UserId == user.Id));
+                    ownedPosts.AddRange(_context.LikedPosts
+                        .Where(likedPost => likedPost.PostId == post.Id));
                 }
 
-                foreach (LikedPost post in ownedOrLikedPosts)
+                foreach (LikedPost likedPost in likedPosts)
                 {
-                    if (post.UserId == user.Id)
-                    {
-                        post.Post.Likes--;
-                    }
+                    likedPost.Post.Likes--;
                 }
 
-                _context.LikedPosts.RemoveRange(ownedOrLikedPosts);
+                _context.LikedPosts.RemoveRange(ownedPosts);
+                _context.LikedPosts.RemoveRange(likedPosts);
 
                 if (user.UserName == User.Identity.Name)
                 {
@@ -138,7 +135,8 @@ namespace IdentityApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", returnUrl.Contains("users",
+                StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
         }
 
         [HttpGet]

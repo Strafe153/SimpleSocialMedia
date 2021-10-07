@@ -74,6 +74,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             string defaultProfilePicPath = $"{_appEnvironment.WebRootPath}" +
@@ -199,7 +200,7 @@ namespace IdentityApp.Controllers
                 Country = user.Country,
                 City = user.City,
                 Company = user.Company,
-                CalledFromAction = returnUrl[0..],
+                CalledFromAction = returnUrl,
                 AuthenticatedUserRoles = authenticatedUser != null 
                     ? await _userManager.GetRolesAsync(authenticatedUser)
                     : new List<string> { "user" }
