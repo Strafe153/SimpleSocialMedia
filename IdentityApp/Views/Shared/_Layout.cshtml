@@ -40,13 +40,15 @@
                         {
                             <ul class="navbar-nav flex-grow-1">
                                 <li class="nav-item">
-                                    <a asp-action="Index" asp-controller="Account"
-                                       asp-route-userName="@User.Identity.Name" class="nav-link text-dark">
+                                    <a asp-action="Index" 
+                                       asp-controller="Account"
+                                       asp-route-userName="@User.Identity.Name" 
+                                       class="nav-link text-dark">
                                         @User.Identity.Name
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <form asp-action="Logout" asp-controller="Account" method="post">
+                                    <form asp-action="Logout" asp-controller="Account" asp-route-userName="@User.Identity.Name" method="post">
                                         <input type="submit" value="Log Out" class="nav-link text-danger btn btn-default" />
                                     </form>
                                 </li>
