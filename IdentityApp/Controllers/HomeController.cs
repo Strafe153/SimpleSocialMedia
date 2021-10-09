@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -12,12 +13,14 @@ namespace IdentityApp.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
         public HomeController(UserManager<User> userManager, 
-            ApplicationDbContext context)
+            ApplicationDbContext context, ILogger<HomeController> logger)
         {
             _userManager = userManager;
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -48,6 +51,7 @@ namespace IdentityApp.Controllers
                     : new List<string> { "user" },
             };
 
+            _logger.LogInformation("On Home page");
             return View(model);
         }
     }
