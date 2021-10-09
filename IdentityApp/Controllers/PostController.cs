@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
@@ -18,12 +19,14 @@ namespace IdentityApp.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        public PostController(UserManager<User> userManager, 
-            ApplicationDbContext context)
+        public PostController(UserManager<User> userManager,
+            ApplicationDbContext context, ILogger<PostController> logger)
         {
             _userManager = userManager;
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -45,6 +48,7 @@ namespace IdentityApp.Controllers
                 }
             }
 
+            _logger.LogError("User not found");
             return NotFound();
         }
 
@@ -57,6 +61,7 @@ namespace IdentityApp.Controllers
                 {
                     ModelState.AddModelError("",
                         "A post can contain up to 5 pictures");
+                    _logger.LogWarning("A post can contain up to 5 pictures");
                 }
             }
 
@@ -103,11 +108,15 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("", "The length of your " +
                             "post must be between 1 and 350 symbols");
+                        _logger.LogWarning("The length of a post must be " +
+                            "between 1 and 350 symbols");
                     }
                     else
                     {
                         user.Posts.Add(post);
                         await _userManager.UpdateAsync(user);
+                        _logger.LogInformation($"User {user.UserName} " +
+                            "created a post");
 
                         return RedirectToAction("Index", "Account",
                             new { userName = user.UserName });
@@ -115,6 +124,7 @@ namespace IdentityApp.Controllers
                 }
             }
 
+            _logger.LogWarning("CreatePostViewModel is not valid");
             return View(model);
         }
 
@@ -126,6 +136,7 @@ namespace IdentityApp.Controllers
 
             if (post == null)
             {
+                _logger.LogError("Post not found");
                 return NotFound();
             }
 
@@ -158,6 +169,8 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("",
                             "A post can contain up to 5 pictures");
+                        _logger.LogWarning("A post can contain up to " +
+                            "5 pictures");
                     }
                 }
             }
@@ -180,7 +193,7 @@ namespace IdentityApp.Controllers
                             {
                                 byte[] pictureData = null;
 
-                                using (BinaryReader binaryReader = 
+                                using (BinaryReader binaryReader =
                                     new BinaryReader(postPic.OpenReadStream()))
                                 {
                                     pictureData = binaryReader.ReadBytes(
@@ -204,6 +217,8 @@ namespace IdentityApp.Controllers
 
                         _context.Update(post);
                         await _context.SaveChangesAsync();
+                        _logger.LogInformation($"User {user.UserName}'s post " +
+                            "was edited");
 
                         if (model.ReturnUrl.Contains("Account"))
                         {
@@ -224,10 +239,12 @@ namespace IdentityApp.Controllers
                 }
                 else
                 {
+                    _logger.LogError("Post not found");
                     return NotFound();
                 }
             }
 
+            _logger.LogWarning("EditPostViewModel is not valid");
             return View(model);
         }
 
@@ -250,6 +267,13 @@ namespace IdentityApp.Controllers
 
                 _context.Posts.Remove(post);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation($"User {user.UserName}'s post " +
+                    "was deleted");
+            }
+            else
+            {
+                _logger.LogError("Post not found");
+                return NotFound();
             }
 
             if (returnUrl.Contains("Account"))
@@ -260,7 +284,7 @@ namespace IdentityApp.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-        
+
         public async Task<IActionResult> Like(PostLikeViewModel model)
         {
             User user = await _userManager.FindByIdAsync(model.UserId);
@@ -273,13 +297,15 @@ namespace IdentityApp.Controllers
                 if (post != null)
                 {
                     LikedPost postToCheck = user.LikedPosts
-                        .FirstOrDefault(post => post.UserId == model.UserId 
+                        .FirstOrDefault(post => post.UserId == model.UserId
                                         && post.PostId == model.PostId);
 
                     if (postToCheck != null)
                     {
                         user.LikedPosts.Remove(postToCheck);
                         post.Likes--;
+                        _logger.LogInformation($"User {user.UserName} removed " +
+                            "a like from a post");
                     }
                     else
                     {
@@ -292,23 +318,34 @@ namespace IdentityApp.Controllers
                                 Post = post
                             });
                         post.Likes++;
+                        _logger.LogInformation($"User {user.UserName} " +
+                            "liked a post");
                     }
 
                     await _context.SaveChangesAsync();
                 }
+                else
+                {
+                    _logger.LogError("Post not found");
+                    return NotFound();
+                }
 
                 if (model.ReturnAction.Contains("Account"))
                 {
-                    return RedirectToAction("Index", "Account", 
-                        new { userName = model.LikedPostUserName,
-                              page = model.Page });
+                    return RedirectToAction("Index", "Account",
+                        new
+                        {
+                            userName = model.LikedPostUserName,
+                            page = model.Page
+                        });
                 }
 
-                return RedirectToAction("Index", "Home", 
+                return RedirectToAction("Index", "Home",
                     new { page = model.Page });
             }
             else
             {
+                _logger.LogError("User not found");
                 return NotFound();
             }
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,15 +19,18 @@ namespace IdentityApp.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _appEnvironment;
+        private readonly ILogger _logger;
 
         public AccountController(UserManager<User> userManager, 
             SignInManager<User> signInManager, ApplicationDbContext context,
-            IWebHostEnvironment appeEnvironment)
+            IWebHostEnvironment appeEnvironment, 
+            ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _appEnvironment = appeEnvironment;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -39,7 +43,7 @@ namespace IdentityApp.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 authenticatedUser = await _userManager
-                .FindByNameAsync(User.Identity.Name);
+                    .FindByNameAsync(User.Identity.Name);
             }
 
             if (user != null)
@@ -61,9 +65,11 @@ namespace IdentityApp.Controllers
                         : new List<string> { "user" }
                 };
 
+                _logger.LogInformation($"On user {user.UserName} profile");
                 return View(viewModel);
             }
 
+            _logger.LogError($"User not found");
             return NotFound();
         }
 
@@ -110,6 +116,7 @@ namespace IdentityApp.Controllers
                     {
                         await _userManager.AddToRoleAsync(user, "user");
                         await _signInManager.SignInAsync(user, false);
+                        _logger.LogInformation($"Created user {user.UserName}");
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -118,15 +125,20 @@ namespace IdentityApp.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
+                        _logger.LogWarning("Failed to create user " +
+                            $"{user.UserName}");
                     }
                 }
                 else
                 {
                     ModelState.AddModelError("", "User with such an email " +
                         "and/or username already exists");
+                    _logger.LogWarning($"User with such email {model.Email} " +
+                        $"and/or username {model.UserName} already exists");
                 }
             }
 
+            _logger.LogWarning("RegisterViewModel is not valid");
             return View(model);
         }
 
@@ -153,28 +165,36 @@ namespace IdentityApp.Controllers
                     {
                         await _signInManager.PasswordSignInAsync(user.UserName,
                             model.Password, model.RememberMe, false);
+                        _logger.LogInformation($"User {user.UserName} " +
+                            "logged in");
                         return RedirectToAction("Index", "Home");
                     }
                     else
                     {
                         ModelState.AddModelError("", "Incorrect password");
+                        _logger.LogWarning($"User {user.UserName} failed " +
+                            $"to log in");
                     }
                 }
                 else
                 {
                     ModelState.AddModelError("", 
                         "User with such an email doesn't exist");
+                    _logger.LogWarning($"User with email {model.Email} " +
+                        "doesn't exist");
                 }
             }
 
+            _logger.LogWarning("LoginViewModel is not valid");
             return View(model);
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(string userName)
         {
             await _signInManager.SignOutAsync();
+            _logger.LogInformation($"User {userName} logged out");
             return RedirectToAction("Index", "Home");
         }
 
@@ -187,6 +207,7 @@ namespace IdentityApp.Controllers
 
             if (user == null)
             {
+                _logger.LogError($"User {user.UserName} not found");
                 return NotFound();
             }
 
@@ -211,6 +232,7 @@ namespace IdentityApp.Controllers
                 user.ProfilePicture.Length, "default_profile_picture",
                 "default_profile_pic.jpg");
 
+            _logger.LogInformation($"Editing user {user.UserName}");
             return View(model);
         }
 
@@ -231,6 +253,8 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("", 
                             "The username is already taken");
+                        _logger.LogWarning($"The username {model.UserName} is " +
+                            "already taken");
                     }
                 }
             }
@@ -267,11 +291,15 @@ namespace IdentityApp.Controllers
                 if (result.Succeeded)
                 {
                     await _context.SaveChangesAsync();
+                    _logger.LogInformation("Information updated for " +
+                        $"{user.UserName}");
 
                     if (userNameChanged)
                     {
                         await _signInManager.SignOutAsync();
                         await _signInManager.SignInAsync(user, false);
+                        _logger.LogInformation($"User {user.UserName}" +
+                            "relogged in");
                     }
 
                     if (model.CalledFromAction.Contains("Account"))
@@ -290,6 +318,8 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("", error.Description);
                     }
+                    _logger.LogWarning($"User {user.UserName} profile " +
+                        "information hasn't been updated");
                 }
             }
 
@@ -300,6 +330,7 @@ namespace IdentityApp.Controllers
                 user.ProfilePicture.Length, "profile_picture",
                 "user_profile_picture");
 
+            _logger.LogWarning("EditUserViewModel is not valid");
             return View(model);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -16,13 +17,16 @@ namespace IdentityApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly SignInManager<User> _signInManager;
+        private readonly ILogger _logger;
 
         public UsersController(UserManager<User> userManager,
-            ApplicationDbContext context, SignInManager<User> signInManager)
+            ApplicationDbContext context, SignInManager<User> signInManager,
+            ILogger<UsersController> logger)
         {
             _userManager = userManager;
             _context = context;
             _signInManager = signInManager;
+            _logger = logger;
         }
 
         [Authorize(Roles = "admin")]
@@ -51,6 +55,7 @@ namespace IdentityApp.Controllers
                     model.Page, usersNumber, PAGE_SIZE)
             };
 
+            _logger.LogInformation("On Users page");
             return View(filterSortPageViewModel);
         }
 
@@ -133,10 +138,16 @@ namespace IdentityApp.Controllers
 
                 await _userManager.DeleteAsync(user);
                 await _context.SaveChangesAsync();
-            }
+                _logger.LogInformation($"Deleted user {user.UserName}");
 
-            return RedirectToAction("Index", returnUrl.Contains("users",
-                StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
+                return RedirectToAction("Index", returnUrl.Contains("users",
+                    StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
+            }
+            else
+            {
+                _logger.LogError($"User {user.UserName} not found");
+                return NotFound();
+            }
         }
 
         [HttpGet]
@@ -148,6 +159,7 @@ namespace IdentityApp.Controllers
 
             if (user == null)
             {
+                _logger.LogError($"User {user.UserName} not found");
                 return NotFound();
             }
 
@@ -178,6 +190,9 @@ namespace IdentityApp.Controllers
 
                     if (result.Succeeded)
                     {
+                        _logger.LogInformation("Changed password for " +
+                            $"user {user.UserName}");
+
                         if (!string.IsNullOrEmpty(model.ReturnUrl) 
                             && Url.IsLocalUrl(model.ReturnUrl))
                         {
@@ -192,11 +207,14 @@ namespace IdentityApp.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
+                        _logger.LogWarning("Failed to change user " +
+                            $"{user.UserName}'s password");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "The user has not been found");
+                    _logger.LogError($"User {user.UserName} not found");
+                    return NotFound();
                 }
             }
 

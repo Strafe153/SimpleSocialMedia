@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using IdentityApp.Models;
@@ -8,10 +9,13 @@ namespace IdentityApp.Controllers
     public class PostPictureController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        public PostPictureController (ApplicationDbContext context)
+        public PostPictureController (ApplicationDbContext context,
+            ILogger<PostPictureController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Delete(string[] postPictureIds, 
@@ -25,6 +29,7 @@ namespace IdentityApp.Controllers
                 if (postPicture != null)
                 {
                     _context.PostPictures.Remove(postPicture);
+                    _logger.LogInformation("User deleted a post picture");
                 }
             }
 
