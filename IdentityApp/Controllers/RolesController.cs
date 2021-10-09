@@ -29,6 +29,7 @@ namespace IdentityApp.Controllers
 
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("On Roles page");
             return View(await _roleManager.Roles.ToListAsync());
         }
 
