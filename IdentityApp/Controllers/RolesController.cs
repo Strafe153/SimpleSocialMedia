@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +16,15 @@ namespace IdentityApp.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger _logger;
 
         public RolesController(UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager, 
+            ILogger<RolesController> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -44,6 +48,7 @@ namespace IdentityApp.Controllers
 
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation($"Created role {name}");
                     return RedirectToAction("Index");
                 }
                 else
@@ -52,9 +57,11 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("", error.Description);
                     }
+                    _logger.LogWarning($"Failed to create {name} role");
                 }
             }
 
+            _logger.LogWarning("Role name is not profived");
             return View(name);
         }
 
@@ -66,6 +73,7 @@ namespace IdentityApp.Controllers
             if (role != null)
             {
                 await _roleManager.DeleteAsync(role);
+                _logger.LogInformation($"Deleted role {role.Name}");
             }
 
             return RedirectToAction("Index");
@@ -90,6 +98,7 @@ namespace IdentityApp.Controllers
                 return View(model);
             }
 
+            _logger.LogError($"User {user.UserName} not found");
             return NotFound();
         }
 
@@ -97,27 +106,26 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(string userId, 
             List<string> roles, string returnUrl)
         {
-            if (ModelState.IsValid)
+            User user = await _userManager.FindByIdAsync(userId);
+
+            if (user != null)
             {
-                User user = await _userManager.FindByIdAsync(userId);
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var addedRoles = roles.Except(userRoles);
+                var removedRoles = userRoles.Except(roles);
 
-                if (user != null)
+                await _userManager.AddToRolesAsync(user, addedRoles);
+                await _userManager.RemoveFromRolesAsync(user, removedRoles);
+                _logger.LogInformation($"Changed ser {user.UserName} roles");
+
+                if (!string.IsNullOrEmpty(returnUrl)
+                    && Url.IsLocalUrl(returnUrl))
                 {
-                    var userRoles = await _userManager.GetRolesAsync(user);
-                    var addedRoles = roles.Except(userRoles);
-                    var removedRoles = userRoles.Except(roles);
-
-                    await _userManager.AddToRolesAsync(user, addedRoles);
-                    await _userManager.RemoveFromRolesAsync(user, removedRoles);
-
-                    if (!string.IsNullOrEmpty(returnUrl) 
-                        && Url.IsLocalUrl(returnUrl))
-                    {
-                        return LocalRedirect(returnUrl);
-                    }
+                    return LocalRedirect(returnUrl);
                 }
             }
 
+            _logger.LogError($"User {user.UserName} not found");
             return NotFound();
         }
     }
