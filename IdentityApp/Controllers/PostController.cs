@@ -217,7 +217,8 @@ namespace IdentityApp.Controllers
 
                         _context.Update(post);
                         await _context.SaveChangesAsync();
-                        _logger.LogInformation($"User {user.UserName} edited a post");
+                        _logger.LogInformation($"User {user.UserName}'s post " +
+                            "was edited");
 
                         if (model.ReturnUrl.Contains("Account"))
                         {
@@ -266,7 +267,8 @@ namespace IdentityApp.Controllers
 
                 _context.Posts.Remove(post);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"User {user.UserName} deleted a post");
+                _logger.LogInformation($"User {user.UserName}'s post " +
+                    "was deleted");
             }
             else
             {
