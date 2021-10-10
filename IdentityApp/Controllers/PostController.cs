@@ -55,15 +55,7 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatePostViewModel model)
         {
-            if (model.PostPictures != null)
-            {
-                if (model.PostPictures.Count > 5)
-                {
-                    ModelState.AddModelError("",
-                        "A post can contain up to 5 pictures");
-                    _logger.LogWarning("A post can contain up to 5 pictures");
-                }
-            }
+            CheckPicturesCountOnCreate(model);
 
             if (ModelState.IsValid)
             {
@@ -78,29 +70,7 @@ namespace IdentityApp.Controllers
                     UserId = user.Id
                 };
 
-                if (model.PostPictures != null)
-                {
-                    foreach (IFormFile postPic in model.PostPictures)
-                    {
-                        byte[] pictureData = null;
-
-                        using (BinaryReader binaryReader = new BinaryReader(
-                            postPic.OpenReadStream()))
-                        {
-                            pictureData = binaryReader.ReadBytes(
-                                (int)postPic.Length);
-                        }
-
-                        PostPicture postPicture = new PostPicture()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            PictureData = pictureData,
-                            UploadedTime = DateTime.Now
-                        };
-
-                        post.PostPictures.Add(postPicture);
-                    }
-                }
+                AddPostPicturesToPost(model.PostPictures, post);
 
                 if (user != null)
                 {
@@ -121,6 +91,11 @@ namespace IdentityApp.Controllers
                         return RedirectToAction("Index", "Account",
                             new { userName = user.UserName });
                     }
+                }
+                else
+                {
+                    _logger.LogError($"User {user.UserName} not found");
+                    return NotFound();
                 }
             }
 
@@ -159,21 +134,7 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
-            if (model.AppendedPostPictures != null)
-            {
-                if (model.CopiedPostPictures != null)
-                {
-                    if (model.AppendedPostPictures.Count() > 5
-                        || model.PostPictures.Count()
-                        + model.AppendedPostPictures.Count() > 5)
-                    {
-                        ModelState.AddModelError("",
-                            "A post can contain up to 5 pictures");
-                        _logger.LogWarning("A post can contain up to " +
-                            "5 pictures");
-                    }
-                }
-            }
+            CheckPicturesCountOnEdit(model);
 
             if (ModelState.IsValid)
             {
@@ -187,30 +148,7 @@ namespace IdentityApp.Controllers
                         User user = await _userManager
                             .FindByIdAsync(model.UserId);
 
-                        if (model.AppendedPostPictures != null)
-                        {
-                            foreach (var postPic in model.AppendedPostPictures)
-                            {
-                                byte[] pictureData = null;
-
-                                using (BinaryReader binaryReader =
-                                    new BinaryReader(postPic.OpenReadStream()))
-                                {
-                                    pictureData = binaryReader.ReadBytes(
-                                        (int)postPic.Length);
-                                }
-
-                                PostPicture postPicture = new PostPicture()
-                                {
-                                    Id = Guid.NewGuid().ToString(),
-                                    PictureData = pictureData,
-                                    UploadedTime = DateTime.Now
-                                };
-
-                                post.PostPictures.Add(postPicture);
-                            }
-                        }
-
+                        AddPostPicturesToPost(model.AppendedPostPictures, post);
                         post.Content = model.Content;
                         post.PostedTime = model.PostedTime;
                         post.IsEdited = true;
@@ -300,28 +238,7 @@ namespace IdentityApp.Controllers
                         .FirstOrDefault(post => post.UserId == model.UserId
                                         && post.PostId == model.PostId);
 
-                    if (postToCheck != null)
-                    {
-                        user.LikedPosts.Remove(postToCheck);
-                        post.Likes--;
-                        _logger.LogInformation($"User {user.UserName} removed " +
-                            "a like from a post");
-                    }
-                    else
-                    {
-                        user.LikedPosts.Add(
-                            new LikedPost()
-                            {
-                                UserId = user.Id,
-                                User = user,
-                                PostId = post.Id,
-                                Post = post
-                            });
-                        post.Likes++;
-                        _logger.LogInformation($"User {user.UserName} " +
-                            "liked a post");
-                    }
-
+                    LikeDislikePost(post, postToCheck, user);
                     await _context.SaveChangesAsync();
                 }
                 else
@@ -332,12 +249,9 @@ namespace IdentityApp.Controllers
 
                 if (model.ReturnAction.Contains("Account"))
                 {
-                    return RedirectToAction("Index", "Account",
-                        new
-                        {
-                            userName = model.LikedPostUserName,
-                            page = model.Page
-                        });
+                    return RedirectToAction("Index", "Account", new { 
+                        userName = model.LikedPostUserName, 
+                        page = model.Page });
                 }
 
                 return RedirectToAction("Index", "Home",
@@ -347,6 +261,92 @@ namespace IdentityApp.Controllers
             {
                 _logger.LogError("User not found");
                 return NotFound();
+            }
+        }
+
+        private void CheckPicturesCountOnCreate(CreatePostViewModel model)
+        {
+            if (model.PostPictures != null)
+            {
+                if (model.PostPictures.Count > 5)
+                {
+                    ModelState.AddModelError("",
+                        "A post can contain up to 5 pictures");
+                    _logger.LogWarning("A post can contain up to 5 pictures");
+                }
+            }
+        }
+
+        private void CheckPicturesCountOnEdit(EditPostViewModel model)
+        {
+            if (model.AppendedPostPictures != null)
+            {
+                if (model.CopiedPostPictures != null)
+                {
+                    if (model.AppendedPostPictures.Count() > 5
+                        || model.PostPictures.Count()
+                        + model.AppendedPostPictures.Count() > 5)
+                    {
+                        ModelState.AddModelError("",
+                            "A post can contain up to 5 pictures");
+                        _logger.LogWarning("A post can contain up to " +
+                            "5 pictures");
+                    }
+                }
+            }
+        }
+
+        private void AddPostPicturesToPost(IFormFileCollection picturesToAdd,
+            Post post)
+        {
+            if (picturesToAdd != null)
+            {
+                foreach (IFormFile postPic in picturesToAdd)
+                {
+                    byte[] pictureData = null;
+
+                    using (BinaryReader binaryReader =
+                        new BinaryReader(postPic.OpenReadStream()))
+                    {
+                        pictureData = binaryReader.ReadBytes(
+                            (int)postPic.Length);
+                    }
+
+                    PostPicture postPicture = new PostPicture()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        PictureData = pictureData,
+                        UploadedTime = DateTime.Now
+                    };
+
+                    post.PostPictures.Add(postPicture);
+                }
+            }
+        }
+
+        private void LikeDislikePost(Post postToLike, LikedPost postToCheck,
+            User user)
+        {
+            if (postToCheck != null)
+            {
+                user.LikedPosts.Remove(postToCheck);
+                postToLike.Likes--;
+                _logger.LogInformation($"User {user.UserName} removed " +
+                    "a like from a post");
+            }
+            else
+            {
+                user.LikedPosts.Add(
+                    new LikedPost()
+                    {
+                        UserId = user.Id,
+                        User = user,
+                        PostId = postToLike.Id,
+                        Post = postToLike
+                    });
+                postToLike.Likes++;
+                _logger.LogInformation($"User {user.UserName} " +
+                    "liked a post");
             }
         }
     }
