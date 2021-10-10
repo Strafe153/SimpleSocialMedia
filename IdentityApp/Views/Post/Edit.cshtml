@@ -4,8 +4,7 @@
     ViewData["Title"] = "Editing a post";
 }
 
-<form asp-action="Edit" asp-route-returnUrl="@Model.ReturnUrl" method ="post"
-      enctype="multipart/form-data">
+<form asp-action="Edit" method ="post" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly"
          class="validation alert alert-danger" role="alert"></div>
 
@@ -13,9 +12,12 @@
     <input type="hidden" asp-for="UserId" value="@Model.UserId" />
     <input type="hidden" asp-for="UserName" value="@Model.UserName" />
     <input type="hidden" asp-for="PostedTime" value="@Model.PostedTime" />
+    <input type="hidden" asp-for="CalledFromAction" 
+           value="@Model.CalledFromAction" />
 
     <input type="hidden" asp-for="PostPictures" value="@Model.PostPictures" />
-    <input type="hidden" asp-for="CopiedPostPictures" value="@Model.PostPictures" />
+    <input type="hidden" asp-for="CopiedPostPictures" 
+           value="@Model.PostPictures" />
 
     <div class="form-group">
         <label asp-for="Content">Post</label><br />
@@ -40,7 +42,7 @@
         </div>
 
         <div class="form-group custom-file mt-1">
-            <label class="custom-file-label" asp-for="AppendedPostPictures"
+            <label asp-for="AppendedPostPictures" class="custom-file-label"
                    for="custom-file">
                 Choose pictures
             </label>
@@ -50,7 +52,7 @@
         </div>
     </div>
     <div class="form-group">
-        @if (Model.ReturnUrl.Contains("Account"))
+        @if (Model.CalledFromAction.Contains("Account"))
         {
             <a asp-action="Index"
                asp-controller="Account"
@@ -71,7 +73,7 @@
         <input type="submit" class="btn btn-primary save-button" value="Save" />
 
         <a asp-action="Delete" asp-route-postId="@Model.Id"
-           asp-route-returnUrl="@Model.ReturnUrl"
+           asp-route-returnUrl="@Model.CalledFromAction"
            class="d-inline float-right btn btn-danger">
             Delete
         </a>

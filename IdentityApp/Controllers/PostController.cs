@@ -122,7 +122,7 @@ namespace IdentityApp.Controllers
                 PostedTime = post.PostedTime,
                 UserId = post.UserId,
                 UserName = post.User.UserName,
-                ReturnUrl = returnUrl,
+                CalledFromAction = returnUrl,
                 PostPictures = post.PostPictures
                     .OrderByDescending(postPic => postPic.UploadedTime)
                     .AsEnumerable()
@@ -134,14 +134,14 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
-            CheckPicturesCountOnEdit(model);
-
-            if (ModelState.IsValid)
-            {
-                Post post = await _context.Posts
+            Post post = await _context.Posts
                     .FirstOrDefaultAsync(post => post.Id == model.Id);
 
-                if (post != null)
+            if (post != null)
+            {
+                CheckPicturesCountOnEdit(model);
+
+                if (ModelState.IsValid)
                 {
                     if (model.Content != null)
                     {
@@ -158,7 +158,7 @@ namespace IdentityApp.Controllers
                         _logger.LogInformation($"User {user.UserName}'s post " +
                             "was edited");
 
-                        if (model.ReturnUrl.Contains("Account"))
+                        if (model.CalledFromAction.Contains("Account"))
                         {
                             return RedirectToAction("Index", "Account",
                                 new { userName = user.UserName });
@@ -170,20 +170,19 @@ namespace IdentityApp.Controllers
                     }
                     else
                     {
-                        model.PostPictures = post.PostPictures;
                         ModelState.AddModelError("", "The length of your " +
                             "post must be between 1 and 350 symbols");
                     }
                 }
-                else
-                {
-                    _logger.LogError("Post not found");
-                    return NotFound();
-                }
+
+                model.PostPictures = post.PostPictures;
+
+                _logger.LogWarning("EditPostViewModel is not valid");
+                return View(model);
             }
 
-            _logger.LogWarning("EditPostViewModel is not valid");
-            return View(model);
+            _logger.LogError("Post not found");
+            return NotFound();
         }
 
         public async Task<IActionResult> Delete(string postId, string returnUrl)
@@ -283,6 +282,8 @@ namespace IdentityApp.Controllers
             {
                 if (model.CopiedPostPictures != null)
                 {
+                    // just model.AppendedPostPictures.Count() +
+                    // model.PostPicturesCount() > 5 would suffice
                     if (model.AppendedPostPictures.Count() > 5
                         || model.PostPictures.Count()
                         + model.AppendedPostPictures.Count() > 5)
