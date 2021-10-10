@@ -83,9 +83,6 @@ namespace IdentityApp.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            string defaultProfilePicPath = $"{_appEnvironment.WebRootPath}" +
-                "/Files/default_profile_pic.jpg";
-
             if (ModelState.IsValid)
             {
                 User existingUser = await _context.Users.FirstOrDefaultAsync(
@@ -100,15 +97,7 @@ namespace IdentityApp.Controllers
                         UserName = model.UserName
                     };
 
-                    using (FileStream fileStream = new FileStream(
-                        defaultProfilePicPath, FileMode.Open, FileAccess.Read))
-                    {
-                        user.ProfilePicture = await System.IO.File
-                            .ReadAllBytesAsync(defaultProfilePicPath);
-                        await fileStream.ReadAsync(user.ProfilePicture, 0,
-                            System.Convert.ToInt32(fileStream.Length));
-                    }
-
+                    await SetDefaultProfilePicture(user);
                     IdentityResult result = await _userManager
                         .CreateAsync(user, model.Password);
 
@@ -221,16 +210,13 @@ namespace IdentityApp.Controllers
                 Country = user.Country,
                 City = user.City,
                 Company = user.Company,
+                ProfilePicture = ConvertByteArrayToIFormFile(
+                    user.ProfilePicture),
                 CalledFromAction = returnUrl,
                 AuthenticatedUserRoles = authenticatedUser != null 
                     ? await _userManager.GetRolesAsync(authenticatedUser)
                     : new List<string> { "user" }
             };
-
-            Stream stream = new MemoryStream(user.ProfilePicture);
-            model.ProfilePicture = new FormFile(stream, 0, 
-                user.ProfilePicture.Length, "default_profile_picture",
-                "default_profile_pic.jpg");
 
             _logger.LogInformation($"Editing user {user.UserName}");
             return View(model);
@@ -240,52 +226,14 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(EditUserViewModel model)
         {
             User user = await _userManager.FindByIdAsync(model.Id);
-
-            if (user != null)
-            {
-                IEnumerable<string> userNames = _context.Users
-                    .Select(user => user.UserName).AsEnumerable();
-
-                foreach (string userName in userNames)
-                {
-                    if (model.UserName == userName 
-                        && model.UserName != user.UserName)
-                    {
-                        ModelState.AddModelError("", 
-                            "The username is already taken");
-                        _logger.LogWarning($"The username {model.UserName} is " +
-                            "already taken");
-                    }
-                }
-            }
+            CheckIfUserNameIsTaken(model, user);
 
             if (ModelState.IsValid)
             {
                 bool userNameChanged = model.UserName != user.UserName
                         ? true : false;
 
-                user.Email = model.Email;
-                user.UserName = model.UserName;
-                user.Year = model.Year;
-                user.Status = model.Status;
-                user.Country = model.Country;
-                user.City = model.City;
-                user.Company = model.Company;
-
-                if (model.ProfilePicture != null)
-                {
-                    byte[] imageData = null;
-
-                    using (BinaryReader binaryReader = new BinaryReader(
-                        model.ProfilePicture.OpenReadStream()))
-                    {
-                        imageData = binaryReader.ReadBytes(
-                            (int)model.ProfilePicture.Length);
-                    }
-
-                    user.ProfilePicture = imageData;
-                }
-
+                AssignEditUserViewModelToUser(model, user);
                 IdentityResult result = await _userManager.UpdateAsync(user);
 
                 if (result.Succeeded)
@@ -293,14 +241,7 @@ namespace IdentityApp.Controllers
                     await _context.SaveChangesAsync();
                     _logger.LogInformation("Information updated for " +
                         $"{user.UserName}");
-
-                    if (userNameChanged)
-                    {
-                        await _signInManager.SignOutAsync();
-                        await _signInManager.SignInAsync(user, false);
-                        _logger.LogInformation($"User {user.UserName}" +
-                            "relogged in");
-                    }
+                    await ReloginUserOnUserNameChanged(userNameChanged, user);
 
                     if (model.CalledFromAction.Contains("Account"))
                     {
@@ -324,14 +265,99 @@ namespace IdentityApp.Controllers
             }
 
             model.UserName = user.UserName;
-
-            Stream stream = new MemoryStream(user.ProfilePicture);
-            model.ProfilePicture = new FormFile(stream, 0,
-                user.ProfilePicture.Length, "profile_picture",
-                "user_profile_picture");
+            model.ProfilePicture = ConvertByteArrayToIFormFile(
+                user.ProfilePicture);
 
             _logger.LogWarning("EditUserViewModel is not valid");
             return View(model);
+        }
+
+        private async Task SetDefaultProfilePicture(User user)
+        {
+            string defaultProfilePicPath = $"{_appEnvironment.WebRootPath}" +
+                "/Files/default_profile_pic.jpg";
+
+            using (FileStream fileStream = new FileStream(
+                defaultProfilePicPath, FileMode.Open, FileAccess.Read))
+            {
+                user.ProfilePicture = await System.IO.File
+                    .ReadAllBytesAsync(defaultProfilePicPath);
+                await fileStream.ReadAsync(user.ProfilePicture, 0,
+                    System.Convert.ToInt32(fileStream.Length));
+            }
+        }
+
+        private IFormFile ConvertByteArrayToIFormFile(byte[] bytePicture)
+        {
+            Stream stream = new MemoryStream(bytePicture);
+            IFormFile formFilePicture = new FormFile(stream, 0,
+                bytePicture.Length, "default_profile_picture",
+                "default_profile_pic.jpg");
+
+            return formFilePicture;
+        }
+
+        private byte[] ConvertIFormFileToByteArray(IFormFile formFilePicture,
+            byte[] bytePicture)
+        {
+            if (formFilePicture != null)
+            {
+                using (BinaryReader binaryReader = new BinaryReader(
+                    formFilePicture.OpenReadStream()))
+                {
+                    bytePicture = binaryReader.ReadBytes(
+                        (int)formFilePicture.Length);
+                }
+            }
+
+            return bytePicture;
+        }
+
+        private void CheckIfUserNameIsTaken(EditUserViewModel model, User user)
+        {
+            if (user != null)
+            {
+                IEnumerable<string> userNames = _context.Users
+                    .Select(user => user.UserName).AsEnumerable();
+
+                foreach (string userName in userNames)
+                {
+                    if (model.UserName == userName
+                        && model.UserName != user.UserName)
+                    {
+                        ModelState.AddModelError("",
+                            "The username is already taken");
+                        _logger.LogWarning($"The username {model.UserName} " +
+                            "is already taken");
+                    }
+                }
+            }
+        }
+
+        private void AssignEditUserViewModelToUser(EditUserViewModel model,
+            User user)
+        {
+            user.Email = model.Email;
+            user.UserName = model.UserName;
+            user.Year = model.Year;
+            user.Status = model.Status;
+            user.Country = model.Country;
+            user.City = model.City;
+            user.Company = model.Company;
+            user.ProfilePicture = ConvertIFormFileToByteArray(
+                model.ProfilePicture, user.ProfilePicture);
+        }
+
+        private async Task ReloginUserOnUserNameChanged(bool isUserNameChanged,
+            User user)
+        {
+            if (isUserNameChanged)
+            {
+                await _signInManager.SignOutAsync();
+                await _signInManager.SignInAsync(user, false);
+                _logger.LogInformation($"User {user.UserName}" +
+                    "relogged in");
+            }
         }
     }
 }
