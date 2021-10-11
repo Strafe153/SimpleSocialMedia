@@ -55,7 +55,7 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatePostViewModel model)
         {
-            CheckPicturesCountOnCreate(model);
+            CheckPostPicturesCount(model.PostPictures);
 
             if (ModelState.IsValid)
             {
@@ -122,7 +122,7 @@ namespace IdentityApp.Controllers
                 PostedTime = post.PostedTime,
                 UserId = post.UserId,
                 UserName = post.User.UserName,
-                ReturnUrl = returnUrl,
+                CalledFromAction = returnUrl,
                 PostPictures = post.PostPictures
                     .OrderByDescending(postPic => postPic.UploadedTime)
                     .AsEnumerable()
@@ -134,14 +134,15 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
-            CheckPicturesCountOnEdit(model);
-
-            if (ModelState.IsValid)
-            {
-                Post post = await _context.Posts
+            Post post = await _context.Posts
                     .FirstOrDefaultAsync(post => post.Id == model.Id);
 
-                if (post != null)
+            if (post != null)
+            {
+                CheckPostPicturesCount(model.AppendedPostPictures, 
+                    post.PostPictures);
+
+                if (ModelState.IsValid)
                 {
                     if (model.Content != null)
                     {
@@ -158,7 +159,7 @@ namespace IdentityApp.Controllers
                         _logger.LogInformation($"User {user.UserName}'s post " +
                             "was edited");
 
-                        if (model.ReturnUrl.Contains("Account"))
+                        if (model.CalledFromAction.Contains("Account"))
                         {
                             return RedirectToAction("Index", "Account",
                                 new { userName = user.UserName });
@@ -170,20 +171,20 @@ namespace IdentityApp.Controllers
                     }
                     else
                     {
-                        model.PostPictures = post.PostPictures;
                         ModelState.AddModelError("", "The length of your " +
                             "post must be between 1 and 350 symbols");
                     }
                 }
-                else
-                {
-                    _logger.LogError("Post not found");
-                    return NotFound();
-                }
+
+                model.PostPictures = post.PostPictures
+                    .OrderByDescending(postPic => postPic.UploadedTime);
+
+                _logger.LogWarning("EditPostViewModel is not valid");
+                return View(model);
             }
 
-            _logger.LogWarning("EditPostViewModel is not valid");
-            return View(model);
+            _logger.LogError("Post not found");
+            return NotFound();
         }
 
         public async Task<IActionResult> Delete(string postId, string returnUrl)
@@ -264,28 +265,24 @@ namespace IdentityApp.Controllers
             }
         }
 
-        private void CheckPicturesCountOnCreate(CreatePostViewModel model)
+        private void CheckPostPicturesCount(IFormFileCollection appendedPostPictures,
+            IEnumerable<PostPicture> postPictures = null)
         {
-            if (model.PostPictures != null)
+            if (appendedPostPictures != null)
             {
-                if (model.PostPictures.Count > 5)
+                if (appendedPostPictures.Count() > 5)
                 {
                     ModelState.AddModelError("",
                         "A post can contain up to 5 pictures");
-                    _logger.LogWarning("A post can contain up to 5 pictures");
+                    _logger.LogWarning("A post can contain up to " +
+                        "5 pictures");
+                    return;
                 }
-            }
-        }
 
-        private void CheckPicturesCountOnEdit(EditPostViewModel model)
-        {
-            if (model.AppendedPostPictures != null)
-            {
-                if (model.CopiedPostPictures != null)
+                if (postPictures != null)
                 {
-                    if (model.AppendedPostPictures.Count() > 5
-                        || model.PostPictures.Count()
-                        + model.AppendedPostPictures.Count() > 5)
+                    if (postPictures.Count()
+                        + appendedPostPictures.Count() > 5)
                     {
                         ModelState.AddModelError("",
                             "A post can contain up to 5 pictures");
