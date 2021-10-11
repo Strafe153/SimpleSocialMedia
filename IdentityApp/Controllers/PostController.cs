@@ -361,7 +361,7 @@ namespace IdentityApp.Controllers
             {
                 using (Image image = Image.Load(imageToResize))
                 {
-                    int height = 150;
+                    int height = 200;
                     double coefficient = (double)image.Height / height;
                     double width = image.Width / coefficient;
 
