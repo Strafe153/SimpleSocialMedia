@@ -55,7 +55,7 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreatePostViewModel model)
         {
-            CheckPicturesCountOnCreate(model);
+            CheckPostPicturesCount(model.PostPictures);
 
             if (ModelState.IsValid)
             {
@@ -139,7 +139,8 @@ namespace IdentityApp.Controllers
 
             if (post != null)
             {
-                CheckPicturesCountOnEdit(model);
+                CheckPostPicturesCount(model.AppendedPostPictures, 
+                    post.PostPictures);
 
                 if (ModelState.IsValid)
                 {
@@ -175,7 +176,8 @@ namespace IdentityApp.Controllers
                     }
                 }
 
-                model.PostPictures = post.PostPictures;
+                model.PostPictures = post.PostPictures
+                    .OrderByDescending(postPic => postPic.UploadedTime);
 
                 _logger.LogWarning("EditPostViewModel is not valid");
                 return View(model);
@@ -263,30 +265,24 @@ namespace IdentityApp.Controllers
             }
         }
 
-        private void CheckPicturesCountOnCreate(CreatePostViewModel model)
+        private void CheckPostPicturesCount(IFormFileCollection appendedPostPictures,
+            IEnumerable<PostPicture> postPictures = null)
         {
-            if (model.PostPictures != null)
+            if (appendedPostPictures != null)
             {
-                if (model.PostPictures.Count > 5)
+                if (appendedPostPictures.Count() > 5)
                 {
                     ModelState.AddModelError("",
                         "A post can contain up to 5 pictures");
-                    _logger.LogWarning("A post can contain up to 5 pictures");
+                    _logger.LogWarning("A post can contain up to " +
+                        "5 pictures");
+                    return;
                 }
-            }
-        }
 
-        private void CheckPicturesCountOnEdit(EditPostViewModel model)
-        {
-            if (model.AppendedPostPictures != null)
-            {
-                if (model.CopiedPostPictures != null)
+                if (postPictures != null)
                 {
-                    // just model.AppendedPostPictures.Count() +
-                    // model.PostPicturesCount() > 5 would suffice
-                    if (model.AppendedPostPictures.Count() > 5
-                        || model.PostPictures.Count()
-                        + model.AppendedPostPictures.Count() > 5)
+                    if (postPictures.Count()
+                        + appendedPostPictures.Count() > 5)
                     {
                         ModelState.AddModelError("",
                             "A post can contain up to 5 pictures");

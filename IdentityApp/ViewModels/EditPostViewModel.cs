@@ -20,8 +20,6 @@ namespace IdentityApp.ViewModels
         public IFormFileCollection AppendedPostPictures { get; set; }
         public string CalledFromAction { get; set; }
 
-        public IEnumerable<PostPicture> CopiedPostPictures { get; set; }
-
         public EditPostViewModel()
         {
             PostPictures = new List<PostPicture>();
