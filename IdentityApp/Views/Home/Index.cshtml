@@ -18,7 +18,7 @@
         @foreach (PostPicture postPicture in post.PostPictures
             .OrderByDescending(postPic => postPic.UploadedTime))
         {
-            <img height="150" alt="post_picture" class="mb-1"
+            <img alt="post_picture" class="mb-1"
                  src="data:image/jpeg;base64,@(Convert.ToBase64String(
                                                 postPicture.PictureData))" />
         }

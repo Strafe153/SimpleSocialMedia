@@ -12,6 +12,10 @@ using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png;
+
 namespace IdentityApp.Controllers
 {
     [Authorize]
@@ -309,6 +313,8 @@ namespace IdentityApp.Controllers
                             (int)postPic.Length);
                     }
 
+                    pictureData = ResizeImage(pictureData);
+
                     PostPicture postPicture = new PostPicture()
                     {
                         Id = Guid.NewGuid().ToString(),
@@ -345,6 +351,28 @@ namespace IdentityApp.Controllers
                 _logger.LogInformation($"User {user.UserName} " +
                     "liked a post");
             }
+        }
+
+        private byte[] ResizeImage(byte[] imageToResize)
+        {
+            byte[] resizedImage = null;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (Image image = Image.Load(imageToResize))
+                {
+                    int height = 150;
+                    double coefficient = (double)image.Height / height;
+                    double width = image.Width / coefficient;
+
+                    image.Mutate(img => img.Resize((int)width, height));
+                    image.Save(memoryStream, new PngEncoder());
+                }
+
+                resizedImage = memoryStream.ToArray();
+            }
+
+            return resizedImage;
         }
     }
 }
