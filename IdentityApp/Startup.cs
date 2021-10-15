@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using IdentityApp.Models;
+using IdentityApp.Interfaces;
 
 namespace IdentityApp
 {
@@ -21,6 +22,7 @@ namespace IdentityApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IUserValidator<User>, CustomUserValidator>();
+            services.AddScoped<IAccountControllable, AccountControllerRepository>();
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(Configuration
                     .GetConnectionString("DefaultConnection")));
