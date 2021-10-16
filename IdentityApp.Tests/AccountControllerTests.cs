@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using System.Collections.Generic;
@@ -16,20 +18,19 @@ namespace IdentityApp.Tests
 {
     public class AccountControllerTests
     {
-        // work in progress
         [Fact]
-        public void Index_FindExistentUser_ViewResult()
+        public void Index_FindExistentUser_ReturnsViewResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
 
             var controller = new AccountController(mockRepository.Object);
             MockUserIdentityName(controller);
 
             // Act
-            IActionResult result = controller.Index("admin").Result;
+            IActionResult result = controller.Index("").Result;
 
             //Assert
             Assert.NotNull(result);
@@ -38,18 +39,19 @@ namespace IdentityApp.Tests
         }
 
         [Fact]
-        public void Index_FindNonExistentUser_NotFoundResult()
+        public void Index_FindNonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
+            User nonExistentUser = null;
             var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => nonExistentUser));
 
             var controller = new AccountController(mockRepository.Object);
             MockUserIdentityName(controller);
 
             // Act
-            IActionResult result = controller.Index("imaginary_user").Result;
+            IActionResult result = controller.Index("").Result;
 
             //Assert
             Assert.NotNull(result);
@@ -58,123 +60,258 @@ namespace IdentityApp.Tests
         }
 
         [Fact]
-        public void Register_NewUserValidModel_ViewResult()
+        public void Register_NewUserValidModel_ReturnsRedirectToActionResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+            User nonExistentUser = null;
+
+            mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
+                It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(Task.Run(() => nonExistentUser));
+            mockRepository.Setup(repository => repository.GetWebRootPath())
+                .Returns(@"C:\C#\IdentityApp\IdentityApp\wwwroot");
+            mockRepository.Setup(repository => repository.CreateAsync(
+                It.IsAny<User>(), It.IsAny<string>())).Returns(Task.Run(() =>
+                    IdentityResult.Success));
 
             var controller = new AccountController(mockRepository.Object);
-            RegisterViewModel registerModel = new RegisterViewModel()
-            {
-                Email = "test@gmail.com",
-                UserName = "test_user",
-                Password = "test_pass",
-                ConfirmPassword = "test_pass"
-            };
 
             // Act
-            IActionResult result = controller.Register(registerModel).Result;
+            IActionResult result = controller.Register(new RegisterViewModel()).Result;
 
             // Assert
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IActionResult>(result);
-            Assert.IsType<ViewResult>(result);
+            Assert.IsType<RedirectToActionResult>(result);
+            Assert.True(controller.ModelState.IsValid);
         }
 
-        // work in progress
         [Fact]
-        public void Register_ExistentUserValidModel_HasModelError()
+        public void Register_ExistentUserValidModel_ReturnsViewResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+            mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
+                It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(Task.Run(() => new User()));
 
             var controller = new AccountController(mockRepository.Object);
 
-            // valid model but with the existing Email and UserName
-            RegisterViewModel registerModel = new RegisterViewModel()
-            {
-                Email = "admin@gmail.com",
-                UserName = "admin",
-                Password = "test_pass",
-                ConfirmPassword = "test_pass"
-            };
-            controller.ModelState.AddModelError("", "User with such an " +
-                "email and/or username already exists");
-
             // Act
-            IActionResult result = controller.Register(registerModel).Result;
+            IActionResult result = controller.Register(new RegisterViewModel()).Result;
 
             // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsAssignableFrom<ViewResult>(result);
             Assert.False(controller.ModelState.IsValid);
         }
 
         // work in progress
         [Fact]
-        public void Register_NewUserInvalidModel_HasModelError()
+        public void Register_UserInvalidModel_ReturnsViewResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
 
             var controller = new AccountController(mockRepository.Object);
-
-            // invalid empty model
-            RegisterViewModel registerModel = new RegisterViewModel() { };
-            controller.ModelState.AddModelError("", "RegisterViewModel is " +
-                "not valid");
+            controller.ModelState.AddModelError("", "Invalid register model");
 
             // Act
-            IActionResult result = controller.Register(registerModel).Result;
+            IActionResult result = controller.Register(new RegisterViewModel()).Result;
 
             // Assert
-            Assert.False(controller.ModelState.IsValid);
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<ViewResult>(result);
+            Assert.False(controller.ModelState.IsValid);
         }
         
         [Fact]
-        public void Login_ValidModel_NotNull()
+        public void Login_ExistentUserValidModel_ReturnsRedirectToActionResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+
+            mockRepository.Setup(repository => repository.FindByEmailAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            mockRepository.Setup(repository => repository.PasswordSignInAsync(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                It.IsAny<bool>())).Returns(Task.Run(() =>
+                    Microsoft.AspNetCore.Identity.SignInResult.Success));
 
             var controller = new AccountController(mockRepository.Object);
-            LoginViewModel loginViewModel = new LoginViewModel()
-            {
-                Email = "admin@gmail.com",
-                Password = "qwerty"
-            };
 
             // Act
-            IActionResult result = controller.Login(loginViewModel).Result;
+            IActionResult result = controller.Login(new LoginViewModel()).Result;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsType<RedirectToActionResult>(result);
+            Assert.True(controller.ModelState.IsValid);
+        }
+
+        [Fact]
+        public void Login_NonExistentUserValidModel_ReturnsViewResult()
+        {
+            // Arrange
+            User nonExistent = null;
+            var mockRepository = new Mock<IAccountControllable>();
+            mockRepository.Setup(repository => repository.FindByEmailAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Login(new LoginViewModel()).Result;
 
             // Assert
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<ViewResult>(result);
+            Assert.False(controller.ModelState.IsValid);
         }
 
         [Fact]
-        public void Edit_ExistentUser_Redirects()
+        public void Login_UserInvalidModel_ReturnsViewResult()
+        {
+            // Assert
+            var mockRepository = new Mock<IAccountControllable>();
+            var controller = new AccountController(mockRepository.Object);
+            controller.ModelState.AddModelError("", "Invalid login model");
+
+            // Act
+            IActionResult result = controller.Login(new LoginViewModel()).Result;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsType<ViewResult>(result);
+            Assert.False(controller.ModelState.IsValid);
+        }
+
+        [Fact]
+        public void Logout_ExistentUser_ReturnsRedirectToActionResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Logout("").Result;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public void Logout_NonExistentUser_ReturnsNotFoundResult()
+        {
+            // Arrange
+            User nonExistent = null;
+            var mockRepository = new Mock<IAccountControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Logout("").Result;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsAssignableFrom<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void Edit_ExistentUserIdentityResultSuccess_ReturnsRedirectToActionResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IAccountControllable>();
+            
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            mockRepository.Setup(repository => repository.FindByEmailAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            mockRepository.Setup(repository => repository.GetRolesAsync(
+                It.IsAny<User>())).Returns(Task.Run(() => 
+                    ToIList(new List<string>())));
+            mockRepository.Setup(repository => repository.GetAllUsers())
+                .Returns(GetTestUsers());
+            mockRepository.Setup(repository => repository.UpdateAsync(
+                It.IsAny<User>())).Returns(Task.Run(() => 
+                    IdentityResult.Success));
+
+            var controller = new AccountController(mockRepository.Object);
+            EditUserViewModel editUserViewModel = new EditUserViewModel()
+                { CalledFromAction = "Account" };
+
+            // Act
+            IActionResult result = controller.Edit(editUserViewModel).Result;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<IActionResult> (result);
+            Assert.IsType<RedirectToActionResult>(result);
+            Assert.True(controller.ModelState.IsValid);
+        }
+
+        [Fact]
+        public void Edit_ExistentUserIdentityResultFailed_ReturnsViewResult()
+        {
+            // Arrange
+            User existentUser = new User { ProfilePicture = new byte[1] };
+            var mockRepository = new Mock<IAccountControllable>();
+
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
+            mockRepository.Setup(repository => repository.FindByEmailAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
+            mockRepository.Setup(repository => repository.GetRolesAsync(
+                It.IsAny<User>())).Returns(Task.Run(() =>
+                    ToIList(new List<string>())));
+            mockRepository.Setup(repository => repository.GetAllUsers())
+                .Returns(GetTestUsers());
+            mockRepository.Setup(repository => repository.UpdateAsync(
+                It.IsAny<User>())).Returns(Task.Run(() =>
+                    IdentityResult.Failed(new IdentityError()
+                        { Description = "test_user" })));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Edit(new EditUserViewModel()).Result;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsType<ViewResult>(result);
+            Assert.False(controller.ModelState.IsValid);
+        }
+
+        [Fact]
+        public void Edit_ExistentUserExistentUserName_ReturnsViewResult()
+        {
+            // Arrange
+            User existentUser = new User() { ProfilePicture = new byte[1] };
+            var mockRepository = new Mock<IAccountControllable>();
+
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
             mockRepository.Setup(repository => repository.GetAllUsers())
                 .Returns(GetTestUsers());
 
             var controller = new AccountController(mockRepository.Object);
             EditUserViewModel editUserViewModel = new EditUserViewModel()
             {
-                Id = "c8fe8b58-e3b6-42bd-8e2e-ef4863b91628",
-                Email = "admin@gmail.com",
                 UserName = "admin"
             };
 
@@ -183,8 +320,9 @@ namespace IdentityApp.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult> (result);
-            Assert.IsType<RedirectResult>(result);
+            Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.IsType<ViewResult>(result);
+            Assert.False(controller.ModelState.IsValid);
         }
 
         private IQueryable<User> GetTestUsers()
@@ -225,6 +363,11 @@ namespace IdentityApp.Tests
 
             controller.ControllerContext.HttpContext = new DefaultHttpContext()
             { User = user };
+        }
+
+        private IList<T> ToIList<T>(List<T> list)
+        {
+            return list;
         }
     }
 }
