@@ -539,6 +539,11 @@ namespace IdentityApp.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Logout(string userName)
         {
+            if (await _repository.FindByNameAsync(userName) == null)
+            {
+                return NotFound();
+            }
+
             await _repository.SignOutAsync();
             _repository.LogInformation($"User {userName} logged out");
             return RedirectToAction("Index", "Home");
@@ -588,7 +593,7 @@ namespace IdentityApp.Controllers
             if (ModelState.IsValid)
             {
                 bool userNameChanged = model.UserName != user.UserName
-                        ? true : false;
+                    ? true : false;
 
                 AssignEditUserViewModelToUser(model, user);
                 IdentityResult result = await _repository.UpdateAsync(user);
