@@ -25,6 +25,7 @@ namespace IdentityApp
             services.AddScoped<IAccountControllable, AccountControllerRepository>();
             services.AddScoped<IHomeControllable, HomeControllerRepository>();
             services.AddScoped<IPostControllable, PostControllerRepository>();
+            services.AddScoped<IPostPictureControllable, PostPictureRepository>();
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(Configuration
                     .GetConnectionString("DefaultConnection")));
