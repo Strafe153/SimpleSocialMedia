@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -243,7 +242,7 @@ namespace IdentityApp.Tests
                 It.IsAny<User>())).Returns(Task.Run(() => 
                     Utility.ToIList(new List<string>())));
             mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+                .Returns(Utility.GetTestUsers());
             mockRepository.Setup(repository => repository.UpdateAsync(
                 It.IsAny<User>())).Returns(Task.Run(() => 
                     IdentityResult.Success));
@@ -277,7 +276,7 @@ namespace IdentityApp.Tests
                 It.IsAny<User>())).Returns(Task.Run(() =>
                     Utility.ToIList(new List<string>())));
             mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+                .Returns(Utility.GetTestUsers());
             mockRepository.Setup(repository => repository.UpdateAsync(
                 It.IsAny<User>())).Returns(Task.Run(() =>
                     IdentityResult.Failed(new IdentityError()
@@ -305,7 +304,7 @@ namespace IdentityApp.Tests
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => existentUser));
             mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(GetTestUsers());
+                .Returns(Utility.GetTestUsers());
 
             var controller = new AccountController(mockRepository.Object);
             EditUserViewModel editUserViewModel = new EditUserViewModel()
@@ -321,35 +320,6 @@ namespace IdentityApp.Tests
             Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<ViewResult>(result);
             Assert.False(controller.ModelState.IsValid);
-        }
-
-        private IQueryable<User> GetTestUsers()
-        {
-            var users = new List<User>();
-
-            users.AddRange(new List<User>()
-            {
-                new User()
-                {
-                    Id = "c8fe8b58-e3b6-42bd-8e2e-ef4863b91628",
-                    Email = "admin@gmail.com",
-                    UserName = "admin"
-                },
-                new User()
-                {
-                    Id = "f6e8a62f-7153-4389-a5b5-51297bc4a133",
-                    Email = "qwerty@ukr.net",
-                    UserName = "qwerty"
-                },
-                new User()
-                {
-                    Id = "6457ed17-dfff-44b1-9c93-edd26edd2624",
-                    Email = "andrew.fox@gmail.com",
-                    UserName = "fox_a15"
-                }
-            });
-
-            return users.AsQueryable();
         }
     }
 }

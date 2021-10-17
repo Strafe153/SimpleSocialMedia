@@ -24,6 +24,7 @@ namespace IdentityApp
             services.AddTransient<IUserValidator<User>, CustomUserValidator>();
             services.AddScoped<IAccountControllable, AccountControllerRepository>();
             services.AddScoped<IHomeControllable, HomeControllerRepository>();
+            services.AddScoped<IPostControllable, PostControllerRepository>();
             services.AddDbContext<ApplicationDbContext>(options => 
                 options.UseSqlServer(Configuration
                     .GetConnectionString("DefaultConnection")));

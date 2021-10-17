@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
-
+using IdentityApp.Interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Png;
@@ -21,16 +20,11 @@ namespace IdentityApp.Controllers
     [Authorize]
     public class PostController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly IPostControllable _repository;
 
-        public PostController(UserManager<User> userManager,
-            ApplicationDbContext context, ILogger<PostController> logger)
+        public PostController(IPostControllable repository)
         {
-            _userManager = userManager;
-            _context = context;
-            _logger = logger;
+            _repository = repository;
         }
 
         [HttpGet]
@@ -38,8 +32,8 @@ namespace IdentityApp.Controllers
         {
             if (!string.IsNullOrEmpty(userId))
             {
-                User user = await _userManager.Users
-                    .FirstOrDefaultAsync(user => user.Id == userId);
+                User user = await _repository.FirstOrDefaultAsync(
+                    _repository.GetAllUsers(), user => user.Id == userId);
 
                 if (user != null)
                 {
@@ -52,7 +46,7 @@ namespace IdentityApp.Controllers
                 }
             }
 
-            _logger.LogError("User not found");
+            _repository.LogError("User not found");
             return NotFound();
         }
 
@@ -63,33 +57,34 @@ namespace IdentityApp.Controllers
 
             if (ModelState.IsValid)
             {
-                User user = await _userManager.Users
-                    .FirstOrDefaultAsync(user => user.Id == model.User.Id);
+                User user = await _repository.FirstOrDefaultAsync(
+                    _repository.GetAllUsers(), user => user.Id == model.User.Id);
 
                 Post post = new Post()
                 {
                     Id = model.Id,
                     Content = model.Content,
-                    PostedTime = model.PostedTime,
-                    UserId = user.Id
+                    PostedTime = model.PostedTime
                 };
 
                 AddPostPicturesToPost(model.PostPictures, post);
 
                 if (user != null)
                 {
+                    post.UserId = user.Id;
+
                     if (post.Content == null)
                     {
                         ModelState.AddModelError("", "The length of your " +
                             "post must be between 1 and 350 symbols");
-                        _logger.LogWarning("The length of a post must be " +
+                        _repository.LogWarning("The length of a post must be " +
                             "between 1 and 350 symbols");
                     }
                     else
                     {
                         user.Posts.Add(post);
-                        await _userManager.UpdateAsync(user);
-                        _logger.LogInformation($"User {user.UserName} " +
+                        await _repository.UpdateAsync(user);
+                        _repository.LogInformation($"User {user.UserName} " +
                             "created a post");
 
                         return RedirectToAction("Index", "Account",
@@ -98,24 +93,24 @@ namespace IdentityApp.Controllers
                 }
                 else
                 {
-                    _logger.LogError($"User {user.UserName} not found");
+                    _repository.LogError($"User not found");
                     return NotFound();
                 }
             }
 
-            _logger.LogWarning("CreatePostViewModel is not valid");
+            _repository.LogWarning("CreatePostViewModel is not valid");
             return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(string postId, string returnUrl)
         {
-            Post post = await _context.Posts
-                .FirstOrDefaultAsync(post => post.Id == postId);
+            Post post = await _repository.FirstOrDefaultAsync(
+                _repository.GetAllPosts(), post => post.Id == postId);
 
             if (post == null)
             {
-                _logger.LogError("Post not found");
+                _repository.LogError("Post not found");
                 return NotFound();
             }
 
@@ -138,19 +133,19 @@ namespace IdentityApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
-            Post post = await _context.Posts
-                    .FirstOrDefaultAsync(post => post.Id == model.Id);
+            Post post = await _repository.FirstOrDefaultAsync(
+                _repository.GetAllPosts(), post => post.Id == model.Id);
 
             if (post != null)
             {
-                CheckPostPicturesCount(model.AppendedPostPictures, 
+                CheckPostPicturesCount(model.AppendedPostPictures,
                     post.PostPictures);
 
                 if (ModelState.IsValid)
                 {
                     if (model.Content != null)
                     {
-                        User user = await _userManager
+                        User user = await _repository
                             .FindByIdAsync(model.UserId);
 
                         AddPostPicturesToPost(model.AppendedPostPictures, post);
@@ -158,9 +153,9 @@ namespace IdentityApp.Controllers
                         post.PostedTime = model.PostedTime;
                         post.IsEdited = true;
 
-                        _context.Update(post);
-                        await _context.SaveChangesAsync();
-                        _logger.LogInformation($"User {user.UserName}'s post " +
+                        _repository.Update(post);
+                        await _repository.SaveChangesAsync();
+                        _repository.LogInformation($"User {user.UserName}'s post " +
                             "was edited");
 
                         if (model.CalledFromAction.Contains("Account"))
@@ -183,39 +178,40 @@ namespace IdentityApp.Controllers
                 model.PostPictures = post.PostPictures
                     .OrderByDescending(postPic => postPic.UploadedTime);
 
-                _logger.LogWarning("EditPostViewModel is not valid");
+                _repository.LogWarning("EditPostViewModel is not valid");
                 return View(model);
             }
 
-            _logger.LogError("Post not found");
+            _repository.LogError("Post not found");
             return NotFound();
         }
 
         public async Task<IActionResult> Delete(string postId, string returnUrl)
         {
-            Post post = await _context.Posts
-                .FirstOrDefaultAsync(post => post.Id == postId);
-            User user = await _userManager.FindByIdAsync(post.UserId);
+            Post post = await _repository.FirstOrDefaultAsync(
+                _repository.GetAllPosts(), post => post.Id == postId);
+            User user = await _repository.FindByIdAsync(post.UserId);
 
             if (post != null)
             {
-                IEnumerable<LikedPost> likedPosts = _context.LikedPosts
+                IEnumerable<LikedPost> likedPosts = _repository
+                    .GetAllLikedPosts()
                     .Where(likedPost => likedPost.PostId == post.Id)
                     .AsEnumerable();
 
                 if (likedPosts != null)
                 {
-                    _context.LikedPosts.RemoveRange(likedPosts);
+                    _repository.RemoveRange(likedPosts);
                 }
 
-                _context.Posts.Remove(post);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation($"User {user.UserName}'s post " +
+                _repository.Remove(post);
+                await _repository.SaveChangesAsync();
+                _repository.LogInformation($"User {user.UserName}'s post " +
                     "was deleted");
             }
             else
             {
-                _logger.LogError("Post not found");
+                _repository.LogError("Post not found");
                 return NotFound();
             }
 
@@ -230,33 +226,35 @@ namespace IdentityApp.Controllers
 
         public async Task<IActionResult> Like(PostLikeViewModel model)
         {
-            User user = await _userManager.FindByIdAsync(model.UserId);
+            User user = await _repository.FindByIdAsync(model.UserId);
 
             if (user != null)
             {
-                Post post = await _context.Posts
-                    .FirstOrDefaultAsync(post => post.Id == model.PostId);
+                Post post = await _repository.FirstOrDefaultAsync(
+                    _repository.GetAllPosts(), post => post.Id == model.PostId);
 
                 if (post != null)
                 {
                     LikedPost postToCheck = user.LikedPosts
                         .FirstOrDefault(post => post.UserId == model.UserId
-                                        && post.PostId == model.PostId);
+                            && post.PostId == model.PostId);
 
                     LikeDislikePost(post, postToCheck, user);
-                    await _context.SaveChangesAsync();
+                    await _repository.SaveChangesAsync();
                 }
                 else
                 {
-                    _logger.LogError("Post not found");
+                    _repository.LogError("Post not found");
                     return NotFound();
                 }
 
                 if (model.ReturnAction.Contains("Account"))
                 {
-                    return RedirectToAction("Index", "Account", new { 
-                        userName = model.LikedPostUserName, 
-                        page = model.Page });
+                    return RedirectToAction("Index", "Account", new
+                    {
+                        userName = model.LikedPostUserName,
+                        page = model.Page
+                    });
                 }
 
                 return RedirectToAction("Index", "Home",
@@ -264,7 +262,7 @@ namespace IdentityApp.Controllers
             }
             else
             {
-                _logger.LogError("User not found");
+                _repository.LogError("User not found");
                 return NotFound();
             }
         }
@@ -278,7 +276,7 @@ namespace IdentityApp.Controllers
                 {
                     ModelState.AddModelError("",
                         "A post can contain up to 5 pictures");
-                    _logger.LogWarning("A post can contain up to " +
+                    _repository.LogWarning("A post can contain up to " +
                         "5 pictures");
                     return;
                 }
@@ -290,7 +288,7 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("",
                             "A post can contain up to 5 pictures");
-                        _logger.LogWarning("A post can contain up to " +
+                        _repository.LogWarning("A post can contain up to " +
                             "5 pictures");
                     }
                 }
@@ -334,7 +332,7 @@ namespace IdentityApp.Controllers
             {
                 user.LikedPosts.Remove(postToCheck);
                 postToLike.Likes--;
-                _logger.LogInformation($"User {user.UserName} removed " +
+                _repository.LogInformation($"User {user.UserName} removed " +
                     "a like from a post");
             }
             else
@@ -348,7 +346,7 @@ namespace IdentityApp.Controllers
                         Post = postToLike
                     });
                 postToLike.Likes++;
-                _logger.LogInformation($"User {user.UserName} " +
+                _repository.LogInformation($"User {user.UserName} " +
                     "liked a post");
             }
         }
