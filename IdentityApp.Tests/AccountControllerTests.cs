@@ -1,11 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using System.Security.Claims;
 using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
@@ -27,7 +25,7 @@ namespace IdentityApp.Tests
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
 
             var controller = new AccountController(mockRepository.Object);
-            MockUserIdentityName(controller);
+            Utility.MockUserIdentityName(controller);
 
             // Act
             IActionResult result = controller.Index("").Result;
@@ -48,7 +46,7 @@ namespace IdentityApp.Tests
                 It.IsAny<string>())).Returns(Task.Run(() => nonExistentUser));
 
             var controller = new AccountController(mockRepository.Object);
-            MockUserIdentityName(controller);
+            Utility.MockUserIdentityName(controller);
 
             // Act
             IActionResult result = controller.Index("").Result;
@@ -243,7 +241,7 @@ namespace IdentityApp.Tests
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
             mockRepository.Setup(repository => repository.GetRolesAsync(
                 It.IsAny<User>())).Returns(Task.Run(() => 
-                    ToIList(new List<string>())));
+                    Utility.ToIList(new List<string>())));
             mockRepository.Setup(repository => repository.GetAllUsers())
                 .Returns(GetTestUsers());
             mockRepository.Setup(repository => repository.UpdateAsync(
@@ -277,7 +275,7 @@ namespace IdentityApp.Tests
                 It.IsAny<string>())).Returns(Task.Run(() => existentUser));
             mockRepository.Setup(repository => repository.GetRolesAsync(
                 It.IsAny<User>())).Returns(Task.Run(() =>
-                    ToIList(new List<string>())));
+                    Utility.ToIList(new List<string>())));
             mockRepository.Setup(repository => repository.GetAllUsers())
                 .Returns(GetTestUsers());
             mockRepository.Setup(repository => repository.UpdateAsync(
@@ -352,22 +350,6 @@ namespace IdentityApp.Tests
             });
 
             return users.AsQueryable();
-        }
-
-        private void MockUserIdentityName(AccountController controller)
-        {
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.Name, "admin")
-            }, "mock"));
-
-            controller.ControllerContext.HttpContext = new DefaultHttpContext()
-            { User = user };
-        }
-
-        private IList<T> ToIList<T>(List<T> list)
-        {
-            return list;
         }
     }
 }
