@@ -9,24 +9,17 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
+using IdentityApp.Interfaces;
 
 namespace IdentityApp.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly ApplicationDbContext _context;
-        private readonly SignInManager<User> _signInManager;
-        private readonly ILogger _logger;
+        private readonly IUsersControllable _repository;
 
-        public UsersController(UserManager<User> userManager,
-            ApplicationDbContext context, SignInManager<User> signInManager,
-            ILogger<UsersController> logger)
+        public UsersController(IUsersControllable repository)
         {
-            _userManager = userManager;
-            _context = context;
-            _signInManager = signInManager;
-            _logger = logger;
+            _repository = repository;
         }
 
         [Authorize(Roles = "admin")]
@@ -34,7 +27,7 @@ namespace IdentityApp.Controllers
         {
             const int PAGE_SIZE = 5;
 
-            IQueryable<User> users = _userManager.Users;
+            IQueryable<User> users = _repository.GetAllUsers();
             FilterUsers(ref users, model.UserName, model.Email,model.Year, 
                 model.Country);
             users = ChooseSort(users, model.SortOrder);
@@ -55,11 +48,126 @@ namespace IdentityApp.Controllers
                     model.Page, usersNumber, PAGE_SIZE)
             };
 
-            _logger.LogInformation("On Users page");
+            _repository.LogInformation("On Users page");
             return View(filterSortPageViewModel);
         }
 
-        private void FilterUsers(ref IQueryable<User> users, string userName, 
+        [Authorize]
+        public async Task<IActionResult> Delete(string userId, string returnUrl)
+        {
+            User user = await _repository.FindByIdAsync(userId);
+
+            if (user != null)
+            {
+                IEnumerable<LikedPost> likedPosts = _repository.GetAllLikedPosts()
+                    .Where(likedPost => likedPost.UserId == user.Id);
+                List<LikedPost> ownedPosts = new List<LikedPost>();
+
+                foreach (Post post in user.Posts)
+                {
+                    ownedPosts.AddRange(_repository.GetAllLikedPosts()
+                        .Where(likedPost => likedPost.PostId == post.Id));
+                }
+
+                foreach (LikedPost likedPost in likedPosts)
+                {
+                    likedPost.Post.Likes--;
+                }
+
+                _repository.GetAllLikedPosts().RemoveRange(ownedPosts);
+                _repository.GetAllLikedPosts().RemoveRange(likedPosts);
+
+                if (user.UserName == User.Identity.Name)
+                {
+                    await _repository.SignOutAsync();
+                }
+
+                await _repository.DeleteAsync(user);
+                await _repository.SaveChangesAsync();
+                _repository.LogInformation($"Deleted user {user.UserName}");
+
+                return RedirectToAction("Index", returnUrl.Contains("users",
+                    StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
+            }
+            else
+            {
+                _repository.LogError($"User not found");
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(string userId, 
+            string returnUrl)
+        {
+            User user = await _repository.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                _repository.LogError($"User not found");
+                return NotFound();
+            }
+
+            ChangePasswordViewModel model = new ChangePasswordViewModel()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await _repository.FindByIdAsync(model.Id);
+
+                if (user != null)
+                {
+                    IdentityResult result = await _repository
+                        .ChangePasswordAsync(user, model.CurrentPassword,
+                            model.NewPassword);
+
+                    if (result.Succeeded)
+                    {
+                        _repository.LogInformation("Changed password for " +
+                            $"user {user.UserName}");
+
+                        if (!string.IsNullOrEmpty(model.ReturnUrl) 
+                            && Url.IsLocalUrl(model.ReturnUrl))
+                        {
+                            return LocalRedirect(model.ReturnUrl);
+                        }
+
+                        return BadRequest();
+                    }
+                    else
+                    {
+                        foreach (IdentityError error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                        _repository.LogWarning("Failed to change user " +
+                            $"{user.UserName}'s password");
+                    }
+                }
+                else
+                {
+                    _repository.LogError($"User not found");
+                    return NotFound();
+                }
+            }
+
+            return View(model);
+        }
+
+        private void FilterUsers(ref IQueryable<User> users, string userName,
             string email, int? year, string country)
         {
             if (!string.IsNullOrEmpty(userName))
@@ -88,137 +196,22 @@ namespace IdentityApp.Controllers
         {
             return sortOrder switch
             {
-                SortState.NameDescending => 
+                SortState.NameDescending =>
                     users.OrderByDescending(user => user.UserName),
-                SortState.EmailAscending => 
+                SortState.EmailAscending =>
                     users.OrderBy(user => user.Email),
-                SortState.EmailDescending => 
+                SortState.EmailDescending =>
                     users.OrderByDescending(user => user.Email),
-                SortState.YearAscending => 
+                SortState.YearAscending =>
                     users.OrderBy(user => user.Year),
-                SortState.YearDescending => 
+                SortState.YearDescending =>
                     users.OrderByDescending(user => user.Year),
-                SortState.CountryAscending => 
+                SortState.CountryAscending =>
                     users.OrderBy(user => user.Country),
-                SortState.CountryDescending => 
+                SortState.CountryDescending =>
                     users.OrderByDescending(user => user.Country),
                 _ => users.OrderBy(u => u.UserName)
             };
-        }
-
-        [Authorize]
-        public async Task<IActionResult> Delete(string userId, string returnUrl)
-        {
-            User user = await _userManager.FindByIdAsync(userId);
-
-            if (user != null)
-            {
-                IEnumerable<LikedPost> likedPosts = _context.LikedPosts.Where(
-                    likedPost => likedPost.UserId == user.Id);
-                List<LikedPost> ownedPosts = new List<LikedPost>();
-
-                foreach (Post post in user.Posts)
-                {
-                    ownedPosts.AddRange(_context.LikedPosts
-                        .Where(likedPost => likedPost.PostId == post.Id));
-                }
-
-                foreach (LikedPost likedPost in likedPosts)
-                {
-                    likedPost.Post.Likes--;
-                }
-
-                _context.LikedPosts.RemoveRange(ownedPosts);
-                _context.LikedPosts.RemoveRange(likedPosts);
-
-                if (user.UserName == User.Identity.Name)
-                {
-                    await _signInManager.SignOutAsync();
-                }
-
-                await _userManager.DeleteAsync(user);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation($"Deleted user {user.UserName}");
-
-                return RedirectToAction("Index", returnUrl.Contains("users",
-                    StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
-            }
-            else
-            {
-                _logger.LogError($"User {user.UserName} not found");
-                return NotFound();
-            }
-        }
-
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> ChangePassword(string userId, 
-            string returnUrl)
-        {
-            User user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-            {
-                _logger.LogError($"User {user.UserName} not found");
-                return NotFound();
-            }
-
-            ChangePasswordViewModel model = new ChangePasswordViewModel()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
-                ReturnUrl = returnUrl
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                User user = await _userManager.FindByIdAsync(model.Id);
-
-                if (user != null)
-                {
-                    IdentityResult result = await _userManager
-                        .ChangePasswordAsync(user, model.CurrentPassword,
-                            model.NewPassword);
-
-                    if (result.Succeeded)
-                    {
-                        _logger.LogInformation("Changed password for " +
-                            $"user {user.UserName}");
-
-                        if (!string.IsNullOrEmpty(model.ReturnUrl) 
-                            && Url.IsLocalUrl(model.ReturnUrl))
-                        {
-                            return LocalRedirect(model.ReturnUrl);
-                        }
-
-                        return BadRequest();
-                    }
-                    else
-                    {
-                        foreach (IdentityError error in result.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
-                        _logger.LogWarning("Failed to change user " +
-                            $"{user.UserName}'s password");
-                    }
-                }
-                else
-                {
-                    _logger.LogError($"User {user.UserName} not found");
-                    return NotFound();
-                }
-            }
-
-            return View(model);
         }
     }
 }

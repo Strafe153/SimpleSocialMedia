@@ -186,7 +186,7 @@ namespace IdentityApp.Controllers
 
             if (user == null)
             {
-                _repository.LogError($"User {user.UserName} not found");
+                _repository.LogError($"User not found");
                 return NotFound();
             }
 
