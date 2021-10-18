@@ -9,7 +9,7 @@ namespace IdentityApp.Tests
     public  class HomeControllerTests
     {
         [Fact]
-        public void Index_ReturnsViewResult()
+        public void Index_DefaultParameters_ReturnsViewResult()
         {
             // Arrange
             var mockRepository = new Mock<IHomeControllable>();
@@ -20,8 +20,6 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Index().Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<ViewResult>(result);
         }
     }
