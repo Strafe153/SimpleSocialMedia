@@ -16,7 +16,7 @@ namespace IdentityApp.Tests
     public class AccountControllerTests
     {
         [Fact]
-        public void Index_FindExistentUser_ReturnsViewResult()
+        public void Index_ExistentUser_ReturnsViewResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
@@ -30,13 +30,11 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Index("").Result;
 
             //Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<ViewResult>(result);
         }
 
         [Fact]
-        public void Index_FindNonExistentUser_ReturnsNotFoundResult()
+        public void Index_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
             User nonExistentUser = null;
@@ -51,13 +49,11 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Index("").Result;
 
             //Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
-        public void Register_NewUserValidModel_ReturnsRedirectToActionResult()
+        public void Register_ValidModelHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
@@ -78,14 +74,11 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Register(new RegisterViewModel()).Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<RedirectToActionResult>(result);
-            Assert.True(controller.ModelState.IsValid);
         }
 
         [Fact]
-        public void Register_ExistentUserValidModel_ReturnsViewResult()
+        public void Register_ValidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
@@ -99,34 +92,11 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Register(new RegisterViewModel()).Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsAssignableFrom<ViewResult>(result);
-            Assert.False(controller.ModelState.IsValid);
-        }
-
-        // work in progress
-        [Fact]
-        public void Register_UserInvalidModel_ReturnsViewResult()
-        {
-            // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-
-            var controller = new AccountController(mockRepository.Object);
-            controller.ModelState.AddModelError("", "Invalid register model");
-
-            // Act
-            IActionResult result = controller.Register(new RegisterViewModel()).Result;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
-            Assert.IsType<ViewResult>(result);
-            Assert.False(controller.ModelState.IsValid);
         }
         
         [Fact]
-        public void Login_ExistentUserValidModel_ReturnsRedirectToActionResult()
+        public void Login_ValidModelHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
@@ -144,14 +114,11 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Login(new LoginViewModel()).Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<RedirectToActionResult>(result);
-            Assert.True(controller.ModelState.IsValid);
         }
 
         [Fact]
-        public void Login_NonExistentUserValidModel_ReturnsViewResult()
+        public void Login_ValidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
             User nonExistent = null;
@@ -165,28 +132,7 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Login(new LoginViewModel()).Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<ViewResult>(result);
-            Assert.False(controller.ModelState.IsValid);
-        }
-
-        [Fact]
-        public void Login_UserInvalidModel_ReturnsViewResult()
-        {
-            // Assert
-            var mockRepository = new Mock<IAccountControllable>();
-            var controller = new AccountController(mockRepository.Object);
-            controller.ModelState.AddModelError("", "Invalid login model");
-
-            // Act
-            IActionResult result = controller.Login(new LoginViewModel()).Result;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
-            Assert.IsType<ViewResult>(result);
-            Assert.False(controller.ModelState.IsValid);
         }
 
         [Fact]
@@ -203,8 +149,6 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Logout("").Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<RedirectToActionResult>(result);
         }
 
@@ -223,13 +167,54 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Logout("").Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsAssignableFrom<NotFoundResult>(result);
         }
 
         [Fact]
-        public void Edit_ExistentUserIdentityResultSuccess_ReturnsRedirectToActionResult()
+        public void Edit_ExistentUserHttpGet_ReturnsViewResult()
+        {
+            // Arrange
+            User existentUser = new User() { ProfilePicture = new byte[1] };
+            var mockRepository = new Mock<IAccountControllable>();
+
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
+            mockRepository.Setup(repository => repository.GetRolesAsync(
+                It.IsAny<User>())).Returns(Task.Run(() =>
+                    Utility.ToIList(new List<string>())));
+
+            var controller = new AccountController(mockRepository.Object);
+            Utility.MockUserIdentityName(controller);
+
+            // Act
+            IActionResult result = controller.Edit("", "").Result;
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void Edit_NonExistentUserHttpGet_ReturnsNotFoundResult()
+        {
+            // Arrange
+            User nonExistent = null;
+            var mockRepository = new Mock<IAccountControllable>();
+
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+
+            var controller = new AccountController(mockRepository.Object);
+            Utility.MockUserIdentityName(controller);
+
+            // Act
+            IActionResult result = controller.Edit("", "").Result;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void Edit_ValidModelHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
             var mockRepository = new Mock<IAccountControllable>();
@@ -255,14 +240,11 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Edit(editUserViewModel).Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult> (result);
             Assert.IsType<RedirectToActionResult>(result);
-            Assert.True(controller.ModelState.IsValid);
         }
 
         [Fact]
-        public void Edit_ExistentUserIdentityResultFailed_ReturnsViewResult()
+        public void Edit_ValidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
             User existentUser = new User { ProfilePicture = new byte[1] };
@@ -288,38 +270,7 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Edit(new EditUserViewModel()).Result;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
             Assert.IsType<ViewResult>(result);
-            Assert.False(controller.ModelState.IsValid);
-        }
-
-        [Fact]
-        public void Edit_ExistentUserExistentUserName_ReturnsViewResult()
-        {
-            // Arrange
-            User existentUser = new User() { ProfilePicture = new byte[1] };
-            var mockRepository = new Mock<IAccountControllable>();
-
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
-            mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(Utility.GetTestUsers());
-
-            var controller = new AccountController(mockRepository.Object);
-            EditUserViewModel editUserViewModel = new EditUserViewModel()
-            {
-                UserName = "admin"
-            };
-
-            // Act
-            IActionResult result = controller.Edit(editUserViewModel).Result;
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.IsAssignableFrom<IActionResult>(result);
-            Assert.IsType<ViewResult>(result);
-            Assert.False(controller.ModelState.IsValid);
         }
     }
 }
