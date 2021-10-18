@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
+using IdentityApp.Interfaces;
 using IdentityApp.ViewModels;
 
 namespace IdentityApp.Controllers
@@ -14,23 +14,17 @@ namespace IdentityApp.Controllers
     [Authorize(Roles = "admin")]
     public class RolesController : Controller
     {
-        private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly ILogger _logger;
+        private readonly IRolesControllable _repository;
 
-        public RolesController(UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManager, 
-            ILogger<RolesController> logger)
+        public RolesController(IRolesControllable repository)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _logger = logger;
+            _repository = repository;
         }
 
         public async Task<IActionResult> Index()
         {
-            _logger.LogInformation("On Roles page");
-            return View(await _roleManager.Roles.ToListAsync());
+            _repository.LogInformation("On Roles page");
+            return View(await _repository.GetAllRolesAsync());
         }
 
         [HttpGet]
@@ -40,16 +34,16 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(string name)
+        public async Task<IActionResult> Create(string roleName)
         {
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(roleName))
             {
-                IdentityResult result = await _roleManager
-                    .CreateAsync(new IdentityRole(name));
+                IdentityResult result = await _repository
+                    .CreateAsync(new IdentityRole(roleName));
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation($"Created role {name}");
+                    _repository.LogInformation($"Created role {roleName}");
                     return RedirectToAction("Index");
                 }
                 else
@@ -58,23 +52,23 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("", error.Description);
                     }
-                    _logger.LogWarning($"Failed to create {name} role");
+                    _repository.LogWarning($"Failed to create {roleName} role");
                 }
             }
 
-            _logger.LogWarning("Role name is not profived");
-            return View(name);
+            _repository.LogWarning("Role name is not profived");
+            return View(roleName);
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(string roleId)
         {
-            IdentityRole role = await _roleManager.FindByIdAsync(roleId);
+            IdentityRole role = await _repository.FindRoleByIdAsync(roleId);
 
             if (role != null)
             {
-                await _roleManager.DeleteAsync(role);
-                _logger.LogInformation($"Deleted role {role.Name}");
+                await _repository.DeleteAsync(role);
+                _repository.LogInformation($"Deleted role {role.Name}");
             }
 
             return RedirectToAction("Index");
@@ -83,7 +77,7 @@ namespace IdentityApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string userId, string returnUrl)
         {
-            User user = await _userManager.FindByIdAsync(userId);
+            User user = await _repository.FindUserByIdAsync(userId);
 
             if (user != null)
             {
@@ -91,15 +85,15 @@ namespace IdentityApp.Controllers
                 {
                     UserId = user.Id,
                     UserName = user.UserName,
-                    UserRoles = await _userManager.GetRolesAsync(user),
-                    AllRoles = await _roleManager.Roles.ToListAsync(),
+                    UserRoles = await _repository.GetRolesAsync(user),
+                    AllRoles = await _repository.GetAllRolesAsync(),
                     ReturnUrl = returnUrl
                 };
 
                 return View(model);
             }
 
-            _logger.LogError($"User {user.UserName} not found");
+            _repository.LogError($"User not found");
             return NotFound();
         }
 
@@ -107,17 +101,17 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(string userId, 
             List<string> roles, string returnUrl)
         {
-            User user = await _userManager.FindByIdAsync(userId);
+            User user = await _repository.FindUserByIdAsync(userId);
 
             if (user != null)
             {
-                var userRoles = await _userManager.GetRolesAsync(user);
+                var userRoles = await _repository.GetRolesAsync(user);
                 IEnumerable<string> addedRoles = roles.Except(userRoles);
                 IEnumerable<string> removedRoles = userRoles.Except(roles);
 
-                await _userManager.AddToRolesAsync(user, addedRoles);
-                await _userManager.RemoveFromRolesAsync(user, removedRoles);
-                _logger.LogInformation($"Changed ser {user.UserName} roles");
+                await _repository.AddToRolesAsync(user, addedRoles);
+                await _repository.RemoveFromRolesAsync(user, removedRoles);
+                _repository.LogInformation($"Changed user {user.UserName} roles");
 
                 if (!string.IsNullOrEmpty(returnUrl)
                     && Url.IsLocalUrl(returnUrl))
@@ -126,7 +120,7 @@ namespace IdentityApp.Controllers
                 }
             }
 
-            _logger.LogError($"User {user.UserName} not found");
+            _repository.LogError($"User not found");
             return NotFound();
         }
     }
