@@ -29,26 +29,22 @@ namespace IdentityApp.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                authenticatedUser = await _repository
-                    .FindByNameAsync(User.Identity.Name);
+                authenticatedUser = await _repository.FindByNameAsync(User.Identity.Name);
             }
 
             if (user != null)
             {
-                IEnumerable<Post> allPosts = user.Posts
-                    .OrderByDescending(post => post.PostedTime);
-                IEnumerable<Post> currentUserPosts = allPosts
-                    .Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
+                IEnumerable<Post> allPosts = user.Posts.OrderByDescending(post => post.PostedTime);
+                IEnumerable<Post> currentUserPosts = allPosts.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
 
                 UserProfileViewModel viewModel = new UserProfileViewModel()
                 {
                     User = user,
                     Posts = currentUserPosts,
-                    PageViewModel = new PageViewModel(
-                        page, allPosts.Count(), PAGE_SIZE),
+                    PageViewModel = new PageViewModel(page, allPosts.Count(), PAGE_SIZE),
                     AuthenticatedUser = authenticatedUser,
-                    AuthenticatedUserRoles = authenticatedUser != null
-                        ? await _repository.GetRolesAsync(authenticatedUser)
+                    AuthenticatedUserRoles = authenticatedUser != null 
+                        ? await _repository.GetRolesAsync(authenticatedUser) 
                         : new List<string> { "user" }
                 };
 
@@ -72,9 +68,8 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User existingUser = await _repository.FirstOrDefaultAsync(
-                    user => user.UserName == model.UserName
-                    || user.Email == model.Email);
+                User existingUser = await _repository.FirstOrDefaultAsync(user => 
+                    user.UserName == model.UserName || user.Email == model.Email);
 
                 if (existingUser == null)
                 {
@@ -85,8 +80,7 @@ namespace IdentityApp.Controllers
                     };
 
                     await SetDefaultProfilePicture(user);
-                    IdentityResult result = await _repository
-                        .CreateAsync(user, model.Password);
+                    IdentityResult result = await _repository.CreateAsync(user, model.Password);
 
                     if (result.Succeeded)
                     {
@@ -101,14 +95,12 @@ namespace IdentityApp.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
-                        _repository.LogWarning("Failed to create user " +
-                            $"{user.UserName}");
+                        _repository.LogWarning($"Failed to create user {user.UserName}");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "User with such an email " +
-                        "and/or username already exists");
+                    ModelState.AddModelError("", "User with such an email and/or username already exists");
                     _repository.LogWarning($"User with such email {model.Email} " +
                         $"and/or username {model.UserName} already exists");
                 }
@@ -139,23 +131,19 @@ namespace IdentityApp.Controllers
 
                     if (result.Succeeded)
                     {
-                        _repository.LogInformation($"User {user.UserName} " +
-                            "logged in");
+                        _repository.LogInformation($"User {user.UserName} logged in");
                         return RedirectToAction("Index", "Home");
                     }
                     else
                     {
                         ModelState.AddModelError("", "Incorrect password");
-                        _repository.LogWarning($"User {user.UserName} failed " +
-                            $"to log in");
+                        _repository.LogWarning($"User {user.UserName} failed to log in");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("",
-                        "User with such an email doesn't exist");
-                    _repository.LogWarning($"User with email {model.Email} " +
-                        "doesn't exist");
+                    ModelState.AddModelError("", "User with such an email doesn't exist");
+                    _repository.LogWarning($"User with email {model.Email} doesn't exist");
                 }
             }
 
@@ -181,8 +169,7 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(string userId, string returnUrl)
         {
             User user = await _repository.FindByIdAsync(userId);
-            User authenticatedUser = await _repository
-                .FindByNameAsync(User.Identity.Name);
+            User authenticatedUser = await _repository.FindByNameAsync(User.Identity.Name);
 
             if (user == null)
             {
@@ -200,8 +187,7 @@ namespace IdentityApp.Controllers
                 Country = user.Country,
                 City = user.City,
                 Company = user.Company,
-                ProfilePicture = ConvertByteArrayToIFormFile(
-                    user.ProfilePicture),
+                ProfilePicture = ConvertByteArrayToIFormFile(user.ProfilePicture),
                 CalledFromAction = returnUrl,
                 AuthenticatedUserRoles = authenticatedUser != null
                     ? await _repository.GetRolesAsync(authenticatedUser)
@@ -220,8 +206,7 @@ namespace IdentityApp.Controllers
 
             if (ModelState.IsValid)
             {
-                bool userNameChanged = model.UserName != user.UserName
-                    ? true : false;
+                bool userNameChanged = model.UserName != user.UserName ? true : false;
 
                 AssignEditUserViewModelToUser(model, user);
                 IdentityResult result = await _repository.UpdateAsync(user);
@@ -229,14 +214,12 @@ namespace IdentityApp.Controllers
                 if (result.Succeeded)
                 {
                     await _repository.SaveChangesAsync();
-                    _repository.LogInformation("Information updated for " +
-                        $"{user.UserName}");
+                    _repository.LogInformation($"Information updated for {user.UserName}");
                     await ReloginUserOnUserNameChanged(userNameChanged, user);
 
                     if (model.CalledFromAction.Contains("Account"))
                     {
-                        return RedirectToAction("Index",
-                            new { userName = user.UserName });
+                        return RedirectToAction("Index", new { userName = user.UserName });
                     }
                     else
                     {
@@ -249,60 +232,72 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("", error.Description);
                     }
-                    _repository.LogWarning($"User {user.UserName} profile " +
-                        "information hasn't been updated");
+                    _repository.LogWarning($"User {user.UserName} profile information hasn't been updated");
                 }
             }
 
             model.UserName = user.UserName;
-            model.ProfilePicture = ConvertByteArrayToIFormFile(
-                user.ProfilePicture);
+            model.ProfilePicture = ConvertByteArrayToIFormFile(user.ProfilePicture);
 
             _repository.LogWarning("EditUserViewModel is not valid");
             return View(model);
         }
 
+        /// <summary>
+        /// Sets a default profile picture
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         private async Task SetDefaultProfilePicture(User user)
         {
-            string defaultProfilePicPath = $"{_repository.GetWebRootPath()}" +
-                "/Files/default_profile_pic.jpg";
+            string defaultProfilePicPath = $"{_repository.GetWebRootPath()}/Files/default_profile_pic.jpg";
 
-            using (FileStream fileStream = new FileStream(
-                defaultProfilePicPath, FileMode.Open, FileAccess.Read))
+            using (var fileStream = new FileStream(defaultProfilePicPath, FileMode.Open, FileAccess.Read))
             {
-                user.ProfilePicture = await System.IO.File
-                    .ReadAllBytesAsync(defaultProfilePicPath);
-                await fileStream.ReadAsync(user.ProfilePicture, 0,
-                    System.Convert.ToInt32(fileStream.Length));
+                user.ProfilePicture = await System.IO.File.ReadAllBytesAsync(defaultProfilePicPath);
+                await fileStream.ReadAsync(user.ProfilePicture, 0, System.Convert.ToInt32(fileStream.Length));
             }
         }
 
+
+        /// <summary>
+        /// Converts an array of a picture's bytes to IFormFile
+        /// </summary>
+        /// <param name="bytePicture"></param>
+        /// <returns></returns>
         private IFormFile ConvertByteArrayToIFormFile(byte[] bytePicture)
         {
             Stream stream = new MemoryStream(bytePicture);
-            IFormFile formFilePicture = new FormFile(stream, 0,
-                bytePicture.Length, "default_profile_picture",
-                "default_profile_pic.jpg");
+            IFormFile formFilePicture = new FormFile(stream, 0, bytePicture.Length, 
+                "default_profile_picture", "default_profile_pic.jpg");
 
             return formFilePicture;
         }
 
-        private byte[] ConvertIFormFileToByteArray(IFormFile formFilePicture,
-            byte[] bytePicture)
+        /// <summary>
+        /// Converts an IFormFile to an array of bytes
+        /// </summary>
+        /// <param name="formFilePicture"></param>
+        /// <param name="bytePicture"></param>
+        /// <returns></returns>
+        private byte[] ConvertIFormFileToByteArray(IFormFile formFilePicture, byte[] bytePicture)
         {
             if (formFilePicture != null)
             {
-                using (BinaryReader binaryReader = new BinaryReader(
-                    formFilePicture.OpenReadStream()))
+                using (BinaryReader binaryReader = new BinaryReader(formFilePicture.OpenReadStream()))
                 {
-                    bytePicture = binaryReader.ReadBytes(
-                        (int)formFilePicture.Length);
+                    bytePicture = binaryReader.ReadBytes((int)formFilePicture.Length);
                 }
             }
 
             return bytePicture;
         }
 
+        /// <summary>
+        /// Checks if the username is taken
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="user"></param>
         private void CheckIfUserNameIsTaken(EditUserViewModel model, User user)
         {
             if (user != null)
@@ -312,20 +307,21 @@ namespace IdentityApp.Controllers
 
                 foreach (string userName in userNames)
                 {
-                    if (model.UserName == userName
-                        && model.UserName != user.UserName)
+                    if (model.UserName == userName && model.UserName != user.UserName)
                     {
-                        ModelState.AddModelError("",
-                            "The username is already taken");
-                        _repository.LogWarning($"The username {model.UserName} " +
-                            "is already taken");
+                        ModelState.AddModelError("", "The username is already taken");
+                        _repository.LogWarning($"The username {model.UserName} is already taken");
                     }
                 }
             }
         }
 
-        private void AssignEditUserViewModelToUser(EditUserViewModel model,
-            User user)
+        /// <summary>
+        /// Assigns EditUserViewModel values to the user
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="user"></param>
+        private void AssignEditUserViewModelToUser(EditUserViewModel model, User user)
         {
             user.Email = model.Email;
             user.UserName = model.UserName;
@@ -334,19 +330,22 @@ namespace IdentityApp.Controllers
             user.Country = model.Country;
             user.City = model.City;
             user.Company = model.Company;
-            user.ProfilePicture = ConvertIFormFileToByteArray(
-                model.ProfilePicture, user.ProfilePicture);
+            user.ProfilePicture = ConvertIFormFileToByteArray(model.ProfilePicture, user.ProfilePicture);
         }
 
-        private async Task ReloginUserOnUserNameChanged(bool isUserNameChanged,
-            User user)
+        /// <summary>
+        /// Forcibly logs out and logs in a user in order to update User.Identity
+        /// </summary>
+        /// <param name="isUserNameChanged"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        private async Task ReloginUserOnUserNameChanged(bool isUserNameChanged, User user)
         {
             if (isUserNameChanged)
             {
                 await _repository.SignOutAsync();
                 await _repository.SignInAsync(user, false);
-                _repository.LogInformation($"User {user.UserName}" +
-                    "relogged in");
+                _repository.LogInformation($"User {user.UserName} relogged in");
             }
         }
     }

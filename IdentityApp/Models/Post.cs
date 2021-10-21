@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace IdentityApp.Models
 {
@@ -11,8 +10,6 @@ namespace IdentityApp.Models
         public DateTime PostedTime { get; set; }
         public int Likes { get; set; }
         public bool IsEdited { get; set; }
-
-        // [MaxLength(5)]
         public virtual List<PostPicture> PostPictures { get; set; } 
         public virtual List<LikedPost> LikedPosts { get; set; } 
 

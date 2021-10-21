@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
 using System.Linq;
@@ -37,11 +35,7 @@ namespace IdentityApp.Controllers
 
                 if (user != null)
                 {
-                    CreatePostViewModel model = new CreatePostViewModel()
-                    {
-                        User = user
-                    };
-
+                    CreatePostViewModel model = new CreatePostViewModel() { User = user };
                     return View(model);
                 }
             }
@@ -77,18 +71,15 @@ namespace IdentityApp.Controllers
                     {
                         ModelState.AddModelError("", "The length of your " +
                             "post must be between 1 and 350 symbols");
-                        _repository.LogWarning("The length of a post must be " +
-                            "between 1 and 350 symbols");
+                        _repository.LogWarning("The length of a post must be between 1 and 350 symbols");
                     }
                     else
                     {
                         user.Posts.Add(post);
                         await _repository.UpdateAsync(user);
-                        _repository.LogInformation($"User {user.UserName} " +
-                            "created a post");
+                        _repository.LogInformation($"User {user.UserName} created a post");
 
-                        return RedirectToAction("Index", "Account",
-                            new { userName = user.UserName });
+                        return RedirectToAction("Index", "Account", new { userName = user.UserName });
                     }
                 }
                 else
@@ -123,8 +114,7 @@ namespace IdentityApp.Controllers
                 UserName = post.User.UserName,
                 CalledFromAction = returnUrl,
                 PostPictures = post.PostPictures
-                    .OrderByDescending(postPic => postPic.UploadedTime)
-                    .AsEnumerable()
+                    .OrderByDescending(postPic => postPic.UploadedTime).AsEnumerable()
             };
 
             return View(model);
@@ -138,15 +128,13 @@ namespace IdentityApp.Controllers
 
             if (post != null)
             {
-                CheckPostPicturesCount(model.AppendedPostPictures,
-                    post.PostPictures);
+                CheckPostPicturesCount(model.AppendedPostPictures, post.PostPictures);
 
                 if (ModelState.IsValid)
                 {
                     if (model.Content != null)
                     {
-                        User user = await _repository
-                            .FindByIdAsync(model.UserId);
+                        User user = await _repository.FindByIdAsync(model.UserId);
 
                         AddPostPicturesToPost(model.AppendedPostPictures, post);
                         post.Content = model.Content;
@@ -155,13 +143,11 @@ namespace IdentityApp.Controllers
 
                         _repository.Update(post);
                         await _repository.SaveChangesAsync();
-                        _repository.LogInformation($"User {user.UserName}'s post " +
-                            "was edited");
+                        _repository.LogInformation($"User {user.UserName}'s post was edited");
 
                         if (model.CalledFromAction.Contains("Account"))
                         {
-                            return RedirectToAction("Index", "Account",
-                                new { userName = user.UserName });
+                            return RedirectToAction("Index", "Account", new { userName = user.UserName });
                         }
                         else
                         {
@@ -170,13 +156,12 @@ namespace IdentityApp.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("", "The length of your " +
-                            "post must be between 1 and 350 symbols");
+                        ModelState.AddModelError("", "The length of your post must " +
+                            "be between 1 and 350 symbols");
                     }
                 }
 
-                model.PostPictures = post.PostPictures
-                    .OrderByDescending(postPic => postPic.UploadedTime);
+                model.PostPictures = post.PostPictures.OrderByDescending(postPic => postPic.UploadedTime);
 
                 _repository.LogWarning("EditPostViewModel is not valid");
                 return View(model);
@@ -194,10 +179,8 @@ namespace IdentityApp.Controllers
 
             if (post != null)
             {
-                IEnumerable<LikedPost> likedPosts = _repository
-                    .GetAllLikedPosts()
-                    .Where(likedPost => likedPost.PostId == post.Id)
-                    .AsEnumerable();
+                IEnumerable<LikedPost> likedPosts = _repository.GetAllLikedPosts()
+                    .Where(likedPost => likedPost.PostId == post.Id).AsEnumerable();
 
                 if (likedPosts != null)
                 {
@@ -206,8 +189,7 @@ namespace IdentityApp.Controllers
 
                 _repository.Remove(post);
                 await _repository.SaveChangesAsync();
-                _repository.LogInformation($"User {user.UserName}'s post " +
-                    "was deleted");
+                _repository.LogInformation($"User {user.UserName}'s post was deleted");
             }
             else
             {
@@ -217,8 +199,7 @@ namespace IdentityApp.Controllers
 
             if (returnUrl.Contains("Account"))
             {
-                return RedirectToAction("Index", "Account",
-                    new { userName = user.UserName });
+                return RedirectToAction("Index", "Account", new { userName = user.UserName });
             }
 
             return RedirectToAction("Index", "Home");
@@ -235,9 +216,8 @@ namespace IdentityApp.Controllers
 
                 if (post != null)
                 {
-                    LikedPost postToCheck = user.LikedPosts
-                        .FirstOrDefault(post => post.UserId == model.UserId
-                            && post.PostId == model.PostId);
+                    LikedPost postToCheck = user.LikedPosts.FirstOrDefault(post =>
+                        post.UserId == model.UserId && post.PostId == model.PostId);
 
                     LikeDislikePost(post, postToCheck, user);
                     await _repository.SaveChangesAsync();
@@ -250,15 +230,11 @@ namespace IdentityApp.Controllers
 
                 if (model.ReturnAction.Contains("Account"))
                 {
-                    return RedirectToAction("Index", "Account", new
-                    {
-                        userName = model.LikedPostUserName,
-                        page = model.Page
-                    });
+                    return RedirectToAction("Index", "Account", 
+                        new { userName = model.LikedPostUserName, page = model.Page });
                 }
 
-                return RedirectToAction("Index", "Home",
-                    new { page = model.Page });
+                return RedirectToAction("Index", "Home", new { page = model.Page });
             }
             else
             {
@@ -267,6 +243,11 @@ namespace IdentityApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Checks if the number of a post's pictures exceeds 5
+        /// </summary>
+        /// <param name="appendedPostPictures"></param>
+        /// <param name="postPictures"></param>
         private void CheckPostPicturesCount(IFormFileCollection appendedPostPictures,
             IEnumerable<PostPicture> postPictures = null)
         {
@@ -274,29 +255,28 @@ namespace IdentityApp.Controllers
             {
                 if (appendedPostPictures.Count() > 5)
                 {
-                    ModelState.AddModelError("",
-                        "A post can contain up to 5 pictures");
-                    _repository.LogWarning("A post can contain up to " +
-                        "5 pictures");
+                    ModelState.AddModelError("", "A post can contain up to 5 pictures");
+                    _repository.LogWarning("A post can contain up to 5 pictures");
                     return;
                 }
 
                 if (postPictures != null)
                 {
-                    if (postPictures.Count()
-                        + appendedPostPictures.Count() > 5)
+                    if (postPictures.Count() + appendedPostPictures.Count() > 5)
                     {
-                        ModelState.AddModelError("",
-                            "A post can contain up to 5 pictures");
-                        _repository.LogWarning("A post can contain up to " +
-                            "5 pictures");
+                        ModelState.AddModelError("", "A post can contain up to 5 pictures");
+                        _repository.LogWarning("A post can contain up to 5 pictures");
                     }
                 }
             }
         }
 
-        private void AddPostPicturesToPost(IFormFileCollection picturesToAdd,
-            Post post)
+        /// <summary>
+        /// Adds pictures to a post
+        /// </summary>
+        /// <param name="picturesToAdd"></param>
+        /// <param name="post"></param>
+        private void AddPostPicturesToPost(IFormFileCollection picturesToAdd, Post post)
         {
             if (picturesToAdd != null)
             {
@@ -304,11 +284,9 @@ namespace IdentityApp.Controllers
                 {
                     byte[] pictureData = null;
 
-                    using (BinaryReader binaryReader =
-                        new BinaryReader(postPic.OpenReadStream()))
+                    using (BinaryReader binaryReader = new BinaryReader(postPic.OpenReadStream()))
                     {
-                        pictureData = binaryReader.ReadBytes(
-                            (int)postPic.Length);
+                        pictureData = binaryReader.ReadBytes((int)postPic.Length);
                     }
 
                     pictureData = ResizeImage(pictureData);
@@ -325,32 +303,34 @@ namespace IdentityApp.Controllers
             }
         }
 
-        private void LikeDislikePost(Post postToLike, LikedPost postToCheck,
-            User user)
+        /// <summary>
+        /// Adds or removes a like according to the post's state
+        /// </summary>
+        /// <param name="postToLike"></param>
+        /// <param name="postToCheck"></param>
+        /// <param name="user"></param>
+        private void LikeDislikePost(Post postToLike, LikedPost postToCheck, User user)
         {
             if (postToCheck != null)
             {
                 user.LikedPosts.Remove(postToCheck);
                 postToLike.Likes--;
-                _repository.LogInformation($"User {user.UserName} removed " +
-                    "a like from a post");
+                _repository.LogInformation($"User {user.UserName} removed a like from a post");
             }
             else
             {
-                user.LikedPosts.Add(
-                    new LikedPost()
-                    {
-                        UserId = user.Id,
-                        User = user,
-                        PostId = postToLike.Id,
-                        Post = postToLike
-                    });
+                user.LikedPosts.Add(new LikedPost() { 
+                    UserId = user.Id, User = user, PostId = postToLike.Id, Post = postToLike });
                 postToLike.Likes++;
-                _repository.LogInformation($"User {user.UserName} " +
-                    "liked a post");
+                _repository.LogInformation($"User {user.UserName} liked a post");
             }
         }
 
+        /// <summary>
+        /// Proportionally resizes an image to the height of 200px
+        /// </summary>
+        /// <param name="imageToResize"></param>
+        /// <returns></returns>
         private byte[] ResizeImage(byte[] imageToResize)
         {
             byte[] resizedImage = null;

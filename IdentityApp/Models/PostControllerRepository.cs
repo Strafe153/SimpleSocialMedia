@@ -3,11 +3,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using IdentityApp.Interfaces;
-using System.Linq;
 using System.Collections.Generic;
+using IdentityApp.Interfaces;
 
 namespace IdentityApp.Models
 {
@@ -18,8 +18,7 @@ namespace IdentityApp.Models
         private readonly ILogger _logger;
 
         public PostControllerRepository(UserManager<User> userManager,
-            ApplicationDbContext context, 
-            ILogger<PostControllerRepository> logger)
+            ApplicationDbContext context, ILogger<PostControllerRepository> logger)
         {
             _userManager = userManager;
             _context = context;

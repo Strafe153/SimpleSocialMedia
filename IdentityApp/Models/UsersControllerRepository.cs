@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityApp.Interfaces;
 using System.Collections.Generic;
+using IdentityApp.Interfaces;
 
 namespace IdentityApp.Models
 {
@@ -15,9 +15,8 @@ namespace IdentityApp.Models
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger _logger;
 
-        public UsersControllerRepository(UserManager<User> userManager,
-            ApplicationDbContext context, SignInManager<User> signInManager,
-            ILogger<UsersControllerRepository> logger)
+        public UsersControllerRepository(UserManager<User> userManager, ApplicationDbContext context,
+            SignInManager<User> signInManager, ILogger<UsersControllerRepository> logger)
         {
             _userManager = userManager;
             _context = context;

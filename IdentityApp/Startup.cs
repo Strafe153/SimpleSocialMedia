@@ -28,9 +28,8 @@ namespace IdentityApp
             services.AddScoped<IPostPictureControllable, PostPictureRepository>();
             services.AddScoped<IRolesControllable, RolesControllerRepository>();
             services.AddScoped<IUsersControllable, UsersControllerRepository>();
-            services.AddDbContext<ApplicationDbContext>(options => 
-                options.UseSqlServer(Configuration
-                    .GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
+                Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -39,9 +38,8 @@ namespace IdentityApp
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.User.RequireUniqueEmail = true;
-                options.User.AllowedUserNameCharacters = "1234567890" +
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                    @"-_.?=+`~!#$;()[]{}*&^:%,\/<>@ ";
+                options.User.AllowedUserNameCharacters = "1234567890abcdefghijklmnopqrstuvwxyz" +
+                    @"ABCDEFGHIJKLMNOPQRSTUVWXYZ-_.?=+`~!#$;()[]{}*&^:%,\/<>@ ";
             }).AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
         }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -28,24 +27,19 @@ namespace IdentityApp.Controllers
             const int PAGE_SIZE = 5;
 
             IQueryable<User> users = _repository.GetAllUsers();
-            FilterUsers(ref users, model.UserName, model.Email,model.Year, 
-                model.Country);
+            FilterUsers(ref users, model.UserName, model.Email,model.Year, model.Country);
             users = ChooseSort(users, model.SortOrder);
 
             int usersNumber = await users.CountAsync();
             IEnumerable<User> currentPageUsers = users
-                .Skip((model.Page - 1) * PAGE_SIZE)
-                .Take(PAGE_SIZE)
-                .AsEnumerable();
+                .Skip((model.Page - 1) * PAGE_SIZE).Take(PAGE_SIZE).AsEnumerable();
 
             var filterSortPageViewModel = new FilterSortPageViewModel()
             {
                 Users = currentPageUsers,
-                FilterViewModel = new FilterViewModel(
-                    model.UserName, model.Email, model.Year, model.Country),
+                FilterViewModel = new FilterViewModel(model.UserName, model.Email, model.Year, model.Country),
                 SortViewModel = new SortViewModel(model.SortOrder),
-                PageViewModel = new PageViewModel(
-                    model.Page, usersNumber, PAGE_SIZE)
+                PageViewModel = new PageViewModel(model.Page, usersNumber, PAGE_SIZE)
             };
 
             _repository.LogInformation("On Users page");
@@ -130,17 +124,14 @@ namespace IdentityApp.Controllers
 
                 if (user != null)
                 {
-                    IdentityResult result = await _repository
-                        .ChangePasswordAsync(user, model.CurrentPassword,
-                            model.NewPassword);
+                    IdentityResult result = await _repository.ChangePasswordAsync(
+                        user, model.CurrentPassword, model.NewPassword);
 
                     if (result.Succeeded)
                     {
-                        _repository.LogInformation("Changed password for " +
-                            $"user {user.UserName}");
+                        _repository.LogInformation($"Changed password for user {user.UserName}");
 
-                        if (!string.IsNullOrEmpty(model.ReturnUrl) 
-                            && Url.IsLocalUrl(model.ReturnUrl))
+                        if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                         {
                             return LocalRedirect(model.ReturnUrl);
                         }
@@ -153,8 +144,7 @@ namespace IdentityApp.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
-                        _repository.LogWarning("Failed to change user " +
-                            $"{user.UserName}'s password");
+                        _repository.LogWarning($"Failed to change user {user.UserName}'s password");
                     }
                 }
                 else
@@ -167,8 +157,16 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
-        private void FilterUsers(ref IQueryable<User> users, string userName,
-            string email, int? year, string country)
+        /// <summary>
+        /// Filters users according to the given parameters
+        /// </summary>
+        /// <param name="users"></param>
+        /// <param name="userName"></param>
+        /// <param name="email"></param>
+        /// <param name="year"></param>
+        /// <param name="country"></param>
+        private void FilterUsers(ref IQueryable<User> users, string userName, string email,
+            int? year, string country)
         {
             if (!string.IsNullOrEmpty(userName))
             {
@@ -191,8 +189,13 @@ namespace IdentityApp.Controllers
             }
         }
 
-        private IQueryable<User> ChooseSort(IQueryable<User> users,
-            SortState sortOrder)
+        /// <summary>
+        /// Sorts users according to a given parameter
+        /// </summary>
+        /// <param name="users"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        private IQueryable<User> ChooseSort(IQueryable<User> users, SortState sortOrder)
         {
             return sortOrder switch
             {

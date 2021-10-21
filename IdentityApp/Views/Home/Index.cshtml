@@ -7,62 +7,38 @@
 @foreach (Post post in Model.Posts)
 {
     <div class="border border-secondary rounded p-2 my-2">
-        <a asp-action="Index"
-           asp-controller="Account"
-           asp-route-userName="@post.User.UserName"
-           id="user-profile-link">
-            @post.User.UserName
-        </a>
+        <a asp-action="Index" asp-controller="Account" asp-route-userName="@post.User.UserName" 
+            id="user-profile-link">@post.User.UserName</a>
         <p class="text-break">@post.Content</p>
 
-        @foreach (PostPicture postPicture in post.PostPictures
-            .OrderByDescending(postPic => postPic.UploadedTime))
+        @foreach (PostPicture postPicture in post.PostPictures.OrderByDescending(postPic => postPic.UploadedTime))
         {
-            <img height="150" alt="post_picture" class="mb-1"
-                 src="data:image/jpeg;base64,@(Convert.ToBase64String(
-                                                postPicture.PictureData))" />
+            <img class="mb-1" height="150" alt="post_picture"
+                 src="data:image/jpeg;base64,@(Convert.ToBase64String(postPicture.PictureData))" />
         }
 
         <div class="mt-2">
             @if (Model.AuthenticatedUser != null)
             {
                 <a asp-action="Like"
-                   asp-controller="Post"
-                   asp-route-PostId="@post.Id"
-                   asp-route-UserId="@Model.AuthenticatedUser.Id"
-                   asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
-                   asp-route-ReturnAction="@Context.Request.Path"
-                   class="btn btn-sm px-3 @(Model.AuthenticatedUser.LikedPosts
-                        .FirstOrDefault(p => p.Post.Id == post.Id) != null 
-                            ? "btn-primary" : "btn-outline-primary")">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                         height="16" class="bi bi-heart align-middle"
-                         fill="currentColor" viewBox="0 0 16 16">
-                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4
-                              3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815
-                              2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542
-                              6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878
-                              10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868
-                              3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12
-                              3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                    asp-controller="Post"
+                    asp-route-PostId="@post.Id"
+                    asp-route-UserId="@Model.AuthenticatedUser.Id"
+                    asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
+                    asp-route-ReturnAction="@Context.Request.Path"
+                    class="btn btn-sm px-3 @(Model.AuthenticatedUser.LikedPosts.FirstOrDefault(
+                        p => p.Post.Id == post.Id) != null ? "btn-primary" : "btn-outline-primary")">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
                     </svg>
                     <span id="likes-count">@post.Likes</span>
                 </a>
             }
             else
             {
-                <a asp-action="Login" asp-controller="Account"
-                   class="btn btn-sm btn-outline-primary px-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                         height="16" class="bi bi-heart align-middle"
-                         fill="currentColor" viewBox="0 0 16 16">
-                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4
-                              3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815
-                              2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542
-                              6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878
-                              10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868
-                              3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12
-                              3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                <a asp-action="Login" asp-controller="Account" class="btn btn-sm btn-outline-primary px-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
                     </svg>
                     <span id="likes-count">@post.Likes</span>
                 </a>
@@ -79,16 +55,10 @@
             }
             @if (Model.AuthenticatedUser != null)
             {
-                @if (Model.AuthenticatedUser.Id == post.UserId 
-                    || Model.AuthenticatedUserRoles.Contains("admin"))
+                @if (Model.AuthenticatedUser.Id == post.UserId || Model.AuthenticatedUserRoles.Contains("admin"))
                 {
-                    <a asp-action="Edit"
-                       asp-controller="Post"
-                       asp-route-postId="@post.Id"
-                       asp-route-returnUrl="@Context.Request.Path"
-                       class="btn btn-outline-secondary">
-                        Edit
-                    </a>
+                    <a asp-action="Edit" asp-controller="Post" asp-route-postId="@post.Id"
+                       asp-route-returnUrl="@Context.Request.Path" class="btn btn-outline-secondary">Edit</a>
                 }
             }
         </div>
@@ -98,9 +68,7 @@
 
 @if (Model.PageViewModel.HasPreviousPage)
 {
-    <a asp-action="Index"
-       asp-route-page="@(Model.PageViewModel.CurrentPageNumber - 1)"
-       class="btn btn-outline-dark">
+    <a asp-action="Index" asp-route-page="@(Model.PageViewModel.CurrentPageNumber - 1)" class="btn btn-outline-dark">
         <i class="glyphicon glyphicon-chevron-left"></i>
         Previous
     </a>
@@ -108,15 +76,12 @@
 
 @if (Model.Posts.Count() > 0)
 {
-    <input type="submit" value="@Model.PageViewModel.CurrentPageNumber"
-           class="btn btn-outline-dark" disabled />
+    <input type="submit" value="@Model.PageViewModel.CurrentPageNumber" class="btn btn-outline-dark" disabled />
 }
 
 @if (Model.PageViewModel.HasNextPage)
 {
-    <a asp-action="Index"
-       asp-route-page="@(Model.PageViewModel.CurrentPageNumber + 1)"
-       class="btn btn-outline-dark">
+    <a asp-action="Index" asp-route-page="@(Model.PageViewModel.CurrentPageNumber + 1)" class="btn btn-outline-dark">
         <i class="glyphicon glyphicon-chevron-right"></i>
         Next
     </a>

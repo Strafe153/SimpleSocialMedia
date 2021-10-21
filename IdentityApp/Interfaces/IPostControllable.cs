@@ -12,9 +12,8 @@ namespace IdentityApp.Interfaces
 {
     public interface IPostControllable
     {
+        Task<T> FirstOrDefaultAsync<T>(IQueryable<T> collection, Expression<Func<T, bool>> predicate);
         Task<User> FindByIdAsync(string id);
-        Task<T> FirstOrDefaultAsync<T>(IQueryable<T> collection, 
-            Expression<Func<T, bool>> predicate);
         Task<IdentityResult> UpdateAsync(User user);
         Task<int> SaveChangesAsync();
         EntityEntry<Post> Update(Post post);

@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
@@ -40,6 +38,7 @@ namespace IdentityApp.Tests
         {
             // Arrange
             User nonExistent = null;
+
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
@@ -75,6 +74,7 @@ namespace IdentityApp.Tests
         {
             // Arrange
             User nonExistent = null;
+
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
@@ -157,6 +157,7 @@ namespace IdentityApp.Tests
         {
             // Arrange
             User nonExistent = null;
+
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => nonExistent));

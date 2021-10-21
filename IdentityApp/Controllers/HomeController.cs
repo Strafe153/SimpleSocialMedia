@@ -20,25 +20,21 @@ namespace IdentityApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(int page = 1)
         {
-            const int PAGE_SIZE = 10;
-            IEnumerable<Post> allPosts = _repository.GetAllPosts()
-                .OrderByDescending(post => post.PostedTime);
-            IEnumerable<Post> currentPagePosts = allPosts
-                .Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
+            const int PAGE_SIZE = 5;
+            IEnumerable<Post> allPosts = _repository.GetAllPosts().OrderByDescending(post => post.PostedTime);
+            IEnumerable<Post> currentPagePosts = allPosts.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
             IEnumerable<User> users = _repository.GetAllUsers();
             User authenticatedUser = null;
 
             if (User.Identity.IsAuthenticated)
             {
-                authenticatedUser = await _repository
-                    .FindByNameAsync(User.Identity.Name);
+                authenticatedUser = await _repository.FindByNameAsync(User.Identity.Name);
             }
 
             HomepageViewModel model = new HomepageViewModel()
             {
                 AuthenticatedUser = authenticatedUser,
-                PageViewModel = new PageViewModel(
-                    page, allPosts.Count(), PAGE_SIZE),
+                PageViewModel = new PageViewModel(page, allPosts.Count(), PAGE_SIZE),
                 Posts = currentPagePosts,
                 AuthenticatedUserRoles = authenticatedUser != null
                     ? await _repository.GetRolesAsync(authenticatedUser)
