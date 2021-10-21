@@ -2,9 +2,9 @@
 @model IdentityApp.ViewModels.ChangeRoleViewModel 
 
 @{ 
-    ViewBag.Title = $"{Model.UserName} - roles";
+    ViewData["Title"] = $"{Model.UserName}'s roles";
 
-    string returnUrl = Model.ReturnUrl.Contains("Account")
+    string returnUrl = Model.ReturnUrl.Contains("Account") 
         ? $"/Account?userName={Model.UserName}" : "/Users/Index";
 }
 
@@ -17,19 +17,13 @@
     <div class="form-group">
         @foreach (IdentityRole role in Model.AllRoles)
         {
-            <input type="checkbox" name="roles" value="@role.Name"
-                   @(Model.UserRoles.Contains(role.Name) 
-                        ? "checked=\"checked\"" : "") />@role.Name<br />
-            }
+            <input type="checkbox" name="roles" value="@role.Name" 
+                @(Model.UserRoles.Contains(role.Name) ? "checked=\"checked\"" : "") />@role.Name<br />
+        }
     </div>
     <div class="form-group">
-        <a asp-action="Edit"
-           asp-controller="Account"
-           asp-route-userId="@Model.UserId"
-           asp-route-returnUrl="@returnUrl"
-           class="btn btn-outline-secondary">
-            Cancel
-        </a>
+        <a asp-action="Edit" asp-controller="Account" asp-route-userId="@Model.UserId"
+           asp-route-returnUrl="@returnUrl" class="btn btn-outline-secondary">Cancel</a>
         <input type="submit" value="Save" class="btn btn-primary" />
     </div>
 </form>

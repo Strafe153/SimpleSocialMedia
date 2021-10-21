@@ -9,15 +9,13 @@ namespace IdentityApp.Models
     public class RoleInitializer
     {
         public static async Task InitializeAsync(UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager, 
-            IWebHostEnvironment appEnvironment)
+            RoleManager<IdentityRole> roleManager, IWebHostEnvironment appEnvironment)
         {
             const string ADMIN_NAME = "admin";
             const string ADMIN_EMAIL = "admin@gmail.com";
             const string ADMIN_PASSWORD = "qwerty";
 
-            string defaultProfilePicPath = 
-                $"{appEnvironment.WebRootPath}/Files/default_profile_pic.jpg";
+            string defaultProfilePicPath = $"{appEnvironment.WebRootPath}/Files/default_profile_pic.jpg";
 
             await CheckRoleOnInitializing(roleManager, "user");
             await CheckRoleOnInitializing(roleManager, "admin");
@@ -33,14 +31,11 @@ namespace IdentityApp.Models
                 using (FileStream fileStream = new FileStream(
                     defaultProfilePicPath, FileMode.Open, FileAccess.Read))
                 {
-                    admin.ProfilePicture = await File
-                        .ReadAllBytesAsync(defaultProfilePicPath);
-                    await fileStream.ReadAsync(admin.ProfilePicture, 0, 
-                        Convert.ToInt32(fileStream.Length));
+                    admin.ProfilePicture = await File.ReadAllBytesAsync(defaultProfilePicPath);
+                    await fileStream.ReadAsync(admin.ProfilePicture, 0, Convert.ToInt32(fileStream.Length));
                 }
 
-                IdentityResult result = await userManager
-                    .CreateAsync(admin, ADMIN_PASSWORD);
+                IdentityResult result = await userManager.CreateAsync(admin, ADMIN_PASSWORD);
 
                 if (result.Succeeded)
                 {
@@ -49,8 +44,7 @@ namespace IdentityApp.Models
             }
         }
 
-        private static async Task CheckRoleOnInitializing(
-            RoleManager<IdentityRole> roleManager, string role)
+        private static async Task CheckRoleOnInitializing(RoleManager<IdentityRole> roleManager, string role)
         {
             if (await roleManager.FindByNameAsync(role) == null)
             {

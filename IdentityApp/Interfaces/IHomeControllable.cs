@@ -9,8 +9,8 @@ namespace IdentityApp.Interfaces
     {
         Task<User> FindByNameAsync(string userName);
         Task<IList<string>> GetRolesAsync(User user);
-        void LogInformation(string message);
         IQueryable<User> GetAllUsers();
         IQueryable<Post> GetAllPosts();
+        void LogInformation(string message);
     }
 }

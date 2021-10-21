@@ -38,8 +38,7 @@ namespace IdentityApp.Controllers
         {
             if (!string.IsNullOrEmpty(roleName))
             {
-                IdentityResult result = await _repository
-                    .CreateAsync(new IdentityRole(roleName));
+                IdentityResult result = await _repository.CreateAsync(new IdentityRole(roleName));
 
                 if (result.Succeeded)
                 {
@@ -113,8 +112,7 @@ namespace IdentityApp.Controllers
                 await _repository.RemoveFromRolesAsync(user, removedRoles);
                 _repository.LogInformation($"Changed user {user.UserName} roles");
 
-                if (!string.IsNullOrEmpty(returnUrl)
-                    && Url.IsLocalUrl(returnUrl))
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
                     return LocalRedirect(returnUrl);
                 }

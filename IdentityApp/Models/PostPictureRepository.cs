@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 using IdentityApp.Interfaces;
 
 namespace IdentityApp.Models

@@ -18,8 +18,7 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IPostPictureControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<Expression<Func<PostPicture, bool>>>()))
-                .Returns(Task.Run(() => new PostPicture()));
+                It.IsAny<Expression<Func<PostPicture, bool>>>())).Returns(Task.Run(() => new PostPicture()));
 
             var controller = new PostPictureController(mockRepository.Object);
 

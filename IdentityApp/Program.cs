@@ -21,22 +21,16 @@ namespace IdentityApp
 
                 try
                 {
-                    UserManager<User> userManager = services
-                        .GetRequiredService<UserManager<User>>();
-                    RoleManager<IdentityRole> roleManager = services
-                        .GetRequiredService<RoleManager<IdentityRole>>();
-                    IWebHostEnvironment appEnvironment = services
-                        .GetRequiredService<IWebHostEnvironment>();
+                    UserManager<User> userManager = services.GetRequiredService<UserManager<User>>();
+                    RoleManager<IdentityRole> roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                    IWebHostEnvironment appEnvironment = services.GetRequiredService<IWebHostEnvironment>();
 
-                    await RoleInitializer.InitializeAsync(
-                        userManager, roleManager, appEnvironment);
+                    await RoleInitializer.InitializeAsync(userManager, roleManager, appEnvironment);
                 }
                 catch (Exception ex)
                 {
-                    ILogger logger = services
-                        .GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, 
-                        "An error occured while seeding a database");
+                    ILogger logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occured while seeding a database");
                 }
             }
 

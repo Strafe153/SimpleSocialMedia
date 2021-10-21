@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using IdentityApp.Interfaces;
-using IdentityApp.Controllers;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using IdentityApp.Interfaces;
 
 namespace IdentityApp.Models
 {

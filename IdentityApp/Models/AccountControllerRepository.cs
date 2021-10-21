@@ -21,8 +21,7 @@ namespace IdentityApp.Models
 
         public AccountControllerRepository(UserManager<User> userManager,
             SignInManager<User> signInManager, ApplicationDbContext context,
-            IWebHostEnvironment appeEnvironment,
-            ILogger<AccountControllerRepository> logger)
+            IWebHostEnvironment appeEnvironment, ILogger<AccountControllerRepository> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -56,8 +55,7 @@ namespace IdentityApp.Models
             return await _userManager.FindByNameAsync(userName);
         }
 
-        public async Task<User> FirstOrDefaultAsync(
-            Expression<Func<User, bool>> predicate)
+        public async Task<User> FirstOrDefaultAsync(Expression<Func<User, bool>> predicate)
         {
             return await _context.Users.FirstOrDefaultAsync(predicate);
         }
@@ -95,8 +93,8 @@ namespace IdentityApp.Models
         public async Task<SignInResult> PasswordSignInAsync(string userName, 
             string password, bool isPersistent, bool lockOutOnFailure)
         {
-            return await _signInManager.PasswordSignInAsync(userName, password,
-                isPersistent, lockOutOnFailure);
+            return await _signInManager.PasswordSignInAsync(
+                userName, password, isPersistent, lockOutOnFailure);
         }
 
         public async Task<int> SaveChangesAsync()

@@ -14,43 +14,24 @@ namespace IdentityApp.Tests
     {
         internal static IQueryable<User> GetTestUsers()
         {
-            List<User> testUsers = new List<User>();
-
-            testUsers.AddRange(new List<User>()
+            List<User> testUsers = new List<User>()
             {
-                new User()
-                {
-                    Id = "zxv34r",
-                    Email = "admin@gmail.com",
-                    UserName = "admin"
-                },
-                new User()
-                {
-                    Id = "45hydgfs",
-                    Email = "qwerty@ukr.net",
-                    UserName = "qwerty"
-                },
-                new User()
-                {
-                    Id = "refv3",
-                    Email = "andrew.fox@gmail.com",
-                    UserName = "fox_a15"
-                }
-            });
+                new User() { Id = "test_id1", Email = "admin@gmail.com", UserName = "admin" },
+                new User() { Id = "test_id2", Email = "qwerty@ukr.net", UserName = "qwerty" },
+                new User() { Id = "test_id3", Email = "andrew.fox@gmail.com", UserName = "fox_a15" }
+            };
 
             return testUsers.AsQueryable();
         }
 
         internal static List<IdentityRole> GetTestRoles()
         {
-            List<IdentityRole> testRoles = new List<IdentityRole>();
-
-            testRoles.AddRange(new List<IdentityRole>()
+            List<IdentityRole> testRoles = new List<IdentityRole>()
             {
                 new IdentityRole() { Name = "admin" },
                 new IdentityRole() { Name = "moderator" },
                 new IdentityRole() { Name = "user" }
-            });
+            };
 
             return testRoles;
         }
@@ -62,13 +43,12 @@ namespace IdentityApp.Tests
 
         internal static IQueryable<LikedPost> GetTestLikedPosts()
         {
-            List<LikedPost> testLikedPosts = new List<LikedPost>();
-
-            testLikedPosts.AddRange(new List<LikedPost>
+            List<LikedPost> testLikedPosts = new List<LikedPost>()
             {
-                new LikedPost() { PostId = "test_id" },
-                new LikedPost() { PostId = "qwerty" }
-            });
+                new LikedPost() { PostId = "test_id1" },
+                new LikedPost() { PostId = "test_id2" },
+                new LikedPost() { PostId = "test_id3" }
+            };
 
             return testLikedPosts.AsQueryable();
         }

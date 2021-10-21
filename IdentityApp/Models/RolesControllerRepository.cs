@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using IdentityApp.Interfaces;
 
 namespace IdentityApp.Models
@@ -14,8 +14,7 @@ namespace IdentityApp.Models
         private readonly ILogger _logger;
 
         public RolesControllerRepository(UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager,
-            ILogger<RolesControllerRepository> logger)
+            RoleManager<IdentityRole> roleManager, ILogger<RolesControllerRepository> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;

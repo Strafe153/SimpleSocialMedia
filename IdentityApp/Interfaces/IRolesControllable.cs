@@ -10,12 +10,12 @@ namespace IdentityApp.Interfaces
     {
         Task<User> FindUserByIdAsync(string userId);
         Task<IdentityRole> FindRoleByIdAsync(string roleId);
+        Task<List<IdentityRole>> GetAllRolesAsync();
         Task<IdentityResult> CreateAsync(IdentityRole roleName);
         Task<IdentityResult> DeleteAsync(IdentityRole role);
         Task<IdentityResult> AddToRolesAsync(User user, IEnumerable<string> roles);
         Task<IdentityResult> RemoveFromRolesAsync(User user, IEnumerable<string> roles);
         Task<IList<string>> GetRolesAsync(User user);
-        Task<List<IdentityRole>> GetAllRolesAsync();
         void LogInformation(string message);
         void LogWarning(string message);
         void LogError(string message);

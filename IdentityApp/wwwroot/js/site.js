@@ -20,16 +20,13 @@ $(".delete-button").on("click", function(event) {
     postPicturesToDelete.push(postPictureId);
 });
 
-// Marks the loaded profile picture as selected and outputs its name in the
-// input type="file" field
+// Marks the loaded profile picture as selected and outputs its name in the input type="file" field
 $("#profile-pic-input").on("change", function() {
     let fileName = $(this).val().split("\\").pop();
     $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
 });
 
-// Marks all the loaded post pictures as selected and outputs their count
-// in the input type="file" fieldW
+// Marks all the loaded post pictures as selected and outputs their count in the input type="file" field
 $("#post-picture").on("change", function() {
-    $(".custom-file-label").text(
-        `Pictures chosen: ${$(this)[0].files.length}`);
+    $(".custom-file-label").text(`Pictures chosen: ${$(this)[0].files.length}`);
 });

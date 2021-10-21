@@ -7,13 +7,11 @@ namespace IdentityApp.Models
 {
     public class CustomUserValidator : IUserValidator<User>
     {
-        public Task<IdentityResult> ValidateAsync(UserManager<User> manager,
-            User user)
+        public Task<IdentityResult> ValidateAsync(UserManager<User> manager, User user)
         {
             List<IdentityError> errors = new List<IdentityError>();
 
-            if (user.Year < DateTime.Now.Year - 90 
-                || user.Year > DateTime.Now.Year)
+            if (user.Year < DateTime.Now.Year - 90 || user.Year > DateTime.Now.Year)
             {
                 errors.Add(new IdentityError
                 {

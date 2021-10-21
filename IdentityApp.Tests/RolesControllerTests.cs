@@ -35,8 +35,7 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IRolesControllable>();
             mockRepository.Setup(repository => repository.CreateAsync(
-                It.IsAny<IdentityRole>())).Returns(Task.Run(() =>
-                    IdentityResult.Success));
+                It.IsAny<IdentityRole>())).Returns(Task.Run(() => IdentityResult.Success));
 
             var controller = new RolesController(mockRepository.Object);
 
@@ -98,7 +97,7 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IRolesControllable>();
             mockRepository.Setup(repository => repository.FindUserByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()
+                It.IsAny<string>())).Returns(Task.Run(() => new User() 
                     { Id = "test_id", UserName = "test_user" }));
 
             var controller = new RolesController(mockRepository.Object);
@@ -139,8 +138,7 @@ namespace IdentityApp.Tests
                 It.IsAny<User>())).Returns(Task.Run(() => Utility.GetTestUserRoles()));
 
             var urlHelper = new Mock<IUrlHelper>();
-            urlHelper.Setup(urlHelper => urlHelper.IsLocalUrl(It.IsAny<string>()))
-                .Returns(true);
+            urlHelper.Setup(urlHelper => urlHelper.IsLocalUrl(It.IsAny<string>())).Returns(true);
 
             var controller = new RolesController(mockRepository.Object);
             controller.Url = urlHelper.Object;

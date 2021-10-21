@@ -23,8 +23,7 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<User>>(), 
-                It.IsAny<Expression<Func<User, bool>>>()))
+                It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, bool>>>()))
                 .Returns(Task.Run(() => new User()));
 
             var controller = new PostController(mockRepository.Object);
@@ -41,10 +40,10 @@ namespace IdentityApp.Tests
         {
             // Arrange
             User nonExistent = null;
+
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<User>>(), 
-                It.IsAny<Expression<Func<User, bool>>>()))
+                It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, bool>>>()))
                 .Returns(Task.Run(() => nonExistent));
             var controller = new PostController(mockRepository.Object);
 
@@ -61,8 +60,7 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<User>>(),
-                It.IsAny<Expression<Func<User, bool>>>()))
+                It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, bool>>>()))
                 .Returns(Task.Run(() => new User()));
 
             var controller = new PostController(mockRepository.Object);
@@ -89,15 +87,11 @@ namespace IdentityApp.Tests
             User nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<User>>(),
-                It.IsAny<Expression<Func<User, bool>>>()))
+                It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, bool>>>()))
                 .Returns(Task.Run(() => nonExistent));
 
             var controller = new PostController(mockRepository.Object);
-            CreatePostViewModel createPostViewModel = new CreatePostViewModel()
-            {
-                PostPictures = new FormFileCollection()
-            };
+            var createPostViewModel = new CreatePostViewModel() { PostPictures = new FormFileCollection() };
 
             // Act
             IActionResult result = controller.Create(createPostViewModel).Result;
@@ -140,8 +134,7 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<Post>>(),
-                It.IsAny<Expression<Func<Post, bool>>>()))
+                It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
                 .Returns(Task.Run(() => new Post() { User = new User() }));
 
             var controller = new PostController(mockRepository.Object);
@@ -160,8 +153,7 @@ namespace IdentityApp.Tests
             Post nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<Post>>(),
-                It.IsAny<Expression<Func<Post, bool>>>()))
+                It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
                 .Returns(Task.Run(() => nonExistent));
 
             var controller = new PostController(mockRepository.Object);
@@ -179,12 +171,10 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<Post>>(),
-                It.IsAny<Expression<Func<Post, bool>>>()))
+                It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
                 .Returns(Task.Run(() => new Post() { User = new User() }));
             mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>()))
-                .Returns(Task.Run(() => new User() { UserName = "test_user" }));
+                It.IsAny<string>())).Returns(Task.Run(() => new User() { UserName = "test_user" }));
 
             var controller = new PostController(mockRepository.Object);
             EditPostViewModel editPostViewModel = new EditPostViewModel()
@@ -201,7 +191,6 @@ namespace IdentityApp.Tests
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);
-            Assert.True(controller.ModelState.IsValid);
         }
 
         [Fact]
@@ -232,7 +221,6 @@ namespace IdentityApp.Tests
             IActionResult result = controller.Edit(editPostViewModel).Result;
 
             // Assert
-            Assert.False(controller.ModelState.IsValid);
             Assert.IsType<ViewResult>(result);
         }
 
@@ -243,8 +231,7 @@ namespace IdentityApp.Tests
             Post nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<Post>>(),
-                It.IsAny<Expression<Func<Post, bool>>>()))
+                It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
                 .Returns(Task.Run(() => nonExistent));
 
             var controller = new PostController(mockRepository.Object);
@@ -262,8 +249,7 @@ namespace IdentityApp.Tests
             // Arrange
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<Post>>(),
-                It.IsAny<Expression<Func<Post, bool>>>()))
+                It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
                 .Returns(Task.Run(() => new Post() { Id = "test_id" }));
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
@@ -286,8 +272,7 @@ namespace IdentityApp.Tests
             Post nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<Post>>(),
-                It.IsAny<Expression<Func<Post, bool>>>()))
+                It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
                 .Returns(Task.Run(() => nonExistent));
 
             var controller = new PostController(mockRepository.Object);
@@ -307,8 +292,7 @@ namespace IdentityApp.Tests
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<IQueryable<Post>>(),
-                It.IsAny<Expression<Func<Post, bool>>>()))
+                It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
                 .Returns(Task.Run(() => new Post()));
 
             var controller = new PostController(mockRepository.Object);
@@ -332,6 +316,7 @@ namespace IdentityApp.Tests
         {
             // Arrange
             User nonExistent = null;
+
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
