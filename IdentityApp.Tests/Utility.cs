@@ -45,9 +45,9 @@ namespace IdentityApp.Tests
         {
             List<LikedPost> testLikedPosts = new List<LikedPost>()
             {
-                new LikedPost() { PostId = "test_id1" },
-                new LikedPost() { PostId = "test_id2" },
-                new LikedPost() { PostId = "test_id3" }
+                new LikedPost() { PostLikedId = "test_id1" },
+                new LikedPost() { PostLikedId = "test_id2" },
+                new LikedPost() { PostLikedId = "test_id3" }
             };
 
             return testLikedPosts.AsQueryable();

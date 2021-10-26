@@ -2,10 +2,10 @@
 {
     public class LikedPost
     {
-        public string UserId { get; set; }
-        public virtual User User { get; set; }
+        public string UserWhoLikedId { get; set; }
+        public virtual User UserWhoLiked { get; set; }
 
-        public string PostId { get; set; }
-        public virtual Post Post { get; set; }
+        public string PostLikedId { get; set; }
+        public virtual Post PostLiked { get; set; }
     }
 }

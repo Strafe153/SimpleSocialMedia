@@ -180,7 +180,7 @@ namespace IdentityApp.Controllers
             if (post != null)
             {
                 IEnumerable<LikedPost> likedPosts = _repository.GetAllLikedPosts()
-                    .Where(likedPost => likedPost.PostId == post.Id).AsEnumerable();
+                    .Where(likedPost => likedPost.PostLikedId == post.Id).AsEnumerable();
 
                 if (likedPosts != null)
                 {
@@ -217,7 +217,7 @@ namespace IdentityApp.Controllers
                 if (post != null)
                 {
                     LikedPost postToCheck = user.LikedPosts.FirstOrDefault(post =>
-                        post.UserId == model.UserId && post.PostId == model.PostId);
+                        post.UserWhoLikedId == model.UserId && post.PostLikedId == model.PostId);
 
                     LikeDislikePost(post, postToCheck, user);
                     await _repository.SaveChangesAsync();
@@ -320,7 +320,7 @@ namespace IdentityApp.Controllers
             else
             {
                 user.LikedPosts.Add(new LikedPost() { 
-                    UserId = user.Id, User = user, PostId = postToLike.Id, Post = postToLike });
+                    UserWhoLikedId = user.Id, UserWhoLiked = user, PostLikedId = postToLike.Id, PostLiked = postToLike });
                 postToLike.Likes++;
                 _repository.LogInformation($"User {user.UserName} liked a post");
             }

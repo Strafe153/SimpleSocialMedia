@@ -39,6 +39,11 @@ namespace IdentityApp.Models
             return await _userManager.FindByIdAsync(id);
         }
 
+        public DbSet<Following> GetAllFollowings()
+        {
+            return _context.Followings;
+        }
+
         public DbSet<LikedPost> GetAllLikedPosts()
         {
             return _context.LikedPosts;
