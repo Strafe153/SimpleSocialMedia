@@ -13,18 +13,17 @@
         <div class="col mt-2">
             <h3>@Model.User.UserName</h3>
             <p class="text-break">@Model.User.Email</p>
+            <p>Readers: @Model.User.ReadersCount</p>
         </div>
         <div class="col mt-2">
             <p>Year: @Model.User.Year</p>
             <p>Country: @Model.User.Country</p>
+            <p>Follows: @Model.User.FollowsCount</p>
         </div>
         <div class="col mt-2">
             <p>City: @Model.User.City</p>
             <p>Company: @Model.User.Company</p>
-        </div>
-        <div class="col mt-2">
-            <p>Readers: @Model.User.ReadersCount</p>
-            <p>Follow: @Model.User.FollowsCount</p>
+            <p>Posts: @Model.User.Posts.Count()</p>
         </div>
     </div>
     <div class="row">
@@ -33,8 +32,6 @@
 </div>
 
 <div>
-    <p>Posts: @Model.User.Posts.Count()</p>
-
     @if (Model.User != Model.AuthenticatedUser)
     {
         @if (Model.AuthenticatedUser.FollowingUsers.FirstOrDefault(
