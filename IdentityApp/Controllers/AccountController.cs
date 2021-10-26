@@ -243,6 +243,59 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Follow(string userToFollowName, 
+            string authenticatedUserName, int page = 1)
+        {
+            User userToFollow = await _repository.FindByNameAsync(userToFollowName);
+            User authenticatedUser = await _repository.FindByNameAsync(authenticatedUserName);
+
+            if (userToFollow == null || authenticatedUser == null)
+            {
+                return NotFound();
+            }
+
+            Following followed = new Following()
+            {
+                FollowedUser = userToFollow,
+                FollowedUserId = userToFollow.Id,
+                Reader = authenticatedUser,
+                ReaderId = authenticatedUser.Id
+            };
+
+            authenticatedUser.FollowingUsers.Add(followed);
+            authenticatedUser.FollowsCount++;
+            userToFollow.Followers.Add(followed);
+            userToFollow.ReadersCount++;
+            await _repository.SaveChangesAsync();
+
+            _repository.LogInformation($"User {authenticatedUserName} is now following user {userToFollowName}");
+            return RedirectToAction("Index", "Account", new { userName = userToFollowName, page = page });
+        }
+
+        public async Task<IActionResult> Unfollow(string userToUnfollowName, 
+            string authenticatedUserName, int page = 1)
+        {
+            User userToUnfollow = await _repository.FindByNameAsync(userToUnfollowName);
+            User authenticatedUser = await _repository.FindByNameAsync(authenticatedUserName);
+
+            if (userToUnfollow == null || authenticatedUser == null)
+            {
+                return NotFound();
+            }
+
+            Following followed = authenticatedUser.FollowingUsers.FirstOrDefault(followed => 
+                followed.FollowedUserId == userToUnfollow.Id && followed.ReaderId == authenticatedUser.Id);
+
+            authenticatedUser.FollowingUsers.Remove(followed);
+            authenticatedUser.FollowsCount--;
+            userToUnfollow.Followers.Remove(followed);
+            userToUnfollow.ReadersCount--;
+            await _repository.SaveChangesAsync();
+
+            _repository.LogInformation($"User {authenticatedUserName} unfollows user {userToUnfollowName}");
+            return RedirectToAction("Index", "Account", new { userName = userToUnfollowName, page = page });
+        }
+
         /// <summary>
         /// Sets a default profile picture
         /// </summary>

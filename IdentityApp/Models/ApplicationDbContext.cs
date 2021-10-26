@@ -8,6 +8,7 @@ namespace IdentityApp.Models
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostPicture> PostPictures { get; set; }
         public DbSet<LikedPost> LikedPosts { get; set; }
+        public DbSet<Following> Followings { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -44,20 +45,41 @@ namespace IdentityApp.Models
             modelBuilder.Entity<LikedPost>()
                 .HasKey(likedPost => new 
                 { 
-                    likedPost.UserId, 
-                    likedPost.PostId 
+                    likedPost.UserWhoLikedId, 
+                    likedPost.PostLikedId 
                 });
 
             modelBuilder.Entity<LikedPost>()
-                .HasOne(likedPost => likedPost.User)
+                .HasOne(likedPost => likedPost.UserWhoLiked)
                 .WithMany(user => user.LikedPosts)
-                .HasForeignKey(likedPost => likedPost.UserId)
+                .HasForeignKey(likedPost => likedPost.UserWhoLikedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<LikedPost>()
-                .HasOne(likedPost => likedPost.Post)
+                .HasOne(likedPost => likedPost.PostLiked)
                 .WithMany(post => post.LikedPosts)
-                .HasForeignKey(likedPost => likedPost.PostId)
+                .HasForeignKey(likedPost => likedPost.PostLikedId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder.Entity<Following>()
+                .HasKey(followedUser => new
+                {
+                    followedUser.FollowedUserId,
+                    followedUser.ReaderId
+                });
+
+            modelBuilder.Entity<Following>()
+                .HasOne(followedUser => followedUser.Reader)
+                .WithMany(follower => follower.FollowingUsers)
+                .HasForeignKey(followedUser => followedUser.ReaderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Following>()
+                .HasOne(follower => follower.FollowedUser)
+                .WithMany(followed => followed.Followers)
+                .HasForeignKey(follower => follower.FollowedUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

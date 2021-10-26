@@ -28,7 +28,7 @@ namespace IdentityApp.Controllers
 
             IQueryable<User> users = _repository.GetAllUsers();
             FilterUsers(ref users, model.UserName, model.Email,model.Year, model.Country);
-            users = ChooseSort(users, model.SortOrder);
+            users = SortByParameter(users, model.SortOrder);
 
             int usersNumber = await users.CountAsync();
             IEnumerable<User> currentPageUsers = users
@@ -49,36 +49,38 @@ namespace IdentityApp.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(string userId, string returnUrl)
         {
-            User user = await _repository.FindByIdAsync(userId);
+            User userToDelete = await _repository.FindByIdAsync(userId);
 
-            if (user != null)
+            if (userToDelete != null)
             {
-                IEnumerable<LikedPost> likedPosts = _repository.GetAllLikedPosts()
-                    .Where(likedPost => likedPost.UserId == user.Id);
-                List<LikedPost> ownedPosts = new List<LikedPost>();
+                IEnumerable<Following> userFollowings = _repository.GetAllFollowings()
+                    .Where(following => following.ReaderId == userToDelete.Id);
+                IEnumerable<Following> userReaders = _repository.GetAllFollowings()
+                    .Where(following => following.FollowedUserId == userToDelete.Id);
+                IEnumerable<LikedPost> userLikes = _repository.GetAllLikedPosts()
+                    .Where(likedPost => likedPost.UserWhoLikedId == userToDelete.Id);
+                IEnumerable<LikedPost> userPosts = from post in userToDelete.Posts
+                                                   from likedPost in _repository.GetAllLikedPosts()
+                                                   where likedPost.PostLikedId == post.Id
+                                                   select likedPost;
 
-                foreach (Post post in user.Posts)
-                {
-                    ownedPosts.AddRange(_repository.GetAllLikedPosts()
-                        .Where(likedPost => likedPost.PostId == post.Id));
-                }
+                userFollowings.ToList().ForEach(following => following.FollowedUser.ReadersCount--);
+                userReaders.ToList().ForEach(following => following.FollowedUser.FollowsCount--);
+                userLikes.ToList().ForEach(likedPost => likedPost.PostLiked.Likes--);
 
-                foreach (LikedPost likedPost in likedPosts)
-                {
-                    likedPost.Post.Likes--;
-                }
+                _repository.GetAllFollowings().RemoveRange(userFollowings);
+                _repository.GetAllFollowings().RemoveRange(userReaders);
+                _repository.GetAllLikedPosts().RemoveRange(userPosts);
+                _repository.GetAllLikedPosts().RemoveRange(userLikes);
 
-                _repository.GetAllLikedPosts().RemoveRange(ownedPosts);
-                _repository.GetAllLikedPosts().RemoveRange(likedPosts);
-
-                if (user.UserName == User.Identity.Name)
+                if (userToDelete.UserName == User.Identity.Name)
                 {
                     await _repository.SignOutAsync();
                 }
 
-                await _repository.DeleteAsync(user);
+                await _repository.DeleteAsync(userToDelete);
                 await _repository.SaveChangesAsync();
-                _repository.LogInformation($"Deleted user {user.UserName}");
+                _repository.LogInformation($"Deleted user {userToDelete.UserName}");
 
                 return RedirectToAction("Index", returnUrl.Contains("users",
                     StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
@@ -92,8 +94,7 @@ namespace IdentityApp.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ChangePassword(string userId, 
-            string returnUrl)
+        public async Task<IActionResult> ChangePassword(string userId, string returnUrl)
         {
             User user = await _repository.FindByIdAsync(userId);
 
@@ -157,14 +158,6 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Filters users according to the given parameters
-        /// </summary>
-        /// <param name="users"></param>
-        /// <param name="userName"></param>
-        /// <param name="email"></param>
-        /// <param name="year"></param>
-        /// <param name="country"></param>
         private void FilterUsers(ref IQueryable<User> users, string userName, string email,
             int? year, string country)
         {
@@ -189,13 +182,7 @@ namespace IdentityApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Sorts users according to a given parameter
-        /// </summary>
-        /// <param name="users"></param>
-        /// <param name="sortOrder"></param>
-        /// <returns></returns>
-        private IQueryable<User> ChooseSort(IQueryable<User> users, SortState sortOrder)
+        private IQueryable<User> SortByParameter(IQueryable<User> users, SortState sortOrder)
         {
             return sortOrder switch
             {

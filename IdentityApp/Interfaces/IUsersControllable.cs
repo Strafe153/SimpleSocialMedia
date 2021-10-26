@@ -16,6 +16,7 @@ namespace IdentityApp.Interfaces
         Task SignOutAsync();
         IQueryable<User> GetAllUsers();
         DbSet<LikedPost> GetAllLikedPosts();
+        DbSet<Following> GetAllFollowings();
         void RemoveLikedPostsRange(IEnumerable<LikedPost> postsToRemove);
         void LogInformation(string message);
         void LogWarning(string message);

@@ -22,22 +22,62 @@
             <p>City: @Model.User.City</p>
             <p>Company: @Model.User.Company</p>
         </div>
+        <div class="col mt-2">
+            <p>Readers: @Model.User.ReadersCount</p>
+            <p>Follow: @Model.User.FollowsCount</p>
+        </div>
     </div>
     <div class="row">
         <p class="text-break mb-2">@Model.User.Status</p>
     </div>
 </div>
 
-@if (Model.AuthenticatedUserRoles.Contains("admin") || Model.AuthenticatedUser == Model.User)
-{
-    <div>
+<div>
+    <p>Posts: @Model.User.Posts.Count()</p>
+
+    @if (Model.User != Model.AuthenticatedUser)
+    {
+        @if (Model.AuthenticatedUser.FollowingUsers.FirstOrDefault(
+            following => following.FollowedUserId == Model.User.Id) == null)
+        {
+            <a asp-action="Follow" 
+                asp-controller="Account" 
+                asp-route-userToFollowName="@Model.User.UserName"
+                asp-route-authenticatedUserName="@Model.AuthenticatedUser.UserName"
+                asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+                Follow
+            </a>
+        }
+        else
+        {
+            <a asp-action="Unfollow" 
+                asp-controller="Account" 
+                asp-route-userToUnfollowName="@Model.User.UserName"
+                asp-route-authenticatedUserName="@Model.AuthenticatedUser.UserName"
+                asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-x" viewBox="0 0 16 16">
+                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                    <path fill-rule="evenodd" d="M12.146 5.146a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
+                </svg>
+                Unfollow
+            </a>
+        }
+    }
+
+    @if (Model.AuthenticatedUserRoles.Contains("admin") || Model.AuthenticatedUser == Model.User)
+    {
         <a asp-action="Create" asp-controller="Post" asp-route-userId="@Model.User.Id" 
             class="btn btn-primary">Create Post</a>
 
         <a asp-action="Edit" asp-controller="Account" asp-route-userId="@Model.User.Id"
-           asp-route-returnUrl="@Context.Request.Path" class="btn btn-primary float-right">Edit Profile</a>
-    </div>
-}
+            asp-route-returnUrl="@Context.Request.Path" class="btn btn-primary float-right">Edit Profile</a>
+    }
+</div>
 
 @if (Model.Posts.Count() > 0)
 {
@@ -62,7 +102,7 @@
                         asp-route-ReturnAction="@Context.Request.Path"
                         asp-route-LikedPostUserName="@Context.Request.Query["userName"]"
                         class="btn btn-sm px-3 @(Model.AuthenticatedUser.LikedPosts
-                            .FirstOrDefault(p => p.Post.Id == post.Id) != null ? "btn-primary" : "btn-outline-primary")">
+                            .FirstOrDefault(p => p.PostLiked.Id == post.Id) != null ? "btn-primary" : "btn-outline-primary")">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
                             <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
                         </svg>
