@@ -7,9 +7,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using IdentityApp.Models;
 using IdentityApp.Interfaces;
 
-namespace IdentityApp.Models
+namespace IdentityApp.ControllerRepositories
 {
     public class AccountControllerRepository : IAccountControllable
     {

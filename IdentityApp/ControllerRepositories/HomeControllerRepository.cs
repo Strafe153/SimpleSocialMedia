@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using IdentityApp.Models;
 using IdentityApp.Interfaces;
 
-namespace IdentityApp.Models
+namespace IdentityApp.ControllerRepositories
 {
     public class HomeControllerRepository : IHomeControllable
     {
@@ -24,6 +25,11 @@ namespace IdentityApp.Models
         public async Task<User> FindByNameAsync(string userName)
         {
             return await _userManager.FindByNameAsync(userName);
+        }
+
+        public IQueryable<Following> GetAllFollowings()
+        {
+            return _context.Followings;
         }
 
         public IQueryable<Post> GetAllPosts()

@@ -44,24 +44,24 @@
                 </a>
             }
 
-        <div class="d-inline float-right mb-1">
-            <sub class="posted-time">
-                @post.PostedTime.ToString("HH:mm:ss dd.MM.yyyy")
-            </sub>
+            <div class="d-inline float-right mb-1">
+                <sub class="posted-time">
+                    @post.PostedTime.ToString("HH:mm:ss dd.MM.yyyy")
+                </sub>
 
-            @if (post.IsEdited)
-            {
-                <sub class="posted-time">(edited)</sub>
-            }
-            @if (Model.AuthenticatedUser != null)
-            {
-                @if (Model.AuthenticatedUser.Id == post.UserId || Model.AuthenticatedUserRoles.Contains("admin"))
+                @if (post.IsEdited)
                 {
-                    <a asp-action="Edit" asp-controller="Post" asp-route-postId="@post.Id"
-                       asp-route-returnUrl="@Context.Request.Path" class="btn btn-outline-secondary">Edit</a>
+                    <sub class="posted-time">(edited)</sub>
                 }
-            }
-        </div>
+                @if (Model.AuthenticatedUser != null)
+                {
+                    @if (Model.AuthenticatedUser.Id == post.UserId || Model.AuthenticatedUserRoles.Contains("admin"))
+                    {
+                        <a asp-action="Edit" asp-controller="Post" asp-route-postId="@post.Id"
+                           asp-route-returnUrl="@Context.Request.Path" class="btn btn-outline-secondary">Edit</a>
+                    }
+                }
+            </div>
         </div>
     </div>
 }

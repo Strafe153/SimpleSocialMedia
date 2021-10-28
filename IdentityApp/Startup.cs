@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using IdentityApp.Models;
 using IdentityApp.Interfaces;
+using IdentityApp.ControllerRepositories;
 
 namespace IdentityApp
 {

@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using IdentityApp.Models;
 using IdentityApp.Interfaces;
 
-namespace IdentityApp.Models
+namespace IdentityApp.ControllerRepositories
 {
     public class UsersControllerRepository : IUsersControllable
     {
