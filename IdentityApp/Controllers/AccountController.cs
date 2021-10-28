@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
+using IdentityApp.ControllerRepositories;
 
 namespace IdentityApp.Controllers
 {
@@ -249,8 +250,9 @@ namespace IdentityApp.Controllers
             User userToFollow = await _repository.FindByNameAsync(userToFollowName);
             User authenticatedUser = await _repository.FindByNameAsync(authenticatedUserName);
 
-            if (userToFollow == null || authenticatedUser == null)
+            if (userToFollow == null)
             {
+                _repository.LogError("User not found");
                 return NotFound();
             }
 
@@ -280,6 +282,7 @@ namespace IdentityApp.Controllers
 
             if (userToUnfollow == null || authenticatedUser == null)
             {
+                _repository.LogError("User not found");
                 return NotFound();
             }
 

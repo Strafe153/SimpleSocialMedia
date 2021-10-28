@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
+using IdentityApp.Models;
 using IdentityApp.Interfaces;
 
-namespace IdentityApp.Models
+namespace IdentityApp.ControllerRepositories
 {
     public class PostPictureRepository : IPostPictureControllable
     {

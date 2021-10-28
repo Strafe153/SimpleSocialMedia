@@ -11,6 +11,7 @@ namespace IdentityApp.Interfaces
         Task<IList<string>> GetRolesAsync(User user);
         IQueryable<User> GetAllUsers();
         IQueryable<Post> GetAllPosts();
+        IQueryable<Following> GetAllFollowings();
         void LogInformation(string message);
     }
 }

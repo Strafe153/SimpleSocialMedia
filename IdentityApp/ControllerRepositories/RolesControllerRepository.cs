@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using IdentityApp.Models;
 using IdentityApp.Interfaces;
 
-namespace IdentityApp.Models
+namespace IdentityApp.ControllerRepositories
 {
     public class RolesControllerRepository : IRolesControllable
     {

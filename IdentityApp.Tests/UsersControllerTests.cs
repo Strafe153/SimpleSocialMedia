@@ -20,6 +20,8 @@ namespace IdentityApp.Tests
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            mockRepository.Setup(repository => repository.GetAllFollowings())
+                .Returns(Utility.GetQueryableMockDbSet(new List<Following>()));
             mockRepository.Setup(repository => repository.GetAllLikedPosts())
                 .Returns(Utility.GetQueryableMockDbSet(new List<LikedPost>()));
 
