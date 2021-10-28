@@ -36,11 +36,6 @@ namespace IdentityApp.Tests
             return testRoles;
         }
 
-        internal static IList<string> GetTestUserRoles()
-        {
-            return ToIList(new List<string>() { "user", "admin" });
-        }
-
         internal static IQueryable<LikedPost> GetTestLikedPosts()
         {
             List<LikedPost> testLikedPosts = new List<LikedPost>()
@@ -51,6 +46,11 @@ namespace IdentityApp.Tests
             };
 
             return testLikedPosts.AsQueryable();
+        }
+
+        internal static IList<string> GetTestUserRoles()
+        {
+            return ToIList(new List<string>() { "user", "admin" });
         }
 
         internal static void MockUserIdentityName(Controller controller)

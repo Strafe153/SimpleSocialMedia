@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using IdentityApp.Models;
 using IdentityApp.Interfaces;
-using IdentityApp.ControllerRepositories;
 
 namespace IdentityApp.Controllers
 {

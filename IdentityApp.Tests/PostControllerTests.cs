@@ -39,12 +39,10 @@ namespace IdentityApp.Tests
         public void Create_NonExistentUserHttpGet_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
-
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
                 It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, bool>>>()))
-                .Returns(Task.Run(() => nonExistent));
+                .Returns(Task.Run(() => (User)null));
             var controller = new PostController(mockRepository.Object);
 
             // Act
@@ -84,11 +82,10 @@ namespace IdentityApp.Tests
         public void Create_ValidModelHttpPost_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
                 It.IsAny<IQueryable<User>>(), It.IsAny<Expression<Func<User, bool>>>()))
-                .Returns(Task.Run(() => nonExistent));
+                .Returns(Task.Run(() => (User)null));
 
             var controller = new PostController(mockRepository.Object);
             var createPostViewModel = new CreatePostViewModel() { PostPictures = new FormFileCollection() };
@@ -150,11 +147,10 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentPostHttpGet_ReturnsNotFoundResult()
         {
             // Arrange
-            Post nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
                 It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
-                .Returns(Task.Run(() => nonExistent));
+                .Returns(Task.Run(() => (Post)null));
 
             var controller = new PostController(mockRepository.Object);
 
@@ -228,11 +224,10 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentPostHttpPost_ReturnsNotFoundResult()
         {
             // Arrange
-            Post nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
                 It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
-                .Returns(Task.Run(() => nonExistent));
+                .Returns(Task.Run(() => (Post)null));
 
             var controller = new PostController(mockRepository.Object);
 
@@ -269,11 +264,10 @@ namespace IdentityApp.Tests
         public void Delete_NonExistentPost_ReturnsNotFoundResult()
         {
             // Arrange
-            Post nonExistent = null;
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
                 It.IsAny<IQueryable<Post>>(), It.IsAny<Expression<Func<Post, bool>>>()))
-                .Returns(Task.Run(() => nonExistent));
+                .Returns(Task.Run(() => (Post)null));
 
             var controller = new PostController(mockRepository.Object);
 
@@ -315,11 +309,9 @@ namespace IdentityApp.Tests
         public void Like_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
-
             var mockRepository = new Mock<IPostControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new PostController(mockRepository.Object);
 
