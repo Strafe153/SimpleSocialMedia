@@ -39,11 +39,9 @@ namespace IdentityApp.Tests
         public void Index_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistentUser = null;
-
             var mockRepository = new Mock<IAccountControllable>();
             mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistentUser));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new AccountController(mockRepository.Object);
             Utility.MockUserIdentityName(controller);
@@ -59,12 +57,11 @@ namespace IdentityApp.Tests
         public void Register_ValidModelHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
-            User nonExistentUser = null;
             var webHostEnvironment = new Mock<IWebHostEnvironment>();
 
             var mockRepository = new Mock<IAccountControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<Expression<Func<User, bool>>>())).Returns(Task.Run(() => nonExistentUser));
+                It.IsAny<Expression<Func<User, bool>>>())).Returns(Task.Run(() => (User)null));
             mockRepository.Setup(repository => repository.GetWebRootPath())
                 .Returns($@"{Directory.GetCurrentDirectory()[..^30]}\wwwroot");
             mockRepository.Setup(repository => repository.CreateAsync(
@@ -120,11 +117,9 @@ namespace IdentityApp.Tests
         public void Login_ValidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
-            User nonExistent = null;
-
             var mockRepository = new Mock<IAccountControllable>();
             mockRepository.Setup(repository => repository.FindByEmailAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new AccountController(mockRepository.Object);
 
@@ -156,11 +151,9 @@ namespace IdentityApp.Tests
         public void Logout_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
-
             var mockRepository = new Mock<IAccountControllable>();
             mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new AccountController(mockRepository.Object);
 
@@ -175,11 +168,9 @@ namespace IdentityApp.Tests
         public void Edit_ExistentUserHttpGet_ReturnsViewResult()
         {
             // Arrange
-            User existentUser = new User() { ProfilePicture = new byte[1] };
-
             var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
+            mockRepository.Setup(repository => repository.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User() { ProfilePicture = new byte[0]}));
             mockRepository.Setup(repository => repository.GetRolesAsync(
                 It.IsAny<User>())).Returns(Task.Run(() => Utility.ToIList(new List<string>())));
 
@@ -197,10 +188,9 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentUserHttpGet_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
             var mockRepository = new Mock<IAccountControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new AccountController(mockRepository.Object);
             Utility.MockUserIdentityName(controller);
@@ -243,7 +233,7 @@ namespace IdentityApp.Tests
         public void Edit_ValidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
-            User existentUser = new User { ProfilePicture = new byte[1] };
+            User existentUser = new User { ProfilePicture = new byte[0] };
             var mockRepository = new Mock<IAccountControllable>();
 
             mockRepository.Setup(repository => repository.FindByIdAsync(
@@ -265,6 +255,74 @@ namespace IdentityApp.Tests
 
             // Assert
             Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void Follow_ExistentUser_ReturnsRedirectToActionResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IAccountControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Follow("", "").Result;
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public void Follow_NonExistentUser_ReturnsNotFoundResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IAccountControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Follow("", "").Result;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void Unfollow_ExistentUser_ReturnsRedirectToActionResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IAccountControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Unfollow("", "").Result;
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public void Unfollow_NonExistentUser_ReturnsNotFoundResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IAccountControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+
+            var controller = new AccountController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.Unfollow("", "").Result;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
         }
     }
 }

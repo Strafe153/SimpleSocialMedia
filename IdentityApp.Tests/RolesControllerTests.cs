@@ -96,9 +96,8 @@ namespace IdentityApp.Tests
         {
             // Arrange
             var mockRepository = new Mock<IRolesControllable>();
-            mockRepository.Setup(repository => repository.FindUserByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User() 
-                    { Id = "test_id", UserName = "test_user" }));
+            mockRepository.Setup(repository => repository.FindUserByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User() { Id = "test_id", UserName = "test_user" }));
 
             var controller = new RolesController(mockRepository.Object);
 
@@ -113,10 +112,9 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentUserHttpGet_ReturnsRedirectToActionResult()
         {
             // Arrange
-            User nonExistent = null;
             var mockRepository = new Mock<IRolesControllable>();
             mockRepository.Setup(repository => repository.FindUserByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new RolesController(mockRepository.Object);
 
@@ -154,10 +152,9 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentUserHttpPost_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
             var mockRepository = new Mock<IRolesControllable>();
             mockRepository.Setup(repository => repository.FindUserByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new RolesController(mockRepository.Object);
 

@@ -66,7 +66,7 @@ namespace IdentityApp.Controllers
                                                    select likedPost;
 
                 userFollowings.ToList().ForEach(following => following.FollowedUser.ReadersCount--);
-                userReaders.ToList().ForEach(following => following.FollowedUser.FollowsCount--);
+                userReaders.ToList().ForEach(following => following.Reader.FollowsCount--);
                 userLikes.ToList().ForEach(likedPost => likedPost.PostLiked.Likes--);
 
                 _repository.GetAllFollowings().RemoveRange(userFollowings);

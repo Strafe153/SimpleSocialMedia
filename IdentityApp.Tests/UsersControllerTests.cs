@@ -39,11 +39,9 @@ namespace IdentityApp.Tests
         public void Delete_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
-
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new UsersController(mockRepository.Object);
 
@@ -75,11 +73,9 @@ namespace IdentityApp.Tests
         public void ChangePassword_NonExistentUserHttpGet_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
-
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new UsersController(mockRepository.Object);
 
@@ -140,10 +136,9 @@ namespace IdentityApp.Tests
         public void ChangePassword_NonExistentUserHttpPost_ReturnsNotFoundResult()
         {
             // Arrange
-            User nonExistent = null;
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new UsersController(mockRepository.Object);
 
@@ -158,11 +153,9 @@ namespace IdentityApp.Tests
         public void ChangePassword_InvalidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
-            User nonExistent = null;
-
             var mockRepository = new Mock<IUsersControllable>();
             mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => nonExistent));
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
             var controller = new UsersController(mockRepository.Object);
             controller.ModelState.AddModelError("", "");

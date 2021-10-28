@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
-using IdentityApp.ControllerRepositories;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Png;
