@@ -40,6 +40,11 @@ namespace IdentityApp.ControllerRepositories
             return await _userManager.FindByIdAsync(id);
         }
 
+        public async Task<User> FindByNameAsync(string userName)
+        {
+            return await _userManager.FindByNameAsync(userName);
+        }
+
         public DbSet<Following> GetAllFollowings()
         {
             return _context.Followings;
