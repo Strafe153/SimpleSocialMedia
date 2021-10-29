@@ -166,5 +166,39 @@ namespace IdentityApp.Tests
             // Assert
             Assert.IsType<ViewResult>(result);
         }
+
+        [Fact]
+        public void FindUser_ExistentUser_ReturnsRedirectToActionResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IUsersControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+
+            var controller = new UsersController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.FindUser("").Result;
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+        }
+
+        [Fact]
+        public void FindUser_NoExistentgUser_ReturnsViewResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IUsersControllable>();
+            mockRepository.Setup(repository => repository.FindByNameAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+
+            var controller = new UsersController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.FindUser("").Result;
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
     }
 }
