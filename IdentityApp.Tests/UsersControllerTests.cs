@@ -200,5 +200,77 @@ namespace IdentityApp.Tests
             // Assert
             Assert.IsType<ViewResult>(result);
         }
+
+        [Fact]
+        public void UserReaders_ExistentUser_ReturnsViewResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IUsersControllable>();
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            mockRepository.Setup(repository => repository.GetAllFollowings())
+                .Returns(Utility.GetQueryableMockDbSet(Utility.GetTestFollowings()));
+
+            var controller = new UsersController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.UserReaders("").Result;
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void UserReaders_NonexistentUser_ReturnsNotFoundResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IUsersControllable>();
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+
+            var controller = new UsersController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.UserReaders("").Result;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void  UserFollows_ExistentUser_ReturnsViewResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IUsersControllable>();
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            mockRepository.Setup(repository => repository.GetAllFollowings())
+                .Returns(Utility.GetQueryableMockDbSet(Utility.GetTestFollowings()));
+
+            var controller = new UsersController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.UserFollows("").Result;
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public void UserFollows_NonexistentUser_ReturnsNotFoundResult()
+        {
+            // Arrange
+            var mockRepository = new Mock<IUsersControllable>();
+            mockRepository.Setup(repository => repository.FindByIdAsync(
+                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+
+            var controller = new UsersController(mockRepository.Object);
+
+            // Act
+            IActionResult result = controller.UserFollows("").Result;
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
     }
 }

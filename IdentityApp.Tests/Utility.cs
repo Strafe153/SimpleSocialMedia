@@ -48,6 +48,29 @@ namespace IdentityApp.Tests
             return testLikedPosts.AsQueryable();
         }
 
+        internal static List<Following> GetTestFollowings()
+        {
+            List<Following> followings = new List<Following>()
+            {
+                new Following() 
+                { 
+                    FollowedUser = new User(), 
+                    FollowedUserId = "test_user_id1",
+                    Reader = new User(),
+                    ReaderId = "test_reader_id1"
+                },
+                new Following()
+                {
+                    FollowedUser = new User(),
+                    FollowedUserId = "test_user_id2",
+                    Reader = new User(),
+                    ReaderId = "test_reader_id2"
+                }
+            };
+
+            return followings;
+        }
+
         internal static IList<string> GetTestUserRoles()
         {
             return ToIList(new List<string>() { "user", "admin" });
