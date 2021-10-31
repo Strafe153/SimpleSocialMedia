@@ -159,6 +159,19 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> FindUser(string userName)
+        {
+            User userToFind = await _repository.FindByNameAsync(userName);
+
+            if (userToFind == null)
+            {
+                _repository.LogWarning($"User with name {userName} not found");
+                return View("UserNotFound", userName);
+            }
+
+            return RedirectToAction("Index", "Account", new { userName = userName });
+        }
+
         public async Task<IActionResult> UserReaders(string userId)
         {
             User user = await _repository.FindByIdAsync(userId);
