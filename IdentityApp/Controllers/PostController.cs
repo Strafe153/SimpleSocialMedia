@@ -244,11 +244,6 @@ namespace IdentityApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Checks if the number of a post's pictures exceeds 5
-        /// </summary>
-        /// <param name="appendedPostPictures"></param>
-        /// <param name="postPictures"></param>
         private void CheckPostPicturesCount(IFormFileCollection appendedPostPictures,
             IEnumerable<PostPicture> postPictures = null)
         {
@@ -272,11 +267,6 @@ namespace IdentityApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Adds pictures to a post
-        /// </summary>
-        /// <param name="picturesToAdd"></param>
-        /// <param name="post"></param>
         private void AddPostPicturesToPost(IFormFileCollection picturesToAdd, Post post)
         {
             if (picturesToAdd != null)
@@ -304,12 +294,6 @@ namespace IdentityApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Adds or removes a like according to the post's state
-        /// </summary>
-        /// <param name="postToLike"></param>
-        /// <param name="postToCheck"></param>
-        /// <param name="user"></param>
         private void LikeDislikePost(Post postToLike, LikedPost postToCheck, User user)
         {
             if (postToCheck != null)
@@ -327,11 +311,6 @@ namespace IdentityApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Proportionally resizes an image to the height of 200px
-        /// </summary>
-        /// <param name="imageToResize"></param>
-        /// <returns></returns>
         private byte[] ResizeImage(byte[] imageToResize)
         {
             byte[] resizedImage = null;

@@ -2,7 +2,7 @@
 @model IdentityApp.ViewModels.ChangeRoleViewModel 
 
 @{ 
-    ViewData["Title"] = $"{Model.UserName}'s roles";
+    ViewData["Title"] = $"{Model.UserName} - roles";
 
     string returnUrl = Model.ReturnUrl.Contains("Account") 
         ? $"/Account?userName={Model.UserName}" : "/Users/Index";

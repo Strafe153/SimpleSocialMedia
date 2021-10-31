@@ -159,6 +159,52 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> UserReaders(string userId)
+        {
+            User user = await _repository.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                _repository.LogError("User not found");
+                return NotFound();
+            }
+
+            IEnumerable<User> readers = _repository.GetAllFollowings()
+                .Where(following => following.FollowedUserId == user.Id)
+                .Select(following => following.Reader).Distinct();
+
+            UserRelationsViewModel model = new UserRelationsViewModel()
+            {
+                UserName = user.UserName,
+                RelatedUsers = readers
+            };
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> UserFollows(string userId)
+        {
+            User user = await _repository.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                _repository.LogError("User not found");
+                return NotFound();
+            }
+
+            IEnumerable<User> follows = _repository.GetAllFollowings()
+                .Where(following => following.ReaderId == user.Id)
+                .Select(following => following.FollowedUser).Distinct();
+
+            UserRelationsViewModel model = new UserRelationsViewModel()
+            {
+                UserName = user.UserName,
+                RelatedUsers = follows
+            };
+
+            return View(model);
+        }
+
         private void FilterUsers(ref IQueryable<User> users, string userName, string email,
             int? year, string country)
         {

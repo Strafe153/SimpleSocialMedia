@@ -299,11 +299,6 @@ namespace IdentityApp.Controllers
             return RedirectToAction("Index", "Account", new { userName = userToUnfollowName, page = page });
         }
 
-        /// <summary>
-        /// Sets a default profile picture
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
         private async Task SetDefaultProfilePicture(User user)
         {
             string defaultProfilePicPath = $"{_repository.GetWebRootPath()}/Files/default_profile_pic.jpg";
@@ -315,12 +310,6 @@ namespace IdentityApp.Controllers
             }
         }
 
-
-        /// <summary>
-        /// Converts an array of a picture's bytes to IFormFile
-        /// </summary>
-        /// <param name="bytePicture"></param>
-        /// <returns></returns>
         private IFormFile ConvertByteArrayToIFormFile(byte[] bytePicture)
         {
             Stream stream = new MemoryStream(bytePicture);
@@ -330,12 +319,6 @@ namespace IdentityApp.Controllers
             return formFilePicture;
         }
 
-        /// <summary>
-        /// Converts an IFormFile to an array of bytes
-        /// </summary>
-        /// <param name="formFilePicture"></param>
-        /// <param name="bytePicture"></param>
-        /// <returns></returns>
         private byte[] ConvertIFormFileToByteArray(IFormFile formFilePicture, byte[] bytePicture)
         {
             if (formFilePicture != null)
@@ -349,11 +332,6 @@ namespace IdentityApp.Controllers
             return bytePicture;
         }
 
-        /// <summary>
-        /// Checks if the username is taken
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="user"></param>
         private void CheckIfUserNameIsTaken(EditUserViewModel model, User user)
         {
             if (user != null)
@@ -372,11 +350,6 @@ namespace IdentityApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Assigns EditUserViewModel values to the user
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="user"></param>
         private void AssignEditUserViewModelToUser(EditUserViewModel model, User user)
         {
             user.Email = model.Email;
@@ -389,12 +362,6 @@ namespace IdentityApp.Controllers
             user.ProfilePicture = ConvertIFormFileToByteArray(model.ProfilePicture, user.ProfilePicture);
         }
 
-        /// <summary>
-        /// Forcibly logs out and logs in a user in order to update User.Identity
-        /// </summary>
-        /// <param name="isUserNameChanged"></param>
-        /// <param name="user"></param>
-        /// <returns></returns>
         private async Task ReloginUserOnUserNameChanged(bool isUserNameChanged, User user)
         {
             if (isUserNameChanged)
