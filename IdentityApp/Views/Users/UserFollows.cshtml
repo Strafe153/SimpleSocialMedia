@@ -1,0 +1,16 @@
+﻿@model IdentityApp.ViewModels.UserRelationsViewModel
+
+@{
+    ViewData["Title"] = $"{Model.UserName} - follows";
+}
+
+<table>
+    <tr>
+        @foreach(User user in Model.RelatedUsers)
+        {
+            <td class="pr-5">
+                <a asp-action="Index" asp-controller="Account" asp-route-userName="@user.UserName">@user.UserName</a>
+            </td>
+        }
+    </tr>
+</table>

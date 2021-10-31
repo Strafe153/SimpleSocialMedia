@@ -13,17 +13,21 @@
         <div class="col mt-2">
             <h3>@Model.User.UserName</h3>
             <p class="text-break">@Model.User.Email</p>
-            <p>Readers: @Model.User.ReadersCount</p>
+            <p>Posts: @Model.User.Posts.Count()</p>
         </div>
         <div class="col mt-2">
             <p>Year: @Model.User.Year</p>
             <p>Country: @Model.User.Country</p>
-            <p>Follows: @Model.User.FollowsCount</p>
+            <a asp-action="UserReaders" asp-controller="Users" asp-route-userId="@Model.User.Id">
+                Readers: @Model.User.ReadersCount
+            </a>
         </div>
         <div class="col mt-2">
             <p>City: @Model.User.City</p>
             <p>Company: @Model.User.Company</p>
-            <p>Posts: @Model.User.Posts.Count()</p>
+            <a asp-action="UserFollows" asp-controller="Users" asp-route-userId="@Model.User.Id">
+                Follows: @Model.User.FollowsCount
+            </a>
         </div>
     </div>
     <div class="row">

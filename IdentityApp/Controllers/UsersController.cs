@@ -159,17 +159,50 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> FindUser(string userName)
+        public async Task<IActionResult> UserReaders(string userId)
         {
-            User userToFind = await _repository.FindByNameAsync(userName);
+            User user = await _repository.FindByIdAsync(userId);
 
-            if (userToFind == null)
+            if (user == null)
             {
-                _repository.LogWarning($"User with name {userName} not found");
-                return View("UserNotFound", userName);
+                _repository.LogError("User not found");
+                return NotFound();
             }
 
-            return RedirectToAction("Index", "Account", new { userName = userName });
+            IEnumerable<User> readers = _repository.GetAllFollowings()
+                .Where(following => following.FollowedUserId == user.Id)
+                .Select(following => following.Reader).Distinct();
+
+            UserRelationsViewModel model = new UserRelationsViewModel()
+            {
+                UserName = user.UserName,
+                RelatedUsers = readers
+            };
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> UserFollows(string userId)
+        {
+            User user = await _repository.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                _repository.LogError("User not found");
+                return NotFound();
+            }
+
+            IEnumerable<User> follows = _repository.GetAllFollowings()
+                .Where(following => following.ReaderId == user.Id)
+                .Select(following => following.FollowedUser).Distinct();
+
+            UserRelationsViewModel model = new UserRelationsViewModel()
+            {
+                UserName = user.UserName,
+                RelatedUsers = follows
+            };
+
+            return View(model);
         }
 
         private void FilterUsers(ref IQueryable<User> users, string userName, string email,
