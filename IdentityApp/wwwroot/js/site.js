@@ -1,9 +1,4 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
-let postPicturesToDelete = [];
+﻿let postPicturesToDelete = [];
 
 // Inputs a loaded picture as the new profile picture
 function loadFile(event) {
@@ -29,4 +24,16 @@ $("#profile-pic-input").on("change", function() {
 // Marks all the loaded post pictures as selected and outputs their count in the input type="file" field
 $("#post-picture").on("change", function() {
     $(".custom-file-label").text(`Pictures chosen: ${$(this)[0].files.length}`);
+});
+
+$("#show-comments-btn").on("click", function() {
+    $(".post-comments").css("display", "block");
+    $("#hide-comments-btn").css("display", "block");
+    $(this).css("display", "none");
+});
+
+$("#hide-comments-btn").on("click", function() {
+    $(".post-comments").css("display", "none");
+    $("#show-comments-btn").css("display", "block");
+    $(this).css("display", "none");
 });

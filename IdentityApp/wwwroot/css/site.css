@@ -121,10 +121,6 @@ div ul li form .btn:active:focus {
     visibility: visible;
 }
 
-textarea {
-    resize: none;
-}
-
 #user-profile-link, #user-profile-link:visited, #user-profile-link:active {
     font-size: 15px;
     font-weight: bold;
@@ -169,4 +165,13 @@ svg {
 
 .glyphicon-chevron-left:before {
     content: "\f053";
+}
+
+hr {
+    background-color: #807E7D;
+    opacity: 0.6;
+}
+
+.post-comments, #hide-comments-btn {
+    display: none;
 }

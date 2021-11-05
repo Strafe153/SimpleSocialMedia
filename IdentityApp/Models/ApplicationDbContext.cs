@@ -7,6 +7,7 @@ namespace IdentityApp.Models
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<PostPicture> PostPictures { get; set; }
+        public DbSet<PostComment> PostComments { get; set; }
         public DbSet<LikedPost> LikedPosts { get; set; }
         public DbSet<Following> Followings { get; set; }
 
@@ -61,8 +62,6 @@ namespace IdentityApp.Models
                 .HasForeignKey(likedPost => likedPost.PostLikedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-
             modelBuilder.Entity<Following>()
                 .HasKey(followedUser => new
                 {
@@ -81,6 +80,17 @@ namespace IdentityApp.Models
                 .WithMany(followed => followed.Followers)
                 .HasForeignKey(follower => follower.FollowedUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // TODO: add PostComment dependencies
+            modelBuilder.Entity<PostComment>()
+                .HasOne(comment => comment.Post)
+                .WithMany(post => post.PostComments);
+
+            modelBuilder.Entity<Post>()
+                .HasMany(post => post.PostComments)
+                .WithOne(comment => comment.Post)
+                .HasForeignKey(post => post.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
