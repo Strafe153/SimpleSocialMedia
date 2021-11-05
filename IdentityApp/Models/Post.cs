@@ -10,8 +10,9 @@ namespace IdentityApp.Models
         public DateTime PostedTime { get; set; }
         public int Likes { get; set; }
         public bool IsEdited { get; set; }
-        public virtual List<PostPicture> PostPictures { get; set; } 
-        public virtual List<LikedPost> LikedPosts { get; set; } 
+        public virtual List<PostPicture> PostPictures { get; set; }
+        public virtual List<PostComment> PostComments { get; set; }
+        public virtual List<LikedPost> LikedPosts { get; set; }
 
         public string UserId { get; set; }
         public virtual User User { get; set; }
@@ -19,6 +20,7 @@ namespace IdentityApp.Models
         public Post()
         {
             PostPictures = new List<PostPicture>();
+            PostComments = new List<PostComment>();
             LikedPosts = new List<LikedPost>();
         }
     }

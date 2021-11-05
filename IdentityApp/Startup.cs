@@ -29,6 +29,7 @@ namespace IdentityApp
             services.AddScoped<IPostPictureControllable, PostPictureRepository>();
             services.AddScoped<IRolesControllable, RolesControllerRepository>();
             services.AddScoped<IUsersControllable, UsersControllerRepository>();
+            services.AddScoped<IPostCommentControllable, PostCommentRepository>();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<User, IdentityRole>(options =>
