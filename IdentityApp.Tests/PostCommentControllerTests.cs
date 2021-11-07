@@ -25,9 +25,16 @@ namespace IdentityApp.Tests
                 .Returns(Task.Run(() => new Post()));
 
             var controller = new PostCommentController(mockRepository.Object);
+            CreatePostCommentViewModel createPostCommentViewModel = new CreatePostCommentViewModel()
+            {
+                PostId = "test_post_id",
+                PostContent = "test_content",
+                ReturnUrl = "",
+                Page = 1
+            };
 
             // Act
-            IActionResult result = controller.Create("test_post_id", "", "test_content", 1).Result;
+            IActionResult result = controller.Create(createPostCommentViewModel).Result;
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);
@@ -45,7 +52,7 @@ namespace IdentityApp.Tests
             var controller = new PostCommentController(mockRepository.Object);
 
             // Act
-            IActionResult result = controller.Create("test_post_id", "", "", 1).Result;
+            IActionResult result = controller.Create(new CreatePostCommentViewModel()).Result;
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
@@ -61,9 +68,17 @@ namespace IdentityApp.Tests
                 .Returns(Task.Run(() => new PostComment() { Post = new Post() }));
 
             var controller = new PostCommentController(mockRepository.Object);
+            ManagePostCommentViewModel managePostCommentViewModel = new ManagePostCommentViewModel()
+            {
+                CommentId = "test_comment_id",
+                Content = "",
+                Author = "",
+                ReturnUrl = "",
+                Page = 1
+            };
 
             // Act
-            IActionResult result = controller.Delete("test_comment_id", 1).Result;
+            IActionResult result = controller.Delete(managePostCommentViewModel).Result;
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);
@@ -79,9 +94,13 @@ namespace IdentityApp.Tests
                 .Returns(Task.Run(() => (PostComment)null));
 
             var controller = new PostCommentController(mockRepository.Object);
+            ManagePostCommentViewModel managePostCommentViewModel = new ManagePostCommentViewModel()
+            {
+                CommentId = "test_comment_id",
+            };
 
             // Act
-            IActionResult result = controller.Delete("test_comment_id", 1).Result;
+            IActionResult result = controller.Delete(managePostCommentViewModel).Result;
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
@@ -95,7 +114,7 @@ namespace IdentityApp.Tests
             var controller = new PostCommentController(mockRepository.Object);
 
             // Act
-            IActionResult result = controller.Delete("", 1).Result;
+            IActionResult result = controller.Delete(new ManagePostCommentViewModel() { CommentId = ""}).Result;
 
             // Assert
             Assert.IsType<BadRequestResult>(result);
@@ -108,7 +127,8 @@ namespace IdentityApp.Tests
             var mockRepository = new Mock<IPostCommentControllable>();
             mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
                 It.IsAny<IQueryable<PostComment>>(), It.IsAny<Expression<Func<PostComment, bool>>>()))
-                .Returns(Task.Run(() => new PostComment()));
+                .Returns(Task.Run(() => new PostComment() { Post = new Post() { 
+                    User = new User() { UserName = "test_username" } } }));
 
             var controller = new PostCommentController(mockRepository.Object);
 
@@ -163,9 +183,17 @@ namespace IdentityApp.Tests
                 .Returns(Utility.GetQueryableMockDbSet(new List<PostComment>()));
 
             var controller = new PostCommentController(mockRepository.Object);
+            ManagePostCommentViewModel managePostCommentViewModel = new ManagePostCommentViewModel()
+            {
+                CommentId = "test_comment_id",
+                Content = "test_content",
+                CommentedPostUser = "test_user",
+                ReturnUrl = "",
+                Page = 1
+            };
 
             // Act
-            IActionResult result = controller.Edit(new ManagePostCommentViewModel()).Result;
+            IActionResult result = controller.Edit(managePostCommentViewModel).Result;
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);

@@ -19,6 +19,17 @@
         <span asp-validation-for="Content"></span>
     </div>
 
-    <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">Cancel</a>
+    @if (Model.ReturnUrl.Contains("Account"))
+    {
+        <a asp-action="Index" asp-controller="Account" asp-route-page="@Model.Page" 
+            asp-route-userName="@Model.CommentedPostUser" class="btn btn-outline-secondary">Cancel</a>
+    }
+    else
+    {
+        <a asp-action="@(Model.ReturnUrl.Contains("Feed") ? "Feed" : "Index")" 
+            asp-controller="Home" asp-route-page="@Model.Page" class="btn btn-outline-secondary">Cancel</a>
+    }
+
+    @*<a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">Cancel</a>*@
     <input type="submit" class="btn btn-primary" value="Save" />
 </form>
