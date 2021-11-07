@@ -165,7 +165,7 @@ namespace IdentityApp.Tests
             var controller = new PostCommentController(mockRepository.Object);
 
             // Act
-            IActionResult result = controller.Edit(new EditPostCommentViewModel()).Result;
+            IActionResult result = controller.Edit(new ManagePostCommentViewModel()).Result;
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);
@@ -183,7 +183,7 @@ namespace IdentityApp.Tests
             var controller = new PostCommentController(mockRepository.Object);
 
             // Act
-            IActionResult result = controller.Edit(new EditPostCommentViewModel()).Result;
+            IActionResult result = controller.Edit(new ManagePostCommentViewModel()).Result;
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
