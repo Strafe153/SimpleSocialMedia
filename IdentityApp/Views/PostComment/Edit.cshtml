@@ -1,4 +1,4 @@
-﻿@model IdentityApp.ViewModels.EditPostCommentViewModel
+﻿@model IdentityApp.ViewModels.ManagePostCommentViewModel
 
 @{
     ViewData["Title"] = "Editing a post comment";
@@ -9,6 +9,9 @@
 
     <input type="hidden" asp-for="CommentId" value="@Model.CommentId" />
     <input type="hidden" asp-for="Author" value="@Model.Author" />
+    <input type="hidden" asp-for="Page" value="@Model.Page" />
+    <input type="hidden" asp-for="ReturnUrl" value="@Model.ReturnUrl" />
+    <input type="hidden" asp-for="CommentedPostUser" value="@Model.CommentedPostUser" />
 
     <div class="form-group">
         <label asp-for="Content">Comment</label>

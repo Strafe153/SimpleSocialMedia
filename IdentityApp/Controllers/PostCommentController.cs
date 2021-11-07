@@ -16,17 +16,16 @@ namespace IdentityApp.Controllers
             _repository = repository;
         }
 
-        public async Task<IActionResult> Create(string postId, string commentAuthorName, 
-            string postContent, int page)
+        public async Task<IActionResult> Create(CreatePostCommentViewModel model)
         {
-            if (!string.IsNullOrEmpty(postId))
+            if (!string.IsNullOrEmpty(model.PostId))
             {
                 Post post = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllPosts(), post => post.Id == postId);
+                    _repository.GetAllPosts(), post => post.Id == model.PostId);
 
                 if (post != null)
                 {
-                    if (string.IsNullOrEmpty(postContent))
+                    if (string.IsNullOrEmpty(model.PostContent))
                     {
                         ModelState.AddModelError("", "The length of your " +
                             "comment must be between 1 and 200 symbols");
@@ -37,8 +36,8 @@ namespace IdentityApp.Controllers
                         PostComment postComment = new PostComment()
                         {
                             Id = Guid.NewGuid().ToString(),
-                            Author = commentAuthorName,
-                            Content = postContent,
+                            Author = model.CommentAuthorName,
+                            Content = model.PostContent,
                             CommentedTime = DateTime.Now,
                             IsEdited = false,
                             PostId = post.Id
@@ -46,9 +45,16 @@ namespace IdentityApp.Controllers
 
                         post.PostComments.Add(postComment);
                         await _repository.SaveChangesAsync();
-                        _repository.LogInformation($"User {commentAuthorName} created a comment");
+                        _repository.LogInformation($"User {model.CommentAuthorName} created a comment");
 
-                        return RedirectToAction("Index", "Home", new { page = page });
+                        if (model.ReturnUrl.Contains("Account"))
+                        {
+                            return RedirectToAction("Index", "Account", new { 
+                                userName = post.User.UserName, page = model.PostContent });
+                        }
+
+                        return RedirectToAction(model.ReturnUrl.Contains("Feed") 
+                            ? "Feed" : "Index", "Home", new { page = model.Page });
                     }
                 }
             }
@@ -57,12 +63,12 @@ namespace IdentityApp.Controllers
             return NotFound();
         }
 
-        public async Task<IActionResult> Delete(string postCommentId, int page)
+        public async Task<IActionResult> Delete(ManagePostCommentViewModel model)
         {
-            if (!string.IsNullOrEmpty(postCommentId))
+            if (!string.IsNullOrEmpty(model.CommentId))
             {
                 PostComment comment = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllComments(), comment => comment.Id == postCommentId);
+                    _repository.GetAllComments(), comment => comment.Id == model.CommentId);
 
                 if (comment == null)
                 {
@@ -74,7 +80,14 @@ namespace IdentityApp.Controllers
                 await _repository.SaveChangesAsync();
                 _repository.LogInformation($"User {comment.Author}'s post was deleted");
 
-                return RedirectToAction("Index", "Home", new { page = page });
+                if (model.ReturnUrl.Contains("Account"))
+                {
+                    return RedirectToAction("Index", "Account", new {
+                        userName = model.CommentedPostUser, page = model.Page });
+                }
+
+                return RedirectToAction(model.ReturnUrl.Contains("Feed")
+                    ? "Feed" : "Index", "Home", new { page = model.Page });
             }
 
             _repository.LogError("Comment id is not passed");
@@ -82,7 +95,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string postCommentId, string returnUrl, int page)
+        public async Task<IActionResult> Edit(string postCommentId, string calledFromAction, int page)
         {
             if (!string.IsNullOrEmpty(postCommentId))
             {
@@ -95,13 +108,14 @@ namespace IdentityApp.Controllers
                     return NotFound();
                 }
 
-                EditPostCommentViewModel model = new EditPostCommentViewModel()
+                ManagePostCommentViewModel model = new ManagePostCommentViewModel()
                 {
                     CommentId = postCommentId,
                     Content = comment.Content,
                     Author = comment.Author,
+                    CommentedPostUser = comment.Post.User.UserName,
                     Page = page,
-                    ReturnUrl = returnUrl
+                    ReturnUrl = calledFromAction
                 };
 
                 return View(model);
@@ -112,7 +126,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EditPostCommentViewModel model)
+        public async Task<IActionResult> Edit(ManagePostCommentViewModel model)
         {
             PostComment comment = await _repository.FirstOrDefaultAsync(
                 _repository.GetAllComments(), comment => comment.Id == model.CommentId);
@@ -129,7 +143,14 @@ namespace IdentityApp.Controllers
             await _repository.SaveChangesAsync();
             _repository.LogInformation($"User {model.Author}'s post was edited");
 
-            return RedirectToAction("Index", "Home", new { page = model.Page });
+            if (model.ReturnUrl.Contains("Account"))
+            {
+                return RedirectToAction("Index", "Account", new { 
+                    userName = model.CommentedPostUser, page = model.Page });
+            }
+
+            return RedirectToAction(model.ReturnUrl.Contains("Feed")
+                ? "Feed" : "Index", "Home", new { page = model.Page });
         }
     }
 }
