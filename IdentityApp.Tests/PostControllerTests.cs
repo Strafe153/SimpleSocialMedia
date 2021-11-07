@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.Interfaces;
 using IdentityApp.ViewModels;
@@ -248,7 +249,7 @@ namespace IdentityApp.Tests
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
             mockRepository.Setup(repository => repository.GetAllLikedPosts())
-                .Returns(Utility.GetTestLikedPosts());
+                .Returns(new List<LikedPost>().AsQueryable());
 
             var controller = new PostController(mockRepository.Object);
 

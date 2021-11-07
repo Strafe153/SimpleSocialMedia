@@ -209,7 +209,7 @@ namespace IdentityApp.Tests
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
             mockRepository.Setup(repository => repository.GetAllFollowings())
-                .Returns(Utility.GetQueryableMockDbSet(Utility.GetTestFollowings()));
+                .Returns(Utility.GetQueryableMockDbSet(new List<Following>()));
 
             var controller = new UsersController(mockRepository.Object);
 
@@ -245,7 +245,7 @@ namespace IdentityApp.Tests
             mockRepository.Setup(repository => repository.FindByIdAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => new User()));
             mockRepository.Setup(repository => repository.GetAllFollowings())
-                .Returns(Utility.GetQueryableMockDbSet(Utility.GetTestFollowings()));
+                .Returns(Utility.GetQueryableMockDbSet(new List<Following>()));
 
             var controller = new UsersController(mockRepository.Object);
 
