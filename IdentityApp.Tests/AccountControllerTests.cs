@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -215,7 +216,7 @@ namespace IdentityApp.Tests
             mockRepository.Setup(repository => repository.GetRolesAsync(
                 It.IsAny<User>())).Returns(Task.Run(() => Utility.ToIList(new List<string>())));
             mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(Utility.GetTestUsers());
+                .Returns(new List<User>().AsQueryable());
             mockRepository.Setup(repository => repository.UpdateAsync(
                 It.IsAny<User>())).Returns(Task.Run(() => IdentityResult.Success));
 
@@ -243,7 +244,7 @@ namespace IdentityApp.Tests
             mockRepository.Setup(repository => repository.GetRolesAsync(
                 It.IsAny<User>())).Returns(Task.Run(() => Utility.ToIList(new List<string>())));
             mockRepository.Setup(repository => repository.GetAllUsers())
-                .Returns(Utility.GetTestUsers());
+                .Returns(new List<User>().AsQueryable());
             mockRepository.Setup(repository => repository.UpdateAsync(It.IsAny<User>()))
                 .Returns(Task.Run(() => IdentityResult.Failed(new IdentityError() 
                     { Description = "test_user" })));
