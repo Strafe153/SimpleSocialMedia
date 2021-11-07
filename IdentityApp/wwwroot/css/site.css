@@ -172,6 +172,6 @@ hr {
     opacity: 0.6;
 }
 
-.post-comments, #hide-comments-btn {
+.post-comments, .hide-comments-btn {
     display: none;
 }

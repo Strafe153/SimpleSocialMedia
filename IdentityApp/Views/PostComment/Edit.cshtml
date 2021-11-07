@@ -1,0 +1,21 @@
+﻿@model IdentityApp.ViewModels.EditPostCommentViewModel
+
+@{
+    ViewData["Title"] = "Editing a post comment";
+}
+
+<form asp-action="Edit" asp-controller="PostComment">
+    <div asp-validation-summary="ModelOnly" class="validation alert alert-danger" role="alert"></div>
+
+    <input type="hidden" asp-for="CommentId" value="@Model.CommentId" />
+    <input type="hidden" asp-for="Author" value="@Model.Author" />
+
+    <div class="form-group">
+        <label asp-for="Content">Comment</label>
+        <textarea asp-for="Content" class="form-control mt-2" rows="2" placeholder="Your comment..."></textarea>
+        <span asp-validation-for="Content"></span>
+    </div>
+
+    <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">Cancel</a>
+    <input type="submit" class="btn btn-primary" value="Save" />
+</form>
