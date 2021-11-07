@@ -65,7 +65,7 @@
         @if (post.PostComments.Count() > 0)
         {
             <hr class="my-2" />
-            <button id="show-comments-btn" class="btn btn-outline-secondary btn-sm btn-block">
+            <button onclick="showComments('@post.Id')" id="show-comments-btn-@post.Id" class="btn btn-outline-secondary btn-sm btn-block">
                 Show comments
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-down" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M1.646 6.646a.5.5 0 0 1 .708 0L8 12.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
@@ -73,7 +73,7 @@
                 </svg>
             </button>
 
-            <button id="hide-comments-btn" class="btn btn-outline-secondary btn-sm btn-block my-2">
+            <button onclick="hideComments('@post.Id')" id="hide-comments-btn-@post.Id" class="btn btn-outline-secondary btn-sm btn-block my-2 hide-comments-btn">
                 Hide comments
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708l6-6z"/>
@@ -87,16 +87,48 @@
             <hr class="my-2" />
         }
 
-        <div class="post-comments">
+        <div>
             @foreach (PostComment comment in post.PostComments.OrderBy(comment => comment.CommentedTime))
             {
-                <div>
+                <div class="post-comments post-comments-@post.Id">
                     <a asp-action="Index" asp-controller="Account" asp-route-userName="@comment.Author" 
                         id="user-profile-link" class="d-block">@comment.Author</a>
                     <div>
                         <p class="text-break d-inline">@comment.Content</p>
-                        <span class="posted-time float-right">@comment.CommentedTime.ToString("HH:mm:ss dd.MM.yyyy")</span>
+                        <span class="posted-time float-right">
+                            @comment.CommentedTime.ToString("HH:mm:ss dd.MM.yyyy")
+                            @if (comment.IsEdited)
+                            {
+                                <span class="posted-time">(edited)</span>
+                            }
+                        </span>
+                        <br />
+
+                        <div class="mt-2">
+                            @if (Model.AuthenticatedUser != null)
+                            {
+                                @if (Model.AuthenticatedUser.UserName == comment.Author 
+                                    || Model.AuthenticatedUserRoles.Contains("admin"))
+                                {
+                                    <a asp-action="Edit" asp-controller="PostComment" asp-route-postCommentId="@comment.Id" 
+                                        asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                                        asp-route-returnUrl="@Context.Request.Path" class="btn btn-sm btn-primary">
+                                        Edit
+                                    </a>
+
+                                    <a asp-action="Delete" asp-controller="PostComment" asp-route-postCommentId="@comment.Id" 
+                                        asp-route-page="@Model.PageViewModel.CurrentPageNumber" class="btn btn-sm btn-danger">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                        Delete
+                                    </a>
+                                }
+                            }
+                        </div>
                     </div>
+
                     <hr class="my-2" />
                 </div>
             }
@@ -106,7 +138,8 @@
             @if (Model.AuthenticatedUser != null)
             {
                 <form asp-action="Create" asp-controller="PostComment" asp-route-postId="@post.Id" 
-                    asp-route-commentAuthorName="@Model.AuthenticatedUser.UserName">
+                    asp-route-commentAuthorName="@Model.AuthenticatedUser.UserName" 
+                    asp-route-page="@Model.PageViewModel.CurrentPageNumber">
                     <textarea name="postContent" class="form-control mt-2" rows="1" placeholder="Your comment..."></textarea>
                     <input type="submit" class="btn btn-sm btn-primary mt-2" value="Submit comment" />
                 </form>
@@ -135,7 +168,7 @@
 
 @if (Model.PageViewModel.HasNextPage)
 {
-    <a asp-action="Index" asp-route-page="@(Model.PageViewModel.CurrentPageNumber + 1)" class="btn btn-outline-dark">
+    <a asp-action="Index" asp-route-page="@(Model.PageViewModel.CurrentPageNumber + 1)" class="btn btn-outline-secondary">
         <i class="glyphicon glyphicon-chevron-right"></i>
         Next
     </a>

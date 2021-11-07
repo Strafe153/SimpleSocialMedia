@@ -7,6 +7,18 @@ function loadFile(event) {
     output.onload = () => URL.revokeObjectURL(output.src);
 };
 
+function showComments(postId) {
+    $(`.post-comments-${postId}`).css("display", "block");
+    $(`#show-comments-btn-${postId}`).css("display", "none");
+    $(`#hide-comments-btn-${postId}`).css("display", "block");
+}
+
+function hideComments(postId) {
+    $(`.post-comments-${postId}`).css("display", "none");
+    $(`#show-comments-btn-${postId}`).css("display", "block");
+    $(`#hide-comments-btn-${postId}`).css("display", "none");
+}
+
 // Hides a post picture when pressed "Delete" button
 $(".delete-button").on("click", function(event) {
     let postPictureId = $(event.target).attr("value");
@@ -24,16 +36,4 @@ $("#profile-pic-input").on("change", function() {
 // Marks all the loaded post pictures as selected and outputs their count in the input type="file" field
 $("#post-picture").on("change", function() {
     $(".custom-file-label").text(`Pictures chosen: ${$(this)[0].files.length}`);
-});
-
-$("#show-comments-btn").on("click", function() {
-    $(".post-comments").css("display", "block");
-    $("#hide-comments-btn").css("display", "block");
-    $(this).css("display", "none");
-});
-
-$("#hide-comments-btn").on("click", function() {
-    $(".post-comments").css("display", "none");
-    $("#show-comments-btn").css("display", "block");
-    $(this).css("display", "none");
 });

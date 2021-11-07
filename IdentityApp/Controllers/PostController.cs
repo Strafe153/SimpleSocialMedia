@@ -113,8 +113,8 @@ namespace IdentityApp.Controllers
                 UserId = post.UserId,
                 UserName = post.User.UserName,
                 CalledFromAction = returnUrl,
-                PostPictures = post.PostPictures
-                    .OrderByDescending(postPic => postPic.UploadedTime).AsEnumerable()
+                PostPictures = post.PostPictures.OrderByDescending(
+                    postPic => postPic.UploadedTime).AsEnumerable()
             };
 
             return View(model);
