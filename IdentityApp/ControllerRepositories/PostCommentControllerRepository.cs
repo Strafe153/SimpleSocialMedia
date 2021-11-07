@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -10,12 +9,13 @@ using IdentityApp.Models;
 
 namespace IdentityApp.ControllerRepositories
 {
-    public class PostCommentRepository : IPostCommentControllable
+    public class PostCommentControllerRepository : IPostCommentControllable
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
 
-        public PostCommentRepository(ApplicationDbContext context, ILogger<PostCommentRepository> logger)
+        public PostCommentControllerRepository(ApplicationDbContext context, 
+            ILogger<PostCommentControllerRepository> logger)
         {
             _context = context;
             _logger = logger;

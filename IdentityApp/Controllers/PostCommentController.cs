@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
@@ -30,7 +26,7 @@ namespace IdentityApp.Controllers
 
                 if (post != null)
                 {
-                    if (post.Content == null)
+                    if (string.IsNullOrEmpty(postContent))
                     {
                         ModelState.AddModelError("", "The length of your " +
                             "comment must be between 1 and 200 symbols");
