@@ -42,6 +42,11 @@ namespace IdentityApp.ControllerRepositories
             return _context.LikedPosts;
         }
 
+        public IQueryable<PostComment> GetAllPostComments()
+        {
+            return _context.PostComments;
+        }
+
         public IQueryable<Post> GetAllPosts()
         {
             return _context.Posts;
@@ -72,9 +77,14 @@ namespace IdentityApp.ControllerRepositories
             return _context.Remove(post);
         }
 
-        public void RemoveRange(IEnumerable<LikedPost> likedPosts)
+        public void RemoveLikedPostsRange(IEnumerable<LikedPost> likedPosts)
         {
             _context.LikedPosts.RemoveRange(likedPosts);
+        }
+
+        public void RemoveCommentsRange(IEnumerable<PostComment> comments)
+        {
+            _context.PostComments.RemoveRange(comments);
         }
 
         public async Task<int> SaveChangesAsync()
@@ -90,6 +100,16 @@ namespace IdentityApp.ControllerRepositories
         public async Task<IdentityResult> UpdateAsync(User user)
         {
             return await _userManager.UpdateAsync(user);
+        }
+
+        public IQueryable<LikedComment> GetAllLikedPostComments()
+        {
+            return _context.LikedComments;
+        }
+
+        public void RemoveLikedCommentsRange(IEnumerable<LikedComment> comments)
+        {
+            _context.LikedComments.RemoveRange(comments);
         }
     }
 }

@@ -94,7 +94,7 @@ namespace IdentityApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string postId, string returnUrl)
+        public async Task<IActionResult> Edit(string postId, string returnUrl, int page)
         {
             Post post = await _repository.FirstOrDefaultAsync(
                 _repository.GetAllPosts(), post => post.Id == postId);
@@ -114,7 +114,8 @@ namespace IdentityApp.Controllers
                 UserName = post.User.UserName,
                 CalledFromAction = returnUrl,
                 PostPictures = post.PostPictures.OrderByDescending(
-                    postPic => postPic.UploadedTime).AsEnumerable()
+                    postPic => postPic.UploadedTime).AsEnumerable(),
+                Page = page
             };
 
             return View(model);
@@ -147,12 +148,12 @@ namespace IdentityApp.Controllers
 
                         if (model.CalledFromAction.Contains("Account"))
                         {
-                            return RedirectToAction("Index", "Account", new { userName = user.UserName });
+                            return RedirectToAction("Index", "Account", new { 
+                                userName = user.UserName, page = model.Page });
                         }
-                        else
-                        {
-                            return RedirectToAction("Index", "Home");
-                        }
+
+                        return RedirectToAction(model.CalledFromAction.Contains("Feed")
+                            ? "Feed" : "Index", "Home", new { page = model.Page });
                     }
                     else
                     {
@@ -171,7 +172,7 @@ namespace IdentityApp.Controllers
             return NotFound();
         }
 
-        public async Task<IActionResult> Delete(string postId, string returnUrl)
+        public async Task<IActionResult> Delete(string postId, string returnUrl, int page)
         {
             Post post = await _repository.FirstOrDefaultAsync(
                 _repository.GetAllPosts(), post => post.Id == postId);
@@ -181,10 +182,15 @@ namespace IdentityApp.Controllers
             {
                 IEnumerable<LikedPost> likedPosts = _repository.GetAllLikedPosts()
                     .Where(likedPost => likedPost.PostLikedId == post.Id).AsEnumerable();
+                IEnumerable<PostComment> comments = _repository.GetAllPostComments()
+                    .Where(comment => comment.PostId == post.Id).AsEnumerable();
+                IEnumerable<LikedComment> likedComments = _repository.GetAllLikedPostComments();
 
                 if (likedPosts != null)
                 {
-                    _repository.RemoveRange(likedPosts);
+                    _repository.RemoveLikedCommentsRange(likedComments);
+                    _repository.RemoveCommentsRange(comments);
+                    _repository.RemoveLikedPostsRange(likedPosts);
                 }
 
                 _repository.Remove(post);
@@ -199,10 +205,12 @@ namespace IdentityApp.Controllers
 
             if (returnUrl.Contains("Account"))
             {
-                return RedirectToAction("Index", "Account", new { userName = user.UserName });
+                return RedirectToAction("Index", "Account",
+                    new { userName = user.UserName, page = page });
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(returnUrl.Contains("Feed")
+                ? "Feed" : "Index", "Home", new { page = page });
         }
 
         public async Task<IActionResult> Like(PostLikeViewModel model)
@@ -234,7 +242,8 @@ namespace IdentityApp.Controllers
                         new { userName = model.LikedPostUserName, page = model.Page });
                 }
 
-                return RedirectToAction("Index", "Home", new { page = model.Page });
+                return RedirectToAction(model.ReturnAction.Contains("Feed")
+                    ? "Feed" : "Index", "Home", new { page = model.Page });
             }
             else
             {

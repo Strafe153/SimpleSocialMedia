@@ -9,6 +9,7 @@ namespace IdentityApp.Models
         public DbSet<PostPicture> PostPictures { get; set; }
         public DbSet<PostComment> PostComments { get; set; }
         public DbSet<LikedPost> LikedPosts { get; set; }
+        public DbSet<LikedComment> LikedComments { get; set; }
         public DbSet<Following> Followings { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -71,6 +72,25 @@ namespace IdentityApp.Models
                 .HasOne(likedPost => likedPost.PostLiked)
                 .WithMany(post => post.LikedPosts)
                 .HasForeignKey(likedPost => likedPost.PostLikedId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LikedComment>()
+                .HasKey(likedComment => new
+                {
+                    likedComment.UserWhoLikedId,
+                    likedComment.CommentLikedId
+                });
+
+            modelBuilder.Entity<LikedComment>()
+                .HasOne(likedComment => likedComment.UserWhoLiked)
+                .WithMany(user => user.LikedComments)
+                .HasForeignKey(likedComment => likedComment.UserWhoLikedId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LikedComment>()
+                .HasOne(likedComment => likedComment.CommentLiked)
+                .WithMany(comment => comment.LikedComments)
+                .HasForeignKey(likedComment => likedComment.CommentLikedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Following>()

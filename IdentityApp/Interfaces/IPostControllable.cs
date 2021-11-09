@@ -21,7 +21,11 @@ namespace IdentityApp.Interfaces
         IQueryable<User> GetAllUsers();
         IQueryable<Post> GetAllPosts();
         IQueryable<LikedPost> GetAllLikedPosts();
-        void RemoveRange(IEnumerable<LikedPost> likedPosts);
+        IQueryable<PostComment> GetAllPostComments();
+        IQueryable<LikedComment> GetAllLikedPostComments();
+        void RemoveLikedPostsRange(IEnumerable<LikedPost> likedPosts);
+        void RemoveCommentsRange(IEnumerable<PostComment> comments);
+        void RemoveLikedCommentsRange(IEnumerable<LikedComment> comments);
         void LogError(string message);
         void LogWarning(string message);
         void LogInformation(string message);
