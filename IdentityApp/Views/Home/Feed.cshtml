@@ -39,6 +39,18 @@
                 {
                     <sub class="posted-time">(edited)</sub>
                 }
+                @if (Model.AuthenticatedUser != null)
+                {
+                    @if (Model.AuthenticatedUser.Id == post.UserId || Context.User.IsInRole("admin"))
+                    {
+                        <a asp-action="Edit" 
+                            asp-controller="Post" 
+                            asp-route-postId="@post.Id"
+                            asp-route-returnUrl="@Context.Request.Path"
+                            asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                            class="btn btn-outline-secondary py-1">Edit</a>
+                    }
+                }
             </div>
         </div>
 
@@ -85,26 +97,48 @@
                         <br />
 
                         <div class="mt-2">
-                            @if (Model.AuthenticatedUser.UserName == comment.Author 
-                                || Context.User.IsInRole("admin"))
+                            @if (Model.AuthenticatedUser != null)
                             {
-                                <a asp-action="Edit" asp-controller="PostComment" asp-route-postCommentId="@comment.Id" 
-                                    asp-route-page="@Model.PageViewModel.CurrentPageNumber"
-                                    asp-route-calledFromAction="@Context.Request.Path" class="btn btn-sm btn-primary">
-                                    Edit
+                                <a asp-action="Like"
+                                    asp-controller="PostComment"
+                                    asp-route-CommentId="@comment.Id"
+                                    asp-route-UserId="@Model.AuthenticatedUser.Id"
+                                    asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
+                                    asp-route-ReturnAction="@Context.Request.Path"
+                                    class="btn btn-sm px-3 py-1 @(Model.AuthenticatedUser.LikedComments.FirstOrDefault(
+                                        p => p.CommentLiked.Id == comment.Id) != null ? "btn-primary" : "btn-outline-primary")">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                                    </svg>
+                                    <span class="comment-likes-count">@comment.Likes</span>
                                 </a>
 
-                                <a asp-action="Delete" asp-controller="PostComment" asp-route-CommentId="@comment.Id" 
-                                    asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
-                                    asp-route-ReturnUrl="@Context.Request.Path"
-                                    asp-route-CommentedPostAuthor="@post.User.UserName"
-                                    class="btn btn-sm btn-danger">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                    </svg>
-                                    Delete
-                                </a>
+                                <span class="float-right">
+                                    @if (Model.AuthenticatedUser.UserName == comment.Author 
+                                        || Context.User.IsInRole("admin"))
+                                    {
+                                        <a asp-action="Edit" asp-controller="PostComment" 
+                                            asp-route-postCommentId="@comment.Id" 
+                                            asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                                            asp-route-calledFromAction="@Context.Request.Path" 
+                                            class="btn btn-sm btn-outline-secondary">
+                                            Edit
+                                        </a>
+
+                                        <a asp-action="Delete" asp-controller="PostComment" 
+                                            asp-route-CommentId="@comment.Id" 
+                                            asp-route-Page="@Model.PageViewModel.CurrentPageNumber" 
+                                            asp-route-ReturnUrl="@Context.Request.Path"
+                                            asp-route-CommentedPostUser="@post.User.UserName"
+                                            class="btn btn-sm btn-danger">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                            </svg>
+                                            Delete
+                                        </a>
+                                    }
+                                </span>
                             }
                         </div>
                     </div>
@@ -122,13 +156,13 @@
                     asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                     asp-route-ReturnUrl="@Context.Request.Path">
                     <textarea name="postContent" class="form-control mt-2" rows="1" placeholder="Your comment..."></textarea>
-                    <input type="submit" class="btn btn-sm btn-primary mt-2" value="Submit comment" />
+                    <input type="submit" class="btn btn-sm btn-primary mt-2" value="Submit" />
                 </form>
             }
             else
             {
                 <textarea name="postContent" class="form-control mt-2" rows="1" placeholder="Your comment..."></textarea>
-                <a asp-action="Login" asp-controller="Account" class="btn btn-sm btn-primary mt-2">Submit comment</a>
+                <a asp-action="Login" asp-controller="Account" class="btn btn-sm btn-primary mt-2">Submit</a>
             }
         </div>
     </div>

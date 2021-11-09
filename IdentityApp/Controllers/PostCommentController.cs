@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
@@ -65,33 +67,39 @@ namespace IdentityApp.Controllers
 
         public async Task<IActionResult> Delete(ManagePostCommentViewModel model)
         {
-            if (!string.IsNullOrEmpty(model.CommentId))
+            PostComment comment = await _repository.FirstOrDefaultAsync(
+                _repository.GetAllComments(), comment => comment.Id == model.CommentId);
+            Post post = await _repository.FirstOrDefaultAsync(
+                _repository.GetAllPosts(), post => post.Id == comment.PostId);
+
+            if (comment != null)
             {
-                PostComment comment = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllComments(), comment => comment.Id == model.CommentId);
+                IEnumerable<LikedComment> likedComments = _repository.GetAllLikedComments()
+                    .Where(likedComment => likedComment.CommentLikedId == comment.Id).AsEnumerable();
 
-                if (comment == null)
+                if (likedComments != null)
                 {
-                    _repository.LogError("Comment not found");
-                    return NotFound();
+                    _repository.RemoveRange(likedComments);
                 }
 
-                comment.Post.PostComments.Remove(comment);
+                _repository.Remove(comment);
                 await _repository.SaveChangesAsync();
-                _repository.LogInformation($"User {comment.Author}'s post was deleted");
-
-                if (model.ReturnUrl.Contains("Account"))
-                {
-                    return RedirectToAction("Index", "Account", new {
-                        userName = model.CommentedPostUser, page = model.Page });
-                }
-
-                return RedirectToAction(model.ReturnUrl.Contains("Feed")
-                    ? "Feed" : "Index", "Home", new { page = model.Page });
+                _repository.LogInformation($"User {comment.Author}'s comment was deleted");
+            }
+            else
+            {
+                _repository.LogError("Comment not found");
+                return NotFound();
             }
 
-            _repository.LogError("Comment id is not passed");
-            return BadRequest();
+            if (model.ReturnUrl.Contains("Account"))
+            {
+                return RedirectToAction("Index", "Account", new {
+                    userName = post.User.UserName, page = model.Page });
+            }
+
+            return RedirectToAction(model.ReturnUrl.Contains("Feed")
+                ? "Feed" : "Index", "Home", new { page = model.Page });
         }
 
         [HttpGet]
@@ -151,6 +159,67 @@ namespace IdentityApp.Controllers
 
             return RedirectToAction(model.ReturnUrl.Contains("Feed")
                 ? "Feed" : "Index", "Home", new { page = model.Page });
+        }
+
+        public async Task<IActionResult> Like(CommentLikeViewModel model)
+        {
+            User user = await _repository.FindByIdAsync(model.UserId);
+
+            if (user != null)
+            {
+                PostComment comment = await _repository.FirstOrDefaultAsync(
+                    _repository.GetAllComments(), comment => comment.Id == model.CommentId);
+
+                if (comment != null)
+                {
+                    LikedComment commentToCheck = user.LikedComments.FirstOrDefault(comment =>
+                        comment.UserWhoLikedId == model.UserId && comment.CommentLikedId == model.CommentId);
+
+                    LikeDislikeComment(comment, commentToCheck, user);
+                    await _repository.SaveChangesAsync();
+                }
+                else
+                {
+                    _repository.LogError("Comment not found");
+                    return NotFound();
+                }
+
+                if (model.ReturnAction.Contains("Account"))
+                {
+                    return RedirectToAction("Index", "Account",
+                        new { userName = comment.Post.User.UserName, page = model.Page });
+                }
+
+                return RedirectToAction(model.ReturnAction.Contains("Feed")
+                    ? "Feed" : "Index", "Home", new { page = model.Page });
+            }
+            else
+            {
+                _repository.LogError("User not found");
+                return NotFound();
+            }
+        }
+
+        private void LikeDislikeComment(PostComment commentToLike, LikedComment commentToCheck, User user)
+        {
+            if (commentToCheck != null)
+            {
+                user.LikedComments.Remove(commentToCheck);
+                commentToLike.Likes--;
+                _repository.LogInformation($"User {user.UserName} removed a like from a comment");
+            }
+            else
+            {
+                user.LikedComments.Add(new LikedComment()
+                {
+                    UserWhoLikedId = user.Id,
+                    UserWhoLiked = user,
+                    CommentLikedId = commentToLike.Id,
+                    CommentLiked = commentToLike
+                });
+                commentToLike.Likes++;
+                _repository.LogInformation($"User {user.UserName} liked a comment");
+            }
         }
     }
 }

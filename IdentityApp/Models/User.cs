@@ -15,6 +15,8 @@ namespace IdentityApp.Models
         public int FollowsCount { get; set; }
         public virtual List<Post> Posts { get; set; } 
         public virtual List<LikedPost> LikedPosts { get; set; }
+        public virtual List<PostComment> Comments { get; set; }
+        public virtual List<LikedComment> LikedComments { get; set; }
         public virtual List<Following> FollowingUsers { get; set; }
         public virtual List<Following> Followers { get; set; }
 
@@ -22,6 +24,8 @@ namespace IdentityApp.Models
         {
             Posts = new List<Post>();
             LikedPosts = new List<LikedPost>();
+            Comments = new List<PostComment>();
+            LikedComments = new List<LikedComment>();
             FollowingUsers = new List<Following>();
             Followers = new List<Following>();
         }

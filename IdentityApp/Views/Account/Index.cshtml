@@ -143,11 +143,14 @@
 
                     @if (Model.AuthenticatedUser != null)
 	                {
-		                @if (Model.AuthenticatedUser.Id == post.UserId 
-                            || Model.AuthenticatedUserRoles.Contains("admin"))
+		                @if (Model.AuthenticatedUser.Id == post.UserId || Model.AuthenticatedUserRoles.Contains("admin"))
                         {
-                            <a asp-action="Edit" asp-controller="Post" asp-route-postId="@post.Id"
-                                asp-route-returnUrl="@Context.Request.Path" class="btn btn-outline-secondary py-1">Edit</a>
+                            <a asp-action="Edit" 
+                                asp-controller="Post" 
+                                asp-route-postId="@post.Id"
+                                asp-route-returnUrl="@Context.Request.Path"
+                                asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                                class="btn btn-outline-secondary py-1">Edit</a>
                         }
 	                }
                 </div>
@@ -197,17 +200,35 @@
 
                             <div class="mt-2">
                                 @if (Model.AuthenticatedUser != null)
-                                {
+                            {
+                                <a asp-action="Like"
+                                    asp-controller="PostComment"
+                                    asp-route-CommentId="@comment.Id"
+                                    asp-route-UserId="@Model.AuthenticatedUser.Id"
+                                    asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
+                                    asp-route-ReturnAction="@Context.Request.Path"
+                                    class="btn btn-sm px-3 py-1 @(Model.AuthenticatedUser.LikedComments.FirstOrDefault(
+                                        p => p.CommentLiked.Id == comment.Id) != null ? "btn-primary" : "btn-outline-primary")">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                                    </svg>
+                                    <span class="comment-likes-count">@comment.Likes</span>
+                                </a>
+
+                                <span class="float-right">
                                     @if (Model.AuthenticatedUser.UserName == comment.Author 
                                         || Model.AuthenticatedUserRoles.Contains("admin"))
                                     {
-                                        <a asp-action="Edit" asp-controller="PostComment" asp-route-postCommentId="@comment.Id" 
+                                        <a asp-action="Edit" asp-controller="PostComment" 
+                                            asp-route-postCommentId="@comment.Id" 
                                             asp-route-page="@Model.PageViewModel.CurrentPageNumber"
-                                            asp-route-calledFromAction="@Context.Request.Path" class="btn btn-sm btn-primary">
+                                            asp-route-calledFromAction="@Context.Request.Path" 
+                                            class="btn btn-sm btn-outline-secondary">
                                             Edit
                                         </a>
 
-                                        <a asp-action="Delete" asp-controller="PostComment" asp-route-CommentId="@comment.Id" 
+                                        <a asp-action="Delete" asp-controller="PostComment" 
+                                            asp-route-CommentId="@comment.Id" 
                                             asp-route-Page="@Model.PageViewModel.CurrentPageNumber" 
                                             asp-route-ReturnUrl="@Context.Request.Path"
                                             asp-route-CommentedPostUser="@post.User.UserName"
@@ -219,7 +240,8 @@
                                             Delete
                                         </a>
                                     }
-                                }
+                                </span>
+                            }
                             </div>
                         </div>
 
@@ -236,13 +258,13 @@
                         asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                         asp-route-ReturnUrl="@Context.Request.Path">
                         <textarea name="postContent" class="form-control mt-2" rows="1" placeholder="Your comment..."></textarea>
-                        <input type="submit" class="btn btn-sm btn-primary mt-2" value="Submit comment" />
+                        <input type="submit" class="btn btn-sm btn-primary mt-2" value="Submit" />
                     </form>
                 }
                 else
                 {
                     <textarea name="postContent" class="form-control mt-2" rows="1" placeholder="Your comment..."></textarea>
-                    <a asp-action="Login" asp-controller="Account" class="btn btn-sm btn-primary mt-2">Submit comment</a>
+                    <a asp-action="Login" asp-controller="Account" class="btn btn-sm btn-primary mt-2">Submit</a>
                 }
             </div>
         </div>

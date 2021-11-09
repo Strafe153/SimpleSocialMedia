@@ -130,6 +130,10 @@ div ul li form .btn:active:focus {
     font-size: 16px;
 }
 
+.comment-likes-count {
+    font-size: 14px;
+}
+
 .posted-time {
     font-size: 13px;
 }
