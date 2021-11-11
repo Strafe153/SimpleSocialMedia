@@ -22,11 +22,11 @@ namespace IdentityApp.Tests
         public void Index_ExistentUser_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
             Utility.MockUserIdentityName(controller);
 
             // Act
@@ -40,11 +40,11 @@ namespace IdentityApp.Tests
         public void Index_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
             Utility.MockUserIdentityName(controller);
 
             // Act
@@ -60,15 +60,16 @@ namespace IdentityApp.Tests
             // Arrange
             var webHostEnvironment = new Mock<IWebHostEnvironment>();
 
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<Expression<Func<User, bool>>>())).Returns(Task.Run(() => (User)null));
-            mockRepository.Setup(repository => repository.GetWebRootPath())
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FirstOrDefaultAsync(
+                It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(Task.Run(() => (User)null));
+            repository.Setup(repo => repo.GetWebRootPath())
                 .Returns($@"{Directory.GetCurrentDirectory()[..^30]}\wwwroot");
-            mockRepository.Setup(repository => repository.CreateAsync(
-                It.IsAny<User>(), It.IsAny<string>())).Returns(Task.Run(() => IdentityResult.Success));
+            repository.Setup(repo => repo.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .Returns(Task.Run(() => IdentityResult.Success));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Register(new RegisterViewModel()).Result;
@@ -81,11 +82,12 @@ namespace IdentityApp.Tests
         public void Register_ValidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<Expression<Func<User, bool>>>())).Returns(Task.Run(() => new User()));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FirstOrDefaultAsync(
+                It.IsAny<Expression<Func<User, bool>>>()))
+                .Returns(Task.Run(() => new User()));
 
-            var controller = new AccountController(mockRepository.Object);
+            var controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Register(new RegisterViewModel()).Result;
@@ -98,14 +100,14 @@ namespace IdentityApp.Tests
         public void Login_ValidModelHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByEmailAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.PasswordSignInAsync(
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByEmailAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.PasswordSignInAsync(It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .Returns(Task.Run(() => Microsoft.AspNetCore.Identity.SignInResult.Success));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Login(new LoginViewModel()).Result;
@@ -118,11 +120,11 @@ namespace IdentityApp.Tests
         public void Login_ValidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByEmailAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByEmailAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Login(new LoginViewModel()).Result;
@@ -135,11 +137,11 @@ namespace IdentityApp.Tests
         public void Logout_ExistentUser_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Logout("").Result;
@@ -152,11 +154,11 @@ namespace IdentityApp.Tests
         public void Logout_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Logout("").Result;
@@ -169,13 +171,13 @@ namespace IdentityApp.Tests
         public void Edit_ExistentUserHttpGet_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(It.IsAny<string>()))
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
                 .Returns(Task.Run(() => new User() { ProfilePicture = new byte[0]}));
-            mockRepository.Setup(repository => repository.GetRolesAsync(
-                It.IsAny<User>())).Returns(Task.Run(() => Utility.ToIList(new List<string>())));
+            repository.Setup(repo => repo.GetRolesAsync(It.IsAny<User>()))
+                .Returns(Task.Run(() => Utility.ToIList(new List<string>())));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
             Utility.MockUserIdentityName(controller);
 
             // Act
@@ -189,11 +191,11 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentUserHttpGet_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
             Utility.MockUserIdentityName(controller);
 
             // Act
@@ -207,24 +209,24 @@ namespace IdentityApp.Tests
         public void Edit_ValidModelHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
+            var repository = new Mock<IAccountControllable>();
             
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.FindByEmailAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.GetRolesAsync(
-                It.IsAny<User>())).Returns(Task.Run(() => Utility.ToIList(new List<string>())));
-            mockRepository.Setup(repository => repository.GetAllUsers())
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.FindByEmailAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.GetRolesAsync(It.IsAny<User>()))
+                .Returns(Task.Run(() => Utility.ToIList(new List<string>())));
+            repository.Setup(repo => repo.GetAllUsers())
                 .Returns(new List<User>().AsQueryable());
-            mockRepository.Setup(repository => repository.UpdateAsync(
-                It.IsAny<User>())).Returns(Task.Run(() => IdentityResult.Success));
+            repository.Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+                .Returns(Task.Run(() => IdentityResult.Success));
 
-            var controller = new AccountController(mockRepository.Object);
-            var editUserViewModel = new EditUserViewModel() { CalledFromAction = "Account" };
+            AccountController controller = new AccountController(repository.Object);
+            EditUserViewModel model = new EditUserViewModel() { CalledFromAction = "Account" };
 
             // Act
-            IActionResult result = controller.Edit(editUserViewModel).Result;
+            IActionResult result = controller.Edit(model).Result;
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);
@@ -235,21 +237,21 @@ namespace IdentityApp.Tests
         {
             // Arrange
             User existentUser = new User { ProfilePicture = new byte[0] };
-            var mockRepository = new Mock<IAccountControllable>();
 
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
-            mockRepository.Setup(repository => repository.FindByEmailAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => existentUser));
-            mockRepository.Setup(repository => repository.GetRolesAsync(
-                It.IsAny<User>())).Returns(Task.Run(() => Utility.ToIList(new List<string>())));
-            mockRepository.Setup(repository => repository.GetAllUsers())
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => existentUser));
+            repository.Setup(repo => repo.FindByEmailAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => existentUser));
+            repository.Setup(repo => repo.GetRolesAsync(It.IsAny<User>()))
+                .Returns(Task.Run(() => Utility.ToIList(new List<string>())));
+            repository.Setup(repo => repo.GetAllUsers())
                 .Returns(new List<User>().AsQueryable());
-            mockRepository.Setup(repository => repository.UpdateAsync(It.IsAny<User>()))
-                .Returns(Task.Run(() => IdentityResult.Failed(new IdentityError() 
-                    { Description = "test_user" })));
+            repository.Setup(repo => repo.UpdateAsync(It.IsAny<User>()))
+                .Returns(Task.Run(() => IdentityResult.Failed(
+                    new IdentityError() { Description = "test_user" })));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Edit(new EditUserViewModel()).Result;
@@ -262,11 +264,11 @@ namespace IdentityApp.Tests
         public void Follow_ExistentUser_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Follow("", "").Result;
@@ -279,11 +281,11 @@ namespace IdentityApp.Tests
         public void Follow_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Follow("", "").Result;
@@ -296,11 +298,11 @@ namespace IdentityApp.Tests
         public void Unfollow_ExistentUser_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Unfollow("", "").Result;
@@ -313,11 +315,11 @@ namespace IdentityApp.Tests
         public void Unfollow_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IAccountControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IAccountControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new AccountController(mockRepository.Object);
+            AccountController controller = new AccountController(repository.Object);
 
             // Act
             IActionResult result = controller.Unfollow("", "").Result;

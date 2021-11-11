@@ -16,13 +16,11 @@ namespace IdentityApp.Tests
         public void Index_Roles_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            /*mockRepository.Setup(repository => repository.GetAllRolesAsync())
-                .Returns(Task.Run(() => Utility.GetTestRoles()));*/
-            mockRepository.Setup(repository => repository.GetAllRolesAsync())
+            var repository = new Mock<IRolesControllable>();
+            repository.Setup(repo => repo.GetAllRolesAsync())
                 .Returns(Task.Run(() => new List<IdentityRole>()));
 
-            var controller = new RolesController(mockRepository.Object);
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Index().Result;
@@ -35,11 +33,11 @@ namespace IdentityApp.Tests
         public void Create_NonEmptyRoleNameHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            mockRepository.Setup(repository => repository.CreateAsync(
-                It.IsAny<IdentityRole>())).Returns(Task.Run(() => IdentityResult.Success));
+            var repository = new Mock<IRolesControllable>();
+            repository.Setup(repo => repo.CreateAsync(It.IsAny<IdentityRole>()))
+                .Returns(Task.Run(() => IdentityResult.Success));
 
-            var controller = new RolesController(mockRepository.Object);
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Create("test_role").Result;
@@ -52,8 +50,8 @@ namespace IdentityApp.Tests
         public void Create_EmptyRoleNameHttpPost_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            var controller = new RolesController(mockRepository.Object);
+            var repository = new Mock<IRolesControllable>();
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Create("").Result;
@@ -66,11 +64,11 @@ namespace IdentityApp.Tests
         public void Delete_NonEmptyRoleName_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            mockRepository.Setup(repository => repository.FindRoleByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new IdentityRole()));
+            var repository = new Mock<IRolesControllable>();
+            repository.Setup(repo => repo.FindRoleByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new IdentityRole()));
 
-            var controller = new RolesController(mockRepository.Object);
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Delete("test_role").Result;
@@ -83,8 +81,8 @@ namespace IdentityApp.Tests
         public void Delete_EmptyRoleName_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            var controller = new RolesController(mockRepository.Object);
+            var repository = new Mock<IRolesControllable>();
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Delete("").Result;
@@ -97,11 +95,11 @@ namespace IdentityApp.Tests
         public void Edit_ExistentUserHttpGet_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            mockRepository.Setup(repository => repository.FindUserByIdAsync(It.IsAny<string>()))
-                .Returns(Task.Run(() => new User() { Id = "test_id", UserName = "test_user" }));
+            var repository = new Mock<IRolesControllable>();
+            repository.Setup(repo => repo.FindUserByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
 
-            var controller = new RolesController(mockRepository.Object);
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Edit("test_user", "").Result;
@@ -114,11 +112,11 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentUserHttpGet_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            mockRepository.Setup(repository => repository.FindUserByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IRolesControllable>();
+            repository.Setup(repo => repo.FindUserByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new RolesController(mockRepository.Object);
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Edit("", "").Result;
@@ -131,16 +129,16 @@ namespace IdentityApp.Tests
         public void Edit_ExistentUserHttpPost_ReturnsLocalRedirectResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            mockRepository.Setup(repository => repository.FindUserByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.GetRolesAsync(
-                It.IsAny<User>())).Returns(Task.Run(() => Utility.ToIList(new List<string>())));
+            var repository = new Mock<IRolesControllable>();
+            repository.Setup(repo => repo.FindUserByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.GetRolesAsync(It.IsAny<User>()))
+                .Returns(Task.Run(() => Utility.ToIList(new List<string>())));
 
             var urlHelper = new Mock<IUrlHelper>();
-            urlHelper.Setup(urlHelper => urlHelper.IsLocalUrl(It.IsAny<string>())).Returns(true);
+            urlHelper.Setup(helper => helper.IsLocalUrl(It.IsAny<string>())).Returns(true);
 
-            var controller = new RolesController(mockRepository.Object);
+            RolesController controller = new RolesController(repository.Object);
             controller.Url = urlHelper.Object;
 
             // Act
@@ -154,11 +152,11 @@ namespace IdentityApp.Tests
         public void Edit_NonExistentUserHttpPost_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IRolesControllable>();
-            mockRepository.Setup(repository => repository.FindUserByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IRolesControllable>();
+            repository.Setup(repo => repo.FindUserByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new RolesController(mockRepository.Object);
+            RolesController controller = new RolesController(repository.Object);
 
             // Act
             IActionResult result = controller.Edit("", new List<string>(), "").Result;

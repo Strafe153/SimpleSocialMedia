@@ -196,7 +196,7 @@ namespace IdentityApp.Controllers
             else
             {
                 _repository.LogError("User not found");
-                return NotFound();
+                return BadRequest();
             }
         }
 

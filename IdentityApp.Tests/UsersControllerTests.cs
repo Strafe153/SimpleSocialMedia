@@ -17,15 +17,15 @@ namespace IdentityApp.Tests
         public void Delete_ExistentUser_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.GetAllFollowings())
-                .Returns(Utility.GetQueryableMockDbSet(new List<Following>()));
-            mockRepository.Setup(repository => repository.GetAllLikedPosts())
-                .Returns(Utility.GetQueryableMockDbSet(new List<LikedPost>()));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.GetAllFollowings())
+                .Returns(Utility.ToDbSet(new List<Following>()));
+            repository.Setup(repo => repo.GetAllLikedPosts())
+                .Returns(Utility.ToDbSet(new List<LikedPost>()));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
             Utility.MockUserIdentityName(controller);
 
             // Act
@@ -39,11 +39,11 @@ namespace IdentityApp.Tests
         public void Delete_NonExistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.Delete("", "").Result;
@@ -56,11 +56,11 @@ namespace IdentityApp.Tests
         public void ChangePassword_ExistentUserHttpGet_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.ChangePassword("", "").Result;
@@ -73,11 +73,11 @@ namespace IdentityApp.Tests
         public void ChangePassword_NonExistentUserHttpGet_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.ChangePassword("", "").Result;
@@ -90,23 +90,23 @@ namespace IdentityApp.Tests
         public void ChangePassword_ExistentUserHttpPost_ReturnsLocalRedirectResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.ChangePasswordAsync(
-                It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()))
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.ChangePasswordAsync(It.IsAny<User>(), 
+                It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(Task.Run(() => IdentityResult.Success));
 
             var urlHelper = new Mock<IUrlHelper>();
-            urlHelper.Setup(urlHelper => urlHelper.IsLocalUrl(It.IsAny<string>())).Returns(true);
+            urlHelper.Setup(helper => helper.IsLocalUrl(It.IsAny<string>())).Returns(true);
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
             controller.Url = urlHelper.Object;
 
-            var changePasswordViewModel = new ChangePasswordViewModel() { ReturnUrl = "test_url" };
+            var model = new ChangePasswordViewModel() { ReturnUrl = "test_url" };
 
             // Act
-            IActionResult result = controller.ChangePassword(changePasswordViewModel).Result;
+            IActionResult result = controller.ChangePassword(model).Result;
 
             // Assert
             Assert.IsType<LocalRedirectResult>(result);
@@ -116,14 +116,14 @@ namespace IdentityApp.Tests
         public void ChangePassword_ExistentUserHttpPost_ReturnsBadRequestResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.ChangePasswordAsync(
-                It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()))
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.ChangePasswordAsync(It.IsAny<User>(),
+                It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(Task.Run(() => IdentityResult.Success));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.ChangePassword(new ChangePasswordViewModel()).Result;
@@ -136,11 +136,11 @@ namespace IdentityApp.Tests
         public void ChangePassword_NonExistentUserHttpPost_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.ChangePassword(new ChangePasswordViewModel()).Result;
@@ -153,11 +153,11 @@ namespace IdentityApp.Tests
         public void ChangePassword_InvalidModelHttpPost_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
             controller.ModelState.AddModelError("", "");
 
             // Act
@@ -171,11 +171,11 @@ namespace IdentityApp.Tests
         public void FindUser_ExistentUser_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(It.IsAny<string>()))
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(It.IsAny<string>()))
                 .Returns(Task.Run(() => new User()));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.FindUser("").Result;
@@ -188,11 +188,11 @@ namespace IdentityApp.Tests
         public void FindUser_NoExistentgUser_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByNameAsync(
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByNameAsync(
                 It.IsAny<string>())).Returns(Task.Run(() => (User)null));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.FindUser("").Result;
@@ -205,13 +205,13 @@ namespace IdentityApp.Tests
         public void UserReaders_ExistentUser_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.GetAllFollowings())
-                .Returns(Utility.GetQueryableMockDbSet(new List<Following>()));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.GetAllFollowings())
+                .Returns(Utility.ToDbSet(new List<Following>()));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.UserReaders("").Result;
@@ -224,11 +224,11 @@ namespace IdentityApp.Tests
         public void UserReaders_NonexistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.UserReaders("").Result;
@@ -241,13 +241,13 @@ namespace IdentityApp.Tests
         public void  UserFollows_ExistentUser_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => new User()));
-            mockRepository.Setup(repository => repository.GetAllFollowings())
-                .Returns(Utility.GetQueryableMockDbSet(new List<Following>()));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => new User()));
+            repository.Setup(repo => repo.GetAllFollowings())
+                .Returns(Utility.ToDbSet(new List<Following>()));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.UserFollows("").Result;
@@ -260,11 +260,11 @@ namespace IdentityApp.Tests
         public void UserFollows_NonexistentUser_ReturnsNotFoundResult()
         {
             // Arrange
-            var mockRepository = new Mock<IUsersControllable>();
-            mockRepository.Setup(repository => repository.FindByIdAsync(
-                It.IsAny<string>())).Returns(Task.Run(() => (User)null));
+            var repository = new Mock<IUsersControllable>();
+            repository.Setup(repo => repo.FindByIdAsync(It.IsAny<string>()))
+                .Returns(Task.Run(() => (User)null));
 
-            var controller = new UsersController(mockRepository.Object);
+            UsersController controller = new UsersController(repository.Object);
 
             // Act
             IActionResult result = controller.UserFollows("").Result;
