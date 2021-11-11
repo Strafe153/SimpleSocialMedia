@@ -23,16 +23,16 @@ namespace IdentityApp.Tests
             return list;
         }
 
-        internal static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
+        internal static DbSet<T> ToDbSet<T>(List<T> sourceList) where T : class
         {
-            var queryable = sourceList.AsQueryable();
+            IQueryable<T> queryable = sourceList.AsQueryable();
 
             var dbSet = new Mock<DbSet<T>>();
-            dbSet.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            dbSet.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-            dbSet.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => sourceList.Add(s));
+            dbSet.As<IQueryable<T>>().Setup(list => list.Provider).Returns(queryable.Provider);
+            dbSet.As<IQueryable<T>>().Setup(list => list.Expression).Returns(queryable.Expression);
+            dbSet.As<IQueryable<T>>().Setup(list => list.ElementType).Returns(queryable.ElementType);
+            dbSet.As<IQueryable<T>>().Setup(list => list.GetEnumerator()).Returns(() => queryable.GetEnumerator());
+            dbSet.Setup(list => list.Add(It.IsAny<T>())).Callback<T>((s) => sourceList.Add(s));
 
             return dbSet.Object;
         }

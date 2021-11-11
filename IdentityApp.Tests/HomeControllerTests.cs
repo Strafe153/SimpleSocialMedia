@@ -13,8 +13,8 @@ namespace IdentityApp.Tests
         public void Index_DefaultParameters_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IHomeControllable>();
-            var controller = new HomeController(mockRepository.Object);
+            var repository = new Mock<IHomeControllable>();
+            HomeController controller = new HomeController(repository.Object);
             Utility.MockUserIdentityName(controller);
 
             // Act
@@ -28,8 +28,8 @@ namespace IdentityApp.Tests
         public void Feed_AuthenticatedUser_ReturnsViewResult()
         {
             // Arrange
-            var mockRepository = new Mock<IHomeControllable>();
-            var controller = new HomeController(mockRepository.Object);
+            var repository = new Mock<IHomeControllable>();
+            HomeController controller = new HomeController(repository.Object);
             Utility.MockUserIdentityName(controller);
 
             // Act
@@ -43,8 +43,8 @@ namespace IdentityApp.Tests
         public void Feed_UnauthenticatedUser_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IHomeControllable>();
-            var controller = new HomeController(mockRepository.Object);
+            var repository = new Mock<IHomeControllable>();
+            HomeController controller = new HomeController(repository.Object);
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
 
             // Act

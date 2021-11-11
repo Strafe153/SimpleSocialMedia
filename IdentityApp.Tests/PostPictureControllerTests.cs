@@ -16,14 +16,15 @@ namespace IdentityApp.Tests
         public void Delete_NonEmptyPostPictureArray_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IPostPictureControllable>();
-            mockRepository.Setup(repository => repository.FirstOrDefaultAsync(
-                It.IsAny<Expression<Func<PostPicture, bool>>>())).Returns(Task.Run(() => new PostPicture()));
+            var repository = new Mock<IPostPictureControllable>();
+            repository.Setup(repo => repo.FirstOrDefaultAsync(
+                It.IsAny<Expression<Func<PostPicture, bool>>>()))
+                .Returns(Task.Run(() => new PostPicture()));
 
-            var controller = new PostPictureController(mockRepository.Object);
+            PostPictureController controller = new PostPictureController(repository.Object);
 
             // Act
-            IActionResult result = controller.Delete(new string[1], "").Result;
+            IActionResult result = controller.Delete(new string[0], "").Result;
 
             // Assert
             Assert.IsType<RedirectToActionResult>(result);
@@ -33,8 +34,8 @@ namespace IdentityApp.Tests
         public void Delete_EmptyPostPictureArray_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var mockRepository = new Mock<IPostPictureControllable>();
-            var controller = new PostPictureController(mockRepository.Object);
+            var repository = new Mock<IPostPictureControllable>();
+            PostPictureController controller = new PostPictureController(repository.Object);
 
             // Act
             IActionResult result = controller.Delete(new string[0], "").Result;
