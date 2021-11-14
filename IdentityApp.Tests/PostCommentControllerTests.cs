@@ -171,6 +171,7 @@ namespace IdentityApp.Tests
             ManagePostCommentViewModel model = new ManagePostCommentViewModel()
             {
                 CommentId = "test_comment_id",
+                Content = "test_content",
                 ReturnUrl = ""
             };
 
