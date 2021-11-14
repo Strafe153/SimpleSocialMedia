@@ -178,7 +178,6 @@ namespace IdentityApp.Tests
                 Id = "test_id",
                 AppendedPostPictures = new FormFileCollection(),
                 Content = "test_content",
-                PostedTime = DateTime.Now,
                 CalledFromAction = "test_action"
             };
 

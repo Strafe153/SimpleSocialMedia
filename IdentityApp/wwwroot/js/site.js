@@ -19,6 +19,12 @@ function hideComments(postId) {
     $(`#hide-comments-btn-${postId}`).css("display", "none");
 }
 
+function showAddCommentPicturesButton(postId) {
+    const currentPicturesButton = $(`#comment-pictures-btn-${postId}`);
+    currentPicturesButton.css("display", "block");
+    $(".comment-pictures-btn").not(currentPicturesButton).css("display", "none");
+}
+
 // Hides a post picture when pressed "Delete" button
 $(".delete-button").on("click", function(event) {
     let postPictureId = $(event.target).attr("value");

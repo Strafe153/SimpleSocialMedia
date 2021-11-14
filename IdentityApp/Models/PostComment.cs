@@ -12,7 +12,7 @@ namespace IdentityApp.Models
         public int Likes { get; set; }
         public bool IsEdited { get; set; }
         public virtual List<LikedComment> LikedComments { get; set; }
-
+        public virtual List<CommentPicture> CommentPictures { get; set; }
 
         public string PostId { get; set; }
         public virtual Post Post { get; set; }
@@ -20,6 +20,7 @@ namespace IdentityApp.Models
         public PostComment()
         {
             LikedComments = new List<LikedComment>();
+            CommentPictures = new List<CommentPicture>();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace IdentityApp.ViewModels
 {
@@ -8,8 +9,9 @@ namespace IdentityApp.ViewModels
         public string CommentAuthorName { get; set; }
 
         [MaxLength(200)]
-        public string PostContent { get; set; }
+        public string CommentContent { get; set; }
 
+        public IFormFileCollection CommentPictures { get; set; }
         public string ReturnUrl { get; set; }
         public int Page { get; set; }
     }
