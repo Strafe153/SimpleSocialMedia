@@ -109,7 +109,6 @@ namespace IdentityApp.Controllers
             {
                 Id = post.Id,
                 Content = post.Content,
-                PostedTime = post.PostedTime,
                 UserId = post.UserId,
                 UserName = post.User.UserName,
                 CalledFromAction = returnUrl,
@@ -139,7 +138,6 @@ namespace IdentityApp.Controllers
 
                         AddPostPicturesToPost(model.AppendedPostPictures, post);
                         post.Content = model.Content;
-                        post.PostedTime = model.PostedTime;
                         post.IsEdited = true;
 
                         _repository.Update(post);

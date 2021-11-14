@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace IdentityApp.Controllers
 {
@@ -27,7 +32,7 @@ namespace IdentityApp.Controllers
 
                 if (post != null)
                 {
-                    if (string.IsNullOrEmpty(model.PostContent))
+                    if (string.IsNullOrEmpty(model.CommentContent))
                     {
                         ModelState.AddModelError("", "The length of your " +
                             "comment must be between 1 and 200 symbols");
@@ -39,12 +44,13 @@ namespace IdentityApp.Controllers
                         {
                             Id = Guid.NewGuid().ToString(),
                             Author = model.CommentAuthorName,
-                            Content = model.PostContent,
+                            Content = model.CommentContent,
                             CommentedTime = DateTime.Now,
                             IsEdited = false,
                             PostId = post.Id
                         };
 
+                        AddPicturesToComment(model.CommentPictures, postComment);
                         post.PostComments.Add(postComment);
                         await _repository.SaveChangesAsync();
                         _repository.LogInformation($"User {model.CommentAuthorName} created a comment");
@@ -52,7 +58,7 @@ namespace IdentityApp.Controllers
                         if (model.ReturnUrl.Contains("Account"))
                         {
                             return RedirectToAction("Index", "Account", new { 
-                                userName = post.User.UserName, page = model.PostContent });
+                                userName = post.User.UserName, page = model.CommentContent });
                         }
 
                         return RedirectToAction(model.ReturnUrl.Contains("Feed") 
@@ -122,8 +128,10 @@ namespace IdentityApp.Controllers
                     Content = comment.Content,
                     Author = comment.Author,
                     CommentedPostUser = comment.Post.User.UserName,
-                    Page = page,
-                    ReturnUrl = calledFromAction
+                    CommentPictures = comment.CommentPictures.OrderByDescending(
+                        pic => pic.UploadedTime).AsEnumerable(),
+                    ReturnUrl = calledFromAction,
+                    Page = page
                 };
 
                 return View(model);
@@ -145,20 +153,38 @@ namespace IdentityApp.Controllers
                 return NotFound();
             }
 
-            comment.Content = model.Content;
-            comment.IsEdited = true;
-            _repository.GetAllComments().Update(comment);
-            await _repository.SaveChangesAsync();
-            _repository.LogInformation($"User {model.Author}'s post was edited");
+            CheckCommentPicturesCount(model.AppendedCommentPictures, comment.CommentPictures);
 
-            if (model.ReturnUrl.Contains("Account"))
+            if (ModelState.IsValid)
             {
-                return RedirectToAction("Index", "Account", new { 
-                    userName = model.CommentedPostUser, page = model.Page });
+                if (model.Content != null)
+                {
+                    AddPicturesToComment(model.AppendedCommentPictures, comment);
+                    comment.Content = model.Content;
+                    comment.IsEdited = true;
+
+                    _repository.GetAllComments().Update(comment);
+                    await _repository.SaveChangesAsync();
+                    _repository.LogInformation($"User {model.Author}'s post was edited");
+
+                    if (model.ReturnUrl.Contains("Account"))
+                    {
+                        return RedirectToAction("Index", "Account", new {
+                            userName = model.CommentedPostUser, page = model.Page });
+                    }
+
+                    return RedirectToAction(model.ReturnUrl.Contains("Feed")
+                        ? "Feed" : "Index", "Home", new { page = model.Page });
+                }
+                else
+                {
+                    ModelState.AddModelError("", "The length of your comment must be between 1 and 200 symbols");
+                }
             }
 
-            return RedirectToAction(model.ReturnUrl.Contains("Feed")
-                ? "Feed" : "Index", "Home", new { page = model.Page });
+            model.CommentPictures = comment.CommentPictures.OrderByDescending(pic => pic.UploadedTime);
+            _repository.LogWarning("ManagePostCommentViewModel is not valid");
+            return View(model);
         }
 
         public async Task<IActionResult> Like(CommentLikeViewModel model)
@@ -220,6 +246,80 @@ namespace IdentityApp.Controllers
                 commentToLike.Likes++;
                 _repository.LogInformation($"User {user.UserName} liked a comment");
             }
+        }
+
+        private void AddPicturesToComment(IFormFileCollection picturesToAdd, PostComment comment)
+        {
+            if (picturesToAdd != null)
+            {
+                foreach (IFormFile picture in picturesToAdd)
+                {
+                    byte[] pictureData = null;
+
+                    using (BinaryReader binaryReader = new BinaryReader(picture.OpenReadStream()))
+                    {
+                        pictureData = binaryReader.ReadBytes((int)picture.Length);
+                    }
+
+                    pictureData = ResizeImage(pictureData);
+
+                    CommentPicture commentPicture = new CommentPicture()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        PictureData = pictureData,
+                        UploadedTime = DateTime.Now
+                    };
+
+                    comment.CommentPictures.Add(commentPicture);
+                }
+            }
+        }
+
+        private void CheckCommentPicturesCount(IFormFileCollection appendedCommentPictures,
+            IEnumerable<CommentPicture> commentPictures = null)
+        {
+            string errorMessage = "A comment can contain up to 5 pictures";
+
+            if (appendedCommentPictures != null)
+            {
+                if (appendedCommentPictures.Count() > 5)
+                {
+                    ModelState.AddModelError("", errorMessage);
+                    _repository.LogWarning(errorMessage);
+                    return;
+                }
+
+                if (commentPictures != null)
+                {
+                    if (commentPictures.Count() + appendedCommentPictures.Count() > 5)
+                    {
+                        ModelState.AddModelError("", errorMessage);
+                        _repository.LogWarning(errorMessage);
+                    }
+                }
+            }
+        }
+
+        private byte[] ResizeImage(byte[] imageToResize)
+        {
+            byte[] resizedImage = null;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (Image image = Image.Load(imageToResize))
+                {
+                    int height = 200;
+                    double coefficient = (double)image.Height / height;
+                    double width = image.Width / coefficient;
+
+                    image.Mutate(img => img.Resize((int)width, height));
+                    image.Save(memoryStream, new PngEncoder());
+                }
+
+                resizedImage = memoryStream.ToArray();
+            }
+
+            return resizedImage;
         }
     }
 }

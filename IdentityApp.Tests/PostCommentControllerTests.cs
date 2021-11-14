@@ -28,7 +28,7 @@ namespace IdentityApp.Tests
             CreatePostCommentViewModel model = new CreatePostCommentViewModel()
             {
                 PostId = "test_post_id",
-                PostContent = "test_content",
+                CommentContent = "test_content",
                 ReturnUrl = "",
                 Page = 1
             };
