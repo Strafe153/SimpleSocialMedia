@@ -6,11 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
+using IdentityApp.Utilities;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Formats.Png;
 
 namespace IdentityApp.Controllers
 {
@@ -261,7 +259,7 @@ namespace IdentityApp.Controllers
                         pictureData = binaryReader.ReadBytes((int)picture.Length);
                     }
 
-                    pictureData = ResizeImage(pictureData);
+                    pictureData = PictureUtility.ResizeImage(pictureData, 200);
 
                     CommentPicture commentPicture = new CommentPicture()
                     {
@@ -298,28 +296,6 @@ namespace IdentityApp.Controllers
                     }
                 }
             }
-        }
-
-        private byte[] ResizeImage(byte[] imageToResize)
-        {
-            byte[] resizedImage = null;
-
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (Image image = Image.Load(imageToResize))
-                {
-                    int height = 200;
-                    double coefficient = (double)image.Height / height;
-                    double width = image.Width / coefficient;
-
-                    image.Mutate(img => img.Resize((int)width, height));
-                    image.Save(memoryStream, new PngEncoder());
-                }
-
-                resizedImage = memoryStream.ToArray();
-            }
-
-            return resizedImage;
         }
     }
 }
