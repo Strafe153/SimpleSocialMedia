@@ -10,10 +10,5 @@ namespace IdentityApp.ViewModels
         public string Country { get; set; }
         public int Page { get; set; } = 1;
         public SortState SortOrder { get; set; } 
-
-        public AdminPanelViewModel()
-        {
-            SortOrder = SortState.NameAscending;
-        }
     }
 }
