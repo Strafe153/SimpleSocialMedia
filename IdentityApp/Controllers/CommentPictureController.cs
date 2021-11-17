@@ -18,7 +18,7 @@ namespace IdentityApp.Controllers
         {
             foreach (string pictureId in commentPictureIds)
             {
-                CommentPicture picture = await _repository.FirstOrDefaultAsync(pic => pic.Id == pictureId);
+                CommentPicture picture = await _repository.FirstOrDefaultAsync(p => p.Id == pictureId);
 
                 if (picture != null)
                 {

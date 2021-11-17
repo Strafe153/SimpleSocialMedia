@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
+using IdentityApp.Utilities;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
 
@@ -34,7 +35,7 @@ namespace IdentityApp.Controllers
 
             if (user != null)
             {
-                IEnumerable<Post> allPosts = user.Posts.OrderByDescending(post => post.PostedTime);
+                IEnumerable<Post> allPosts = user.Posts.OrderByDescending(p => p.PostedTime);
                 IEnumerable<Post> currentUserPosts = allPosts.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
 
                 UserProfileViewModel viewModel = new UserProfileViewModel()
@@ -68,25 +69,25 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User existingUser = await _repository.FirstOrDefaultAsync(user => 
-                    user.UserName == model.UserName || user.Email == model.Email);
+                User existingUser = await _repository.FirstOrDefaultAsync(u => 
+                    u.UserName == model.UserName || u.Email == model.Email);
 
                 if (existingUser == null)
                 {
-                    User user = new User()
+                    User newUser = new User()
                     {
                         Email = model.Email,
                         UserName = model.UserName
                     };
 
-                    await SetDefaultProfilePicture(user);
-                    IdentityResult result = await _repository.CreateAsync(user, model.Password);
+                    await SetDefaultProfilePicture(newUser);
+                    IdentityResult result = await _repository.CreateAsync(newUser, model.Password);
 
                     if (result.Succeeded)
                     {
-                        await _repository.AddToRoleAsync(user, "user");
-                        await _repository.SignInAsync(user, false);
-                        _repository.LogInformation($"Created user {user.UserName}");
+                        await _repository.AddToRoleAsync(newUser, "user");
+                        await _repository.SignInAsync(newUser, false);
+                        _repository.LogInformation($"Created user {newUser.UserName}");
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -95,7 +96,7 @@ namespace IdentityApp.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
-                        _repository.LogWarning($"Failed to create user {user.UserName}");
+                        _repository.LogWarning($"Failed to create user {newUser.UserName}");
                     }
                 }
                 else
@@ -187,7 +188,7 @@ namespace IdentityApp.Controllers
                 Country = user.Country,
                 City = user.City,
                 Company = user.Company,
-                ProfilePicture = ConvertByteArrayToIFormFile(user.ProfilePicture),
+                ProfilePicture = PictureUtility.ConvertByteArrayToIFormFile(user.ProfilePicture),
                 CalledFromAction = returnUrl,
                 AuthenticatedUserRoles = authenticatedUser != null
                     ? await _repository.GetRolesAsync(authenticatedUser)
@@ -237,7 +238,7 @@ namespace IdentityApp.Controllers
             }
 
             model.UserName = user.UserName;
-            model.ProfilePicture = ConvertByteArrayToIFormFile(user.ProfilePicture);
+            model.ProfilePicture = PictureUtility.ConvertByteArrayToIFormFile(user.ProfilePicture);
 
             _repository.LogWarning("EditUserViewModel is not valid");
             return View(model);
@@ -285,8 +286,8 @@ namespace IdentityApp.Controllers
                 return NotFound();
             }
 
-            Following followed = authenticatedUser.FollowingUsers.FirstOrDefault(followed => 
-                followed.FollowedUserId == userToUnfollow.Id && followed.ReaderId == authenticatedUser.Id);
+            Following followed = authenticatedUser.FollowingUsers.FirstOrDefault(f => 
+                f.FollowedUserId == userToUnfollow.Id && f.ReaderId == authenticatedUser.Id);
 
             authenticatedUser.FollowingUsers.Remove(followed);
             authenticatedUser.FollowsCount--;
@@ -309,34 +310,11 @@ namespace IdentityApp.Controllers
             }
         }
 
-        private IFormFile ConvertByteArrayToIFormFile(byte[] bytePicture)
-        {
-            Stream stream = new MemoryStream(bytePicture);
-            IFormFile formFilePicture = new FormFile(stream, 0, bytePicture.Length, 
-                "default_profile_picture", "default_profile_pic.jpg");
-
-            return formFilePicture;
-        }
-
-        private byte[] ConvertIFormFileToByteArray(IFormFile formFilePicture, byte[] bytePicture)
-        {
-            if (formFilePicture != null)
-            {
-                using (BinaryReader binaryReader = new BinaryReader(formFilePicture.OpenReadStream()))
-                {
-                    bytePicture = binaryReader.ReadBytes((int)formFilePicture.Length);
-                }
-            }
-
-            return bytePicture;
-        }
-
         private void CheckIfUserNameIsTaken(EditUserViewModel model, User user)
         {
             if (user != null)
             {
-                IEnumerable<string> userNames = _repository.GetAllUsers()
-                    .Select(user => user.UserName).AsEnumerable();
+                IEnumerable<string> userNames = _repository.GetAllUsers().Select(u => u.UserName).AsEnumerable();
 
                 foreach (string userName in userNames)
                 {
@@ -358,7 +336,8 @@ namespace IdentityApp.Controllers
             user.Country = model.Country;
             user.City = model.City;
             user.Company = model.Company;
-            user.ProfilePicture = ConvertIFormFileToByteArray(model.ProfilePicture, user.ProfilePicture);
+            user.ProfilePicture = PictureUtility.ConvertIFormFileToByteArray(
+                model.ProfilePicture, user.ProfilePicture);
         }
 
         private async Task ReloginUserOnUserNameChanged(bool isUserNameChanged, User user)

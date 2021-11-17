@@ -28,8 +28,7 @@ namespace IdentityApp.Controllers
         {
             if (!string.IsNullOrEmpty(userId))
             {
-                User user = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllUsers(), user => user.Id == userId);
+                User user = await _repository.FirstOrDefaultAsync(_repository.GetAllUsers(), u => u.Id == userId);
 
                 if (user != null)
                 {
@@ -50,7 +49,7 @@ namespace IdentityApp.Controllers
             if (ModelState.IsValid)
             {
                 User user = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllUsers(), user => user.Id == model.User.Id);
+                    _repository.GetAllUsers(), u => u.Id == model.User.Id);
 
                 Post post = new Post()
                 {
@@ -95,7 +94,7 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(string postId, string returnUrl, int page)
         {
             Post post = await _repository.FirstOrDefaultAsync(
-                _repository.GetAllPosts(), post => post.Id == postId);
+                _repository.GetAllPosts(), p => p.Id == postId);
 
             if (post == null)
             {
@@ -122,7 +121,7 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(EditPostViewModel model)
         {
             Post post = await _repository.FirstOrDefaultAsync(
-                _repository.GetAllPosts(), post => post.Id == model.Id);
+                _repository.GetAllPosts(), p => p.Id == model.Id);
 
             if (post != null)
             {
@@ -171,15 +170,15 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Delete(string postId, string returnUrl, int page)
         {
             Post post = await _repository.FirstOrDefaultAsync(
-                _repository.GetAllPosts(), post => post.Id == postId);
+                _repository.GetAllPosts(), p => p.Id == postId);
             User user = await _repository.FindByIdAsync(post.UserId);
 
             if (post != null)
             {
                 IEnumerable<LikedPost> likedPosts = _repository.GetAllLikedPosts()
-                    .Where(likedPost => likedPost.PostLikedId == post.Id).AsEnumerable();
+                    .Where(lp => lp.PostLikedId == post.Id).AsEnumerable();
                 IEnumerable<PostComment> comments = _repository.GetAllPostComments()
-                    .Where(comment => comment.PostId == post.Id).AsEnumerable();
+                    .Where(c => c.PostId == post.Id).AsEnumerable();
                 IEnumerable<LikedComment> likedComments = _repository.GetAllLikedPostComments();
 
                 if (likedPosts != null)
@@ -216,12 +215,12 @@ namespace IdentityApp.Controllers
             if (user != null)
             {
                 Post post = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllPosts(), post => post.Id == model.PostId);
+                    _repository.GetAllPosts(), p => p.Id == model.PostId);
 
                 if (post != null)
                 {
-                    LikedPost postToCheck = user.LikedPosts.FirstOrDefault(post =>
-                        post.UserWhoLikedId == model.UserId && post.PostLikedId == model.PostId);
+                    LikedPost postToCheck = user.LikedPosts.FirstOrDefault(lp =>
+                        lp.UserWhoLikedId == model.UserId && lp.PostLikedId == model.PostId);
 
                     LikeDislikePost(post, postToCheck, user);
                     await _repository.SaveChangesAsync();
@@ -308,8 +307,13 @@ namespace IdentityApp.Controllers
             }
             else
             {
-                user.LikedPosts.Add(new LikedPost() { 
-                    UserWhoLikedId = user.Id, UserWhoLiked = user, PostLikedId = postToLike.Id, PostLiked = postToLike });
+                user.LikedPosts.Add(new LikedPost() 
+                { 
+                    UserWhoLikedId = user.Id, 
+                    UserWhoLiked = user, 
+                    PostLikedId = postToLike.Id, 
+                    PostLiked = postToLike 
+                });
                 postToLike.Likes++;
                 _repository.LogInformation($"User {user.UserName} liked a post");
             }

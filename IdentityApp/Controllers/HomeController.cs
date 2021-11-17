@@ -21,7 +21,7 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Index(int page = 1)
         {
             const int PAGE_SIZE = 5;
-            IEnumerable<Post> allPosts = _repository.GetAllPosts().OrderByDescending(post => post.PostedTime);
+            IEnumerable<Post> allPosts = _repository.GetAllPosts().OrderByDescending(p => p.PostedTime);
             IEnumerable<Post> currentPagePosts = allPosts.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
             User authenticatedUser = null;
 

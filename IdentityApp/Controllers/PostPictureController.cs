@@ -19,7 +19,7 @@ namespace IdentityApp.Controllers
             foreach (string postPicId in postPictureIds)
             {
                 PostPicture postPicture = await _repository.FirstOrDefaultAsync(
-                    picture => picture.Id == postPicId);
+                    p => p.Id == postPicId);
 
                 if (postPicture != null)
                 {
