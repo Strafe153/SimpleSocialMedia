@@ -26,7 +26,7 @@ namespace IdentityApp.Controllers
             if (!string.IsNullOrEmpty(model.PostId))
             {
                 Post post = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllPosts(), post => post.Id == model.PostId);
+                    _repository.GetAllPosts(), p => p.Id == model.PostId);
 
                 if (post != null)
                 {
@@ -72,14 +72,14 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Delete(ManagePostCommentViewModel model)
         {
             PostComment comment = await _repository.FirstOrDefaultAsync(
-                _repository.GetAllComments(), comment => comment.Id == model.CommentId);
+                _repository.GetAllComments(), c => c.Id == model.CommentId);
             Post post = await _repository.FirstOrDefaultAsync(
-                _repository.GetAllPosts(), post => post.Id == comment.PostId);
+                _repository.GetAllPosts(), p => p.Id == comment.PostId);
 
             if (comment != null)
             {
                 IEnumerable<LikedComment> likedComments = _repository.GetAllLikedComments()
-                    .Where(likedComment => likedComment.CommentLikedId == comment.Id).AsEnumerable();
+                    .Where(lc => lc.CommentLikedId == comment.Id).AsEnumerable();
 
                 if (likedComments != null)
                 {
@@ -112,7 +112,7 @@ namespace IdentityApp.Controllers
             if (!string.IsNullOrEmpty(postCommentId))
             {
                 PostComment comment = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllComments(), comment => comment.Id == postCommentId);
+                    _repository.GetAllComments(), c => c.Id == postCommentId);
 
                 if (comment == null)
                 {
@@ -127,7 +127,7 @@ namespace IdentityApp.Controllers
                     Author = comment.Author,
                     CommentedPostUser = comment.Post.User.UserName,
                     CommentPictures = comment.CommentPictures.OrderByDescending(
-                        pic => pic.UploadedTime).AsEnumerable(),
+                        cp => cp.UploadedTime).AsEnumerable(),
                     ReturnUrl = calledFromAction,
                     Page = page
                 };
@@ -143,7 +143,7 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Edit(ManagePostCommentViewModel model)
         {
             PostComment comment = await _repository.FirstOrDefaultAsync(
-                _repository.GetAllComments(), comment => comment.Id == model.CommentId);
+                _repository.GetAllComments(), c => c.Id == model.CommentId);
 
             if (comment == null)
             {
@@ -180,7 +180,7 @@ namespace IdentityApp.Controllers
                 }
             }
 
-            model.CommentPictures = comment.CommentPictures.OrderByDescending(pic => pic.UploadedTime);
+            model.CommentPictures = comment.CommentPictures.OrderByDescending(cp => cp.UploadedTime);
             _repository.LogWarning("ManagePostCommentViewModel is not valid");
             return View(model);
         }
@@ -192,12 +192,12 @@ namespace IdentityApp.Controllers
             if (user != null)
             {
                 PostComment comment = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllComments(), comment => comment.Id == model.CommentId);
+                    _repository.GetAllComments(), c => c.Id == model.CommentId);
 
                 if (comment != null)
                 {
-                    LikedComment commentToCheck = user.LikedComments.FirstOrDefault(comment =>
-                        comment.UserWhoLikedId == model.UserId && comment.CommentLikedId == model.CommentId);
+                    LikedComment commentToCheck = user.LikedComments.FirstOrDefault(c =>
+                        c.UserWhoLikedId == model.UserId && c.CommentLikedId == model.CommentId);
 
                     LikeDislikeComment(comment, commentToCheck, user);
                     await _repository.SaveChangesAsync();

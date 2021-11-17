@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.IO;
+using IdentityApp.Models.AbstractModels;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Png;
@@ -26,6 +29,28 @@ namespace IdentityApp.Utilities
             }
 
             return resizedImage;
+        }
+
+        public static IFormFile ConvertByteArrayToIFormFile(byte[] bytePicture)
+        {
+            Stream stream = new MemoryStream(bytePicture);
+            IFormFile formFilePicture = new FormFile(stream, 0, bytePicture.Length,
+                "default_profile_picture", "default_profile_pic.jpg");
+
+            return formFilePicture;
+        }
+
+        public static byte[] ConvertIFormFileToByteArray(IFormFile formFilePicture, byte[] bytePicture)
+        {
+            if (formFilePicture != null)
+            {
+                using (BinaryReader binaryReader = new BinaryReader(formFilePicture.OpenReadStream()))
+                {
+                    bytePicture = binaryReader.ReadBytes((int)formFilePicture.Length);
+                }
+            }
+
+            return bytePicture;
         }
     }
 }

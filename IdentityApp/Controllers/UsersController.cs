@@ -26,14 +26,16 @@ namespace IdentityApp.Controllers
         public async Task<IActionResult> Index(AdminPanelViewModel model)
         {
             const int PAGE_SIZE = 5;
-
             IQueryable<User> users = _repository.GetAllUsers();
             FilterUsers(ref users, model.UserName, model.Email,model.Year, model.Country);
+
             users = SortByParameter(users, model.SortOrder);
 
             int usersNumber = await users.CountAsync();
             IEnumerable<User> currentPageUsers = users
-                .Skip((model.Page - 1) * PAGE_SIZE).Take(PAGE_SIZE).AsEnumerable();
+                .Skip((model.Page - 1) * PAGE_SIZE)
+                .Take(PAGE_SIZE)
+                .AsEnumerable();
 
             var filterSortPageViewModel = new FilterSortPageViewModel()
             {
@@ -55,19 +57,19 @@ namespace IdentityApp.Controllers
             if (userToDelete != null)
             {
                 IEnumerable<Following> userFollowings = _repository.GetAllFollowings()
-                    .Where(following => following.ReaderId == userToDelete.Id);
+                    .Where(f => f.ReaderId == userToDelete.Id);
                 IEnumerable<Following> userReaders = _repository.GetAllFollowings()
-                    .Where(following => following.FollowedUserId == userToDelete.Id);
+                    .Where(f => f.FollowedUserId == userToDelete.Id);
                 IEnumerable<LikedPost> userLikes = _repository.GetAllLikedPosts()
-                    .Where(likedPost => likedPost.UserWhoLikedId == userToDelete.Id);
-                IEnumerable<LikedPost> userPosts = from post in userToDelete.Posts
-                                                   from likedPost in _repository.GetAllLikedPosts()
-                                                   where likedPost.PostLikedId == post.Id
-                                                   select likedPost;
+                    .Where(p => p.UserWhoLikedId == userToDelete.Id);
+                IEnumerable<LikedPost> userPosts = from p in userToDelete.Posts
+                                                   from lp in _repository.GetAllLikedPosts()
+                                                   where lp.PostLikedId == p.Id
+                                                   select lp;
 
-                userFollowings.ToList().ForEach(following => following.FollowedUser.ReadersCount--);
-                userReaders.ToList().ForEach(following => following.Reader.FollowsCount--);
-                userLikes.ToList().ForEach(likedPost => likedPost.PostLiked.Likes--);
+                userFollowings.ToList().ForEach(f => f.FollowedUser.ReadersCount--);
+                userReaders.ToList().ForEach(f => f.Reader.FollowsCount--);
+                userLikes.ToList().ForEach(lp => lp.PostLiked.Likes--);
 
                 _repository.GetAllFollowings().RemoveRange(userFollowings);
                 _repository.GetAllFollowings().RemoveRange(userReaders);
@@ -82,9 +84,7 @@ namespace IdentityApp.Controllers
                 await _repository.DeleteAsync(userToDelete);
                 await _repository.SaveChangesAsync();
                 _repository.LogInformation($"Deleted user {userToDelete.UserName}");
-
-                return RedirectToAction("Index", returnUrl.Contains("users",
-                    StringComparison.OrdinalIgnoreCase) ? "Users" : "Home");
+                return RedirectToAction("Index", returnUrl.Contains("Users") ? "Users" : "Home");
             }
             else
             {
@@ -183,8 +183,9 @@ namespace IdentityApp.Controllers
             }
 
             IEnumerable<User> readers = _repository.GetAllFollowings()
-                .Where(following => following.FollowedUserId == user.Id)
-                .Select(following => following.Reader).Distinct();
+                .Where(f => f.FollowedUserId == user.Id)
+                .Select(f => f.Reader)
+                .Distinct();
 
             UserRelationsViewModel model = new UserRelationsViewModel()
             {
@@ -206,8 +207,8 @@ namespace IdentityApp.Controllers
             }
 
             IEnumerable<User> follows = _repository.GetAllFollowings()
-                .Where(following => following.ReaderId == user.Id)
-                .Select(following => following.FollowedUser).Distinct();
+                .Where(f => f.ReaderId == user.Id)
+                .Select(f => f.FollowedUser).Distinct();
 
             UserRelationsViewModel model = new UserRelationsViewModel()
             {
@@ -223,22 +224,22 @@ namespace IdentityApp.Controllers
         {
             if (!string.IsNullOrEmpty(userName))
             {
-                users = users.Where(user => user.UserName.Contains(userName));
+                users = users.Where(u => u.UserName.Contains(userName));
             }
 
             if (!string.IsNullOrEmpty(email))
             {
-                users = users.Where(user => user.Email.Contains(email));
+                users = users.Where(u => u.Email.Contains(email));
             }
 
             if (year.HasValue)
             {
-                users = users.Where(user => user.Year == year.Value);
+                users = users.Where(u => u.Year == year.Value);
             }
 
             if (!string.IsNullOrEmpty(country))
             {
-                users = users.Where(user => user.Country.Contains(country));
+                users = users.Where(u => u.Country.Contains(country));
             }
         }
 
@@ -246,20 +247,13 @@ namespace IdentityApp.Controllers
         {
             return sortOrder switch
             {
-                SortState.NameDescending =>
-                    users.OrderByDescending(user => user.UserName),
-                SortState.EmailAscending =>
-                    users.OrderBy(user => user.Email),
-                SortState.EmailDescending =>
-                    users.OrderByDescending(user => user.Email),
-                SortState.YearAscending =>
-                    users.OrderBy(user => user.Year),
-                SortState.YearDescending =>
-                    users.OrderByDescending(user => user.Year),
-                SortState.CountryAscending =>
-                    users.OrderBy(user => user.Country),
-                SortState.CountryDescending =>
-                    users.OrderByDescending(user => user.Country),
+                SortState.NameDescending => users.OrderByDescending(u => u.UserName),
+                SortState.EmailAscending => users.OrderBy(u => u.Email),
+                SortState.EmailDescending => users.OrderByDescending(u => u.Email),
+                SortState.YearAscending => users.OrderBy(u => u.Year),
+                SortState.YearDescending => users.OrderByDescending(u => u.Year),
+                SortState.CountryAscending => users.OrderBy(u => u.Country),
+                SortState.CountryDescending => users.OrderByDescending(u => u.Country),
                 _ => users.OrderBy(u => u.UserName)
             };
         }
