@@ -9,7 +9,7 @@ using IdentityApp.Interfaces;
 
 namespace IdentityApp.ControllerRepositories
 {
-    public class CommentPictureRepository : ICommentPictureControllable
+    public class CommentPictureRepository : IPictureControllable<CommentPicture>
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;

@@ -7,9 +7,9 @@ namespace IdentityApp.Controllers
 {
     public class CommentPictureController : Controller
     {
-        private readonly ICommentPictureControllable _repository;
+        private readonly IPictureControllable<CommentPicture> _repository;
 
-        public CommentPictureController(ICommentPictureControllable repository)
+        public CommentPictureController(IPictureControllable<CommentPicture> repository)
         {
             _repository = repository;
         }
