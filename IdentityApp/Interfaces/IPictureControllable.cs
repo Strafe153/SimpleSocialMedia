@@ -3,14 +3,15 @@ using System;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using IdentityApp.Models;
+using IdentityApp.Models.AbstractModels;
 
 namespace IdentityApp.Interfaces
 {
-    public interface ICommentPictureControllable
+    public interface IPictureControllable<T> where T: Picture
     {
-        Task<CommentPicture> FirstOrDefaultAsync(Expression<Func<CommentPicture, bool>> predicate);
+        Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
         Task<int> SaveChangesAsync();
-        EntityEntry<CommentPicture> Remove(CommentPicture commentPicture);
+        EntityEntry<T> Remove(T commentPicture);
         void LogInformation(string message);
     }
 }

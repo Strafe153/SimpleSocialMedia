@@ -25,12 +25,12 @@ namespace IdentityApp
             services.AddTransient<IUserValidator<User>, CustomUserValidator>();
             services.AddScoped<IAccountControllable, AccountControllerRepository>();
             services.AddScoped<IHomeControllable, HomeControllerRepository>();
-            services.AddScoped<IPostControllable, PostControllerRepository>();
-            services.AddScoped<IPostPictureControllable, PostPictureRepository>();
             services.AddScoped<IRolesControllable, RolesControllerRepository>();
             services.AddScoped<IUsersControllable, UsersControllerRepository>();
+            services.AddScoped<IPostControllable, PostControllerRepository>();
             services.AddScoped<IPostCommentControllable, PostCommentControllerRepository>();
-            services.AddScoped<ICommentPictureControllable, CommentPictureRepository>();
+            services.AddScoped<IPictureControllable<PostPicture>, PostPictureRepository>();
+            services.AddScoped<IPictureControllable<CommentPicture>, CommentPictureRepository>();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<User, IdentityRole>(options =>

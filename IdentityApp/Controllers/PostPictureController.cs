@@ -7,9 +7,9 @@ namespace IdentityApp.Controllers
 {
     public class PostPictureController : Controller
     {
-        private readonly IPostPictureControllable _repository;
+        private readonly IPictureControllable<PostPicture> _repository;
 
-        public PostPictureController(IPostPictureControllable repository)
+        public PostPictureController(IPictureControllable<PostPicture> repository)
         {
             _repository = repository;
         }
@@ -18,8 +18,7 @@ namespace IdentityApp.Controllers
         {
             foreach (string postPicId in postPictureIds)
             {
-                PostPicture postPicture = await _repository.FirstOrDefaultAsync(
-                    p => p.Id == postPicId);
+                PostPicture postPicture = await _repository.FirstOrDefaultAsync(p => p.Id == postPicId);
 
                 if (postPicture != null)
                 {

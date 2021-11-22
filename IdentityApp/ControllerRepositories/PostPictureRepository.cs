@@ -9,7 +9,7 @@ using IdentityApp.Interfaces;
 
 namespace IdentityApp.ControllerRepositories
 {
-    public class PostPictureRepository : IPostPictureControllable
+    public class PostPictureRepository : IPictureControllable<PostPicture>
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
