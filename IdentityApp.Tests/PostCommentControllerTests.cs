@@ -212,7 +212,7 @@ namespace IdentityApp.Tests
                 .Returns(Task.Run(() => new PostComment()));
 
             PostCommentController controller = new PostCommentController(repository.Object);
-            CommentLikeViewModel model = new CommentLikeViewModel() 
+            LikeViewModel model = new LikeViewModel() 
             { 
                 UserId = "", 
                 ReturnAction = "" 
@@ -234,7 +234,7 @@ namespace IdentityApp.Tests
                 .Returns(Task.Run(() => (User)null));
 
             PostCommentController controller = new PostCommentController(repository.Object);
-            CommentLikeViewModel model = new CommentLikeViewModel() { UserId = "" };
+            LikeViewModel model = new LikeViewModel() { UserId = "" };
 
             // Act
             IActionResult result = controller.Like(model).Result;
@@ -255,7 +255,7 @@ namespace IdentityApp.Tests
                 .Returns(Task.Run(() => (PostComment)null));
 
             PostCommentController controller = new PostCommentController(repository.Object);
-            CommentLikeViewModel model = new CommentLikeViewModel() { UserId = "" };
+            LikeViewModel model = new LikeViewModel() { UserId = "" };
 
             // Act
             IActionResult result = controller.Like(model).Result;

@@ -185,19 +185,19 @@ namespace IdentityApp.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Like(CommentLikeViewModel model)
+        public async Task<IActionResult> Like(LikeViewModel model)
         {
             User user = await _repository.FindByIdAsync(model.UserId);
 
             if (user != null)
             {
                 PostComment comment = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllComments(), c => c.Id == model.CommentId);
+                    _repository.GetAllComments(), c => c.Id == model.Id);
 
                 if (comment != null)
                 {
                     LikedComment commentToCheck = user.LikedComments.FirstOrDefault(c =>
-                        c.UserWhoLikedId == model.UserId && c.CommentLikedId == model.CommentId);
+                        c.UserWhoLikedId == model.UserId && c.CommentLikedId == model.Id);
 
                     LikeDislikeComment(comment, commentToCheck, user);
                     await _repository.SaveChangesAsync();

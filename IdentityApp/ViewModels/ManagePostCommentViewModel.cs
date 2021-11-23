@@ -17,7 +17,7 @@ namespace IdentityApp.ViewModels
         public virtual IEnumerable<CommentPicture> CommentPictures { get; set; }
         public IFormFileCollection AppendedCommentPictures { get; set; }
         public string ReturnUrl { get; set; }
-        public int Page { get; set; }
+        public int Page { get; set; } = 1;
 
         public ManagePostCommentViewModel()
         {

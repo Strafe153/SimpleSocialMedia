@@ -12,7 +12,6 @@ namespace IdentityApp.ViewModels
         [MaxLength(350)]
         public string Content { get; set; }
 
-        public DateTime PostedTime { get; set; }
         public IFormFileCollection PostPictures { get; set; }
         public User User { get; set; }
     }

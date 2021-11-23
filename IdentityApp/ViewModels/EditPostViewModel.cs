@@ -18,7 +18,7 @@ namespace IdentityApp.ViewModels
         public virtual IEnumerable<PostPicture> PostPictures { get; set; } 
         public IFormFileCollection AppendedPostPictures { get; set; }
         public string CalledFromAction { get; set; }
-        public int Page { get; set; }
+        public int Page { get; set; } = 1;
 
         public EditPostViewModel()
         {

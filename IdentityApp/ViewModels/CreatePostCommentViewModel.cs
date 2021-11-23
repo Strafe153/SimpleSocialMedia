@@ -13,6 +13,6 @@ namespace IdentityApp.ViewModels
 
         public IFormFileCollection CommentPictures { get; set; }
         public string ReturnUrl { get; set; }
-        public int Page { get; set; }
+        public int Page { get; set; } = 1;
     }
 }

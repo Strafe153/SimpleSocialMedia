@@ -108,11 +108,10 @@
                 @if (Model.AuthenticatedUser != null)
                 {
                     <a asp-action="Like" asp-controller="Post"
-                        asp-route-PostId="@post.Id"
+                        asp-route-Id="@post.Id"
                         asp-route-UserId="@Model.AuthenticatedUser.Id" 
                         asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                         asp-route-ReturnAction="@Context.Request.Path"
-                        asp-route-LikedPostUserName="@Context.Request.Query["userName"]"
                         class="btn btn-sm px-3 @(Model.AuthenticatedUser.LikedPosts
                             .FirstOrDefault(p => p.PostLiked.Id == post.Id) != null ? "btn-primary" : "btn-outline-primary")">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
@@ -204,7 +203,7 @@
                             {
                                 <a asp-action="Like"
                                     asp-controller="PostComment"
-                                    asp-route-CommentId="@comment.Id"
+                                    asp-route-Id="@comment.Id"
                                     asp-route-UserId="@Model.AuthenticatedUser.Id"
                                     asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                                     asp-route-ReturnAction="@Context.Request.Path"

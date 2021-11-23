@@ -20,7 +20,7 @@
         <div class="mt-2">
             <a asp-action="Like"
                 asp-controller="Post"
-                asp-route-PostId="@post.Id"
+                asp-route-Id="@post.Id"
                 asp-route-UserId="@Model.AuthenticatedUser.Id"
                 asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                 asp-route-ReturnAction="@Context.Request.Path"
@@ -102,7 +102,7 @@
                             {
                                 <a asp-action="Like"
                                     asp-controller="PostComment"
-                                    asp-route-CommentId="@comment.Id"
+                                    asp-route-Id="@comment.Id"
                                     asp-route-UserId="@Model.AuthenticatedUser.Id"
                                     asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
                                     asp-route-ReturnAction="@Context.Request.Path"
