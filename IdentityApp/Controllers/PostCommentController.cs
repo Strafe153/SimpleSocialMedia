@@ -44,7 +44,6 @@ namespace IdentityApp.Controllers
                             Author = model.CommentAuthorName,
                             Content = model.CommentContent,
                             CommentedTime = DateTime.Now,
-                            IsEdited = false,
                             PostId = post.Id
                         };
 
