@@ -2,14 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
-using IdentityApp.ControllerRepositories;
 
 namespace IdentityApp.Controllers
 {
