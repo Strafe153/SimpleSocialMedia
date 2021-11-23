@@ -7,7 +7,6 @@
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="validation alert alert-danger" role="alert"></div>
 
-    <input type="hidden" asp-for="PostedTime" value="@DateTime.Now" />
     <input type="hidden" asp-for="User.UserName" value="@Model.User.UserName" />
     <input type="hidden" asp-for="User.Id" value="@Model.User.Id" />
     <input type="hidden" asp-for="Id" value="@System.Guid.NewGuid().ToString()" />

@@ -55,7 +55,7 @@ namespace IdentityApp.Controllers
                 {
                     Id = model.Id,
                     Content = model.Content,
-                    PostedTime = model.PostedTime
+                    PostedTime = DateTime.Now
                 };
 
                 AddPostPicturesToPost(model.PostPictures, post);
@@ -208,19 +208,19 @@ namespace IdentityApp.Controllers
                 ? "Feed" : "Index", "Home", new { page = page });
         }
 
-        public async Task<IActionResult> Like(PostLikeViewModel model)
+        public async Task<IActionResult> Like(LikeViewModel model)
         {
             User user = await _repository.FindByIdAsync(model.UserId);
 
             if (user != null)
             {
                 Post post = await _repository.FirstOrDefaultAsync(
-                    _repository.GetAllPosts(), p => p.Id == model.PostId);
+                    _repository.GetAllPosts(), p => p.Id == model.Id);
 
                 if (post != null)
                 {
                     LikedPost postToCheck = user.LikedPosts.FirstOrDefault(lp =>
-                        lp.UserWhoLikedId == model.UserId && lp.PostLikedId == model.PostId);
+                        lp.UserWhoLikedId == model.UserId && lp.PostLikedId == model.Id);
 
                     LikeDislikePost(post, postToCheck, user);
                     await _repository.SaveChangesAsync();
@@ -234,7 +234,7 @@ namespace IdentityApp.Controllers
                 if (model.ReturnAction.Contains("Account"))
                 {
                     return RedirectToAction("Index", "Account", 
-                        new { userName = model.LikedPostUserName, page = model.Page });
+                        new { userName = post.User.UserName, page = model.Page });
                 }
 
                 return RedirectToAction(model.ReturnAction.Contains("Feed")

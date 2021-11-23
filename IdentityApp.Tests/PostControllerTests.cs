@@ -68,8 +68,7 @@ namespace IdentityApp.Tests
                 PostPictures = new FormFileCollection(),
                 User = new User(),
                 Id = "test_id",
-                Content = "test_content",
-                PostedTime = DateTime.Now
+                Content = "test_content"
             };
 
             // Act
@@ -288,10 +287,10 @@ namespace IdentityApp.Tests
                 .Returns(Task.Run(() => new Post()));
 
             PostController controller = new PostController(repository.Object);
-            PostLikeViewModel model = new PostLikeViewModel()
+            LikeViewModel model = new LikeViewModel()
             {
                 UserId = "test_user_id",
-                PostId = "test_post_id",
+                Id = "test_post_id",
                 ReturnAction = ""
             };
 
@@ -313,7 +312,7 @@ namespace IdentityApp.Tests
             PostController controller = new PostController(repository.Object);
 
             // Act
-            IActionResult result = controller.Like(new PostLikeViewModel()).Result;
+            IActionResult result = controller.Like(new LikeViewModel()).Result;
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
