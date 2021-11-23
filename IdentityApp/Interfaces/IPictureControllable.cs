@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
-using IdentityApp.Models;
 using IdentityApp.Models.AbstractModels;
 
 namespace IdentityApp.Interfaces

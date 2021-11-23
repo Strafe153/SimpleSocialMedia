@@ -16,7 +16,7 @@ namespace IdentityApp.Tests
         public void Delete_NonEmptyCommentPictureArray_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var repository = new Mock<IPictureControllable>();
+            var repository = new Mock<IPictureControllable<CommentPicture>>();
             repository.Setup(repo => repo.FirstOrDefaultAsync(
                 It.IsAny<Expression<Func<CommentPicture, bool>>>()))
                 .Returns(Task.Run(() => new CommentPicture()));
@@ -34,7 +34,7 @@ namespace IdentityApp.Tests
         public void Delete_EmptyCommentPictureArray_ReturnsRedirectToActionResult()
         {
             // Arrange
-            var repository = new Mock<IPictureControllable>();
+            var repository = new Mock<IPictureControllable<CommentPicture>>();
             CommentPictureController controller = new CommentPictureController(repository.Object);
 
             // Act
