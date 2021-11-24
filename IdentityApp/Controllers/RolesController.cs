@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -96,24 +97,40 @@ namespace IdentityApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(string userId, 
-            List<string> roles, string returnUrl)
+        public async Task<IActionResult> Edit(ChangeRoleViewModel model)
         {
-            User user = await _repository.FindUserByIdAsync(userId);
+            User user = await _repository.FindUserByIdAsync(model.UserId);
 
             if (user != null)
             {
                 var userRoles = await _repository.GetRolesAsync(user);
-                IEnumerable<string> addedRoles = roles.Except(userRoles);
-                IEnumerable<string> removedRoles = userRoles.Except(roles);
+                IEnumerable<string> addedRoles = model.NewRoles.Except(userRoles);
+                IEnumerable<string> removedRoles = userRoles.Except(model.NewRoles);
 
                 await _repository.AddToRolesAsync(user, addedRoles);
                 await _repository.RemoveFromRolesAsync(user, removedRoles);
                 _repository.LogInformation($"Changed user {user.UserName} roles");
 
-                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                if (user.UserName == User.Identity.Name)
                 {
-                    return LocalRedirect(returnUrl);
+                    await _repository.SignOutAsync();
+                    await _repository.SignInAsync(user, false);
+                }
+
+                if (model.ReturnUrl.Contains("Account"))
+                {
+                    return RedirectToAction("Index", "Account", new { userName = user.UserName });
+                }
+                else
+                {
+                    userRoles = await _repository.GetRolesAsync(user);
+
+                    if (userRoles.Contains("admin"))
+                    {
+                        return RedirectToAction("Index", "Users");
+                    }
+
+                    return RedirectToAction("Index", "Home");
                 }
             }
 

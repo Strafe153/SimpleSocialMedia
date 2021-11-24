@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using IdentityApp.Models;
+using IdentityApp.ViewModels;
 using IdentityApp.Interfaces;
 using IdentityApp.Controllers;
 using Moq;
@@ -126,7 +127,7 @@ namespace IdentityApp.Tests
         }
 
         [Fact]
-        public void Edit_ExistentUserHttpPost_ReturnsLocalRedirectResult()
+        public void Edit_ExistentUserHttpPost_ReturnsRedirectToActionResult()
         {
             // Arrange
             var repository = new Mock<IRolesControllable>();
@@ -139,13 +140,21 @@ namespace IdentityApp.Tests
             urlHelper.Setup(helper => helper.IsLocalUrl(It.IsAny<string>())).Returns(true);
 
             RolesController controller = new RolesController(repository.Object);
+            Utility.MockUserIdentityName(controller);
             controller.Url = urlHelper.Object;
 
+            ChangeRoleViewModel model = new ChangeRoleViewModel() 
+            { 
+                UserId = "",
+                NewRoles = new List<string>(), 
+                ReturnUrl = "test_url" 
+            };
+
             // Act
-            IActionResult result = controller.Edit("", new List<string>(), "test_url").Result;
+            IActionResult result = controller.Edit(model).Result;
 
             // Assert
-            Assert.IsType<LocalRedirectResult>(result);
+            Assert.IsType<RedirectToActionResult>(result);
         }
 
         [Fact]
@@ -158,8 +167,15 @@ namespace IdentityApp.Tests
 
             RolesController controller = new RolesController(repository.Object);
 
+            ChangeRoleViewModel model = new ChangeRoleViewModel()
+            {
+                UserId = "",
+                NewRoles = new List<string>(),
+                ReturnUrl = ""
+            };
+
             // Act
-            IActionResult result = controller.Edit("", new List<string>(), "").Result;
+            IActionResult result = controller.Edit(model).Result;
 
             // Assert
             Assert.IsType<NotFoundResult>(result);

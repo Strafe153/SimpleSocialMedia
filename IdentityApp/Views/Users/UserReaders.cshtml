@@ -4,13 +4,21 @@
     ViewData["Title"] = $"{Model.UserName} - readers";
 }
 
-<table>
-    <tr>
-        @foreach(User user in Model.RelatedUsers)
-        {
-            <td class="pr-5">
-                <a asp-action="Index" asp-controller="Account" asp-route-userName="@user.UserName">@user.UserName</a>
-            </td>
-        }
-    </tr>
-</table>
+@if (Model.RelatedUsers.Count() == 0)
+{
+    <h2>Results: 0</h2>
+    <p>Nobody follows @Model.UserName</p>
+}
+else
+{
+    <table>
+        <tr>
+            @foreach(User user in Model.RelatedUsers)
+            {
+                <td class="pr-5">
+                    <a asp-action="Index" asp-controller="Account" asp-route-userName="@user.UserName">@user.UserName</a>
+                </td>
+            }
+        </tr>
+    </table>
+}

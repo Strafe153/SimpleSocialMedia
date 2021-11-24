@@ -11,13 +11,15 @@ namespace IdentityApp.ControllerRepositories
     public class RolesControllerRepository : IRolesControllable
     {
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger _logger;
 
-        public RolesControllerRepository(UserManager<User> userManager,
+        public RolesControllerRepository(UserManager<User> userManager, SignInManager<User> signInManager,
             RoleManager<IdentityRole> roleManager, ILogger<RolesControllerRepository> logger)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
             _roleManager = roleManager;
             _logger = logger;
         }
@@ -75,6 +77,16 @@ namespace IdentityApp.ControllerRepositories
         public async Task<IdentityResult> RemoveFromRolesAsync(User user, IEnumerable<string> roles)
         {
             return await _userManager.RemoveFromRolesAsync(user, roles);
+        }
+
+        public async Task SignInAsync(User user, bool isPersistent)
+        {
+            await _signInManager.SignInAsync(user, isPersistent);
+        }
+
+        public async Task SignOutAsync()
+        {
+            await _signInManager.SignOutAsync();
         }
     }
 }
