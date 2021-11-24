@@ -16,6 +16,8 @@ namespace IdentityApp.Interfaces
         Task<IdentityResult> AddToRolesAsync(User user, IEnumerable<string> roles);
         Task<IdentityResult> RemoveFromRolesAsync(User user, IEnumerable<string> roles);
         Task<IList<string>> GetRolesAsync(User user);
+        Task SignInAsync(User user, bool isPersistent);
+        Task SignOutAsync();
         void LogInformation(string message);
         void LogWarning(string message);
         void LogError(string message);

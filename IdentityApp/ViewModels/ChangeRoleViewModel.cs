@@ -7,8 +7,9 @@ namespace IdentityApp.ViewModels
     {
         public string UserId { get; set; }
         public string UserName { get; set; }
-        public List<IdentityRole> AllRoles { get; set; }
+        public IList<IdentityRole> AllRoles { get; set; }
         public IList<string> UserRoles { get; set; }
+        public IList<string> NewRoles { get; set; }
         public string ReturnUrl { get; set; }
 
         public ChangeRoleViewModel()
