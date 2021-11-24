@@ -24,92 +24,92 @@ namespace IdentityApp.Models
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<User>()
-                .HasMany(user => user.Posts)
-                .WithOne(post => post.User)
+                .HasMany(u => u.Posts)
+                .WithOne(p => p.User)
                 .IsRequired();
 
             modelBuilder.Entity<Post>()
-                .HasOne(post => post.User)
-                .WithMany(user => user.Posts)
-                .HasForeignKey(post => post.UserId)
+                .HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Post>()
-                .HasMany(post => post.PostPictures)
-                .WithOne(postPicture => postPicture.Post)
+                .HasMany(p => p.PostPictures)
+                .WithOne(pic => pic.Post)
                 .IsRequired();
 
             modelBuilder.Entity<PostPicture>()
-                .HasOne(postPicture => postPicture.Post)
-                .WithMany(post => post.PostPictures)
-                .HasForeignKey(postPicture => postPicture.PostId)
+                .HasOne(pic => pic.Post)
+                .WithMany(p => p.PostPictures)
+                .HasForeignKey(pic => pic.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Post>()
-                .HasMany(post => post.PostComments)
-                .WithOne(comment => comment.Post)
+                .HasMany(p => p.PostComments)
+                .WithOne(c => c.Post)
                 .IsRequired();
 
             modelBuilder.Entity<PostComment>()
-                .HasOne(comment => comment.Post)
-                .WithMany(post => post.PostComments)
-                .HasForeignKey(post => post.PostId)
+                .HasOne(c => c.Post)
+                .WithMany(p => p.PostComments)
+                .HasForeignKey(p => p.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<LikedPost>()
-                .HasKey(likedPost => new 
+                .HasKey(lp => new 
                 { 
-                    likedPost.UserWhoLikedId, 
-                    likedPost.PostLikedId 
+                    lp.UserWhoLikedId, 
+                    lp.PostLikedId 
                 });
 
             modelBuilder.Entity<LikedPost>()
-                .HasOne(likedPost => likedPost.UserWhoLiked)
-                .WithMany(user => user.LikedPosts)
-                .HasForeignKey(likedPost => likedPost.UserWhoLikedId)
+                .HasOne(lp => lp.UserWhoLiked)
+                .WithMany(u => u.LikedPosts)
+                .HasForeignKey(lp => lp.UserWhoLikedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<LikedPost>()
-                .HasOne(likedPost => likedPost.PostLiked)
-                .WithMany(post => post.LikedPosts)
-                .HasForeignKey(likedPost => likedPost.PostLikedId)
+                .HasOne(lp => lp.PostLiked)
+                .WithMany(p => p.LikedPosts)
+                .HasForeignKey(lp => lp.PostLikedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PostComment>()
-                .HasMany(comment => comment.CommentPictures)
-                .WithOne(picture => picture.Comment)
+                .HasMany(c => c.CommentPictures)
+                .WithOne(p => p.Comment)
                 .IsRequired();
 
             modelBuilder.Entity<CommentPicture>()
-                .HasOne(picture => picture.Comment)
-                .WithMany(comment => comment.CommentPictures)
-                .HasForeignKey(picture => picture.CommentId)
+                .HasOne(p => p.Comment)
+                .WithMany(c => c.CommentPictures)
+                .HasForeignKey(p => p.CommentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<LikedComment>()
-                .HasKey(likedComment => new
+                .HasKey(lc => new
                 {
-                    likedComment.UserWhoLikedId,
-                    likedComment.CommentLikedId
+                    lc.UserWhoLikedId,
+                    lc.CommentLikedId
                 });
 
             modelBuilder.Entity<LikedComment>()
-                .HasOne(likedComment => likedComment.UserWhoLiked)
-                .WithMany(user => user.LikedComments)
-                .HasForeignKey(likedComment => likedComment.UserWhoLikedId)
+                .HasOne(lc => lc.UserWhoLiked)
+                .WithMany(u => u.LikedComments)
+                .HasForeignKey(lc => lc.UserWhoLikedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<LikedComment>()
-                .HasOne(likedComment => likedComment.CommentLiked)
-                .WithMany(comment => comment.LikedComments)
-                .HasForeignKey(likedComment => likedComment.CommentLikedId)
+                .HasOne(lc => lc.CommentLiked)
+                .WithMany(c => c.LikedComments)
+                .HasForeignKey(lc => lc.CommentLikedId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Following>()
-                .HasKey(followedUser => new
+                .HasKey(f => new
                 {
-                    followedUser.FollowedUserId,
-                    followedUser.ReaderId
+                    f.FollowedUserId,
+                    f.ReaderId
                 });
 
             modelBuilder.Entity<Following>()

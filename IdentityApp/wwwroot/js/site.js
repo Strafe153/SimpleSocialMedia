@@ -7,18 +7,21 @@ function loadFile(event) {
     output.onload = () => URL.revokeObjectURL(output.src);
 };
 
+// shows individual post's comment section
 function showComments(postId) {
     $(`.post-comments-${postId}`).css("display", "block");
     $(`#show-comments-btn-${postId}`).css("display", "none");
     $(`#hide-comments-btn-${postId}`).css("display", "block");
 }
 
+// hides individual post's comment section
 function hideComments(postId) {
     $(`.post-comments-${postId}`).css("display", "none");
     $(`#show-comments-btn-${postId}`).css("display", "block");
     $(`#hide-comments-btn-${postId}`).css("display", "none");
 }
 
+// shows individual post's button to attach pictures
 function showAddCommentPicturesButton(postId) {
     const currentPicturesButton = $(`#comment-pictures-btn-${postId}`);
     currentPicturesButton.css("display", "block");
