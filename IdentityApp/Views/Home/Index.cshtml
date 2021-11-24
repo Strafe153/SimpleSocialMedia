@@ -185,7 +185,7 @@
 
 @if (Model.PageViewModel.HasPreviousPage)
 {
-    <a asp-action="Index" asp-route-page="@(Model.PageViewModel.CurrentPageNumber - 1)" class="btn btn-outline-dark">
+    <a asp-action="Index" asp-route-page="@(Model.PageViewModel.CurrentPageNumber - 1)" class="btn btn-outline-secondary">
         <i class="glyphicon glyphicon-chevron-left"></i>
         Previous
     </a>
@@ -193,7 +193,7 @@
 
 @if (Model.Posts.Count() > 0)
 {
-    <input type="submit" value="@Model.PageViewModel.CurrentPageNumber" class="btn btn-outline-dark" disabled />
+    <input type="submit" value="@Model.PageViewModel.CurrentPageNumber" class="btn btn-outline-secondary" disabled />
 }
 
 @if (Model.PageViewModel.HasNextPage)

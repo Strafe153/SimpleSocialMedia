@@ -68,8 +68,8 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User existingUser = await _repository.FirstOrDefaultAsync(u => 
-                    u.UserName == model.UserName || u.Email == model.Email);
+                User existingUser = await _repository.FirstOrDefaultAsync(
+                    u => u.UserName == model.UserName || u.Email == model.Email);
 
                 if (existingUser == null)
                 {

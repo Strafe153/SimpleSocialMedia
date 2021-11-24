@@ -55,7 +55,7 @@ namespace IdentityApp.Controllers
                         if (model.ReturnUrl.Contains("Account"))
                         {
                             return RedirectToAction("Index", "Account", new { 
-                                userName = post.User.UserName, page = model.CommentContent });
+                                userName = post.User.UserName, page = model.Page });
                         }
 
                         return RedirectToAction(model.ReturnUrl.Contains("Feed") 
