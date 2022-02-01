@@ -1,0 +1,283 @@
+﻿@model SimpleSocialMedia.ViewModels.UserProfileViewModel
+
+@{
+    ViewData["Title"] = $"Profile: {Model.User.UserName}";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="mb-2 mr-1">
+            <img class="border border-3 border-secondary rounded-circle" id="profile-pic" alt="profile_picture" 
+                src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.User.ProfilePicture))" />
+        </div>
+        <div class="col mt-2">
+            <h3>@Model.User.UserName</h3>
+            <p class="text-break">@Model.User.Email</p>
+            <p>Posts: @Model.User.Posts.Count()</p>
+        </div>
+        <div class="col mt-2">
+            <p>Year: @Model.User.Year</p>
+            <p>Country: @Model.User.Country</p>
+            <a asp-action="UserReaders" asp-controller="Users" asp-route-userId="@Model.User.Id">
+                Readers: @Model.User.ReadersCount
+            </a>
+        </div>
+        <div class="col mt-2">
+            <p>City: @Model.User.City</p>
+            <p>Company: @Model.User.Company</p>
+            <a asp-action="UserFollows" asp-controller="Users" asp-route-userId="@Model.User.Id">
+                Follows: @Model.User.FollowsCount
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <p class="text-break mb-2">@Model.User.Status</p>
+    </div>
+</div>
+
+<div>
+    @if (Model.User != Model.AuthenticatedUser)
+    {
+        @if (Model.AuthenticatedUser == null)
+        {
+            <a asp-action="Login" 
+                asp-controller="Accounts"
+                class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+                Follow
+            </a>
+        }
+        else if (Model.AuthenticatedUser.FollowingUsers.FirstOrDefault(
+            following => following.FollowedUserId == Model.User.Id) == null)
+        {
+            <a asp-action="Follow" 
+                asp-controller="Accounts" 
+                asp-route-userToFollowName="@Model.User.UserName"
+                asp-route-authenticatedUserName="@Model.AuthenticatedUser.UserName"
+                asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+                Follow
+            </a>
+        }
+        else
+        {
+            <a asp-action="Unfollow" 
+                asp-controller="Accounts" 
+                asp-route-userToUnfollowName="@Model.User.UserName"
+                asp-route-authenticatedUserName="@Model.AuthenticatedUser.UserName"
+                asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-x" viewBox="0 0 16 16">
+                    <path d="M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                    <path fill-rule="evenodd" d="M12.146 5.146a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
+                </svg>
+                Unfollow
+            </a>
+        }
+    }
+
+    @if (Model.AuthenticatedUserRoles.Contains("admin") || Model.AuthenticatedUser == Model.User)
+    {
+        <a asp-action="Create" asp-controller="Posts" asp-route-userId="@Model.User.Id" 
+            class="btn btn-primary">Create Post</a>
+
+        <a asp-action="Edit" asp-controller="Accounts" asp-route-userId="@Model.User.Id"
+            asp-route-returnUrl="@Context.Request.Path" class="btn btn-primary float-right">Edit Profile</a>
+    }
+</div>
+
+@if (Model.Posts.Count() > 0)
+{
+    @foreach (Post post in Model.Posts)
+    {
+        <div class="border border-secondary rounded p-2 my-2">
+            <p class="text-break">@post.Content</p>
+
+            @foreach (var postPicture in post.PostPictures.OrderByDescending(postPic => postPic.UploadedTime))
+            {
+                <img height="150" alt="post_picture" class="mb-1"
+                     src="data:image/jpeg;base64,@(Convert.ToBase64String(postPicture.PictureData))" />
+            }
+
+            <div class="mt-2">
+                @if (Model.AuthenticatedUser != null)
+                {
+                    <a asp-action="Like" asp-controller="Posts"
+                        asp-route-Id="@post.Id"
+                        asp-route-UserId="@Model.AuthenticatedUser.Id" 
+                        asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
+                        asp-route-ReturnAction="@Context.Request.Path"
+                        class="btn btn-sm px-3 @(Model.AuthenticatedUser.LikedPosts
+                            .FirstOrDefault(p => p.PostLiked.Id == post.Id) != null ? "btn-primary" : "btn-outline-primary")">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                        </svg>
+                        <span id="likes-count">@post.Likes</span>
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="Login" asp-controller="Accounts" class="btn btn-sm btn-outline-primary px-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                        </svg>
+                        <span id="likes-count">@post.Likes</span>
+                    </a>
+                }
+
+                <div class="d-inline float-right mb-1">
+                    <sub class="posted-time">@post.PostedTime.ToString("HH:mm:ss dd.MM.yyyy")</sub>
+
+                    @if (post.IsEdited)
+                    {
+                        <sub class="posted-time">(edited)</sub>
+                    }
+
+                    @if (Model.AuthenticatedUser != null)
+	                {
+		                @if (Model.AuthenticatedUser.Id == post.UserId || Context.User.IsInRole("admin"))
+                        {
+                            <a asp-action="Edit" 
+                                asp-controller="Posts" 
+                                asp-route-postId="@post.Id"
+                                asp-route-returnUrl="@Context.Request.Path"
+                                asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                                class="btn btn-outline-secondary py-1">Edit</a>
+                        }
+	                }
+                </div>
+            </div>
+
+            <partial name="../Partial/CommentSection" model="post" />
+
+            <div>
+                @foreach (PostComment comment in post.PostComments.OrderBy(comment => comment.CommentedTime))
+                {
+                    <div class="post-comments post-comments-@post.Id">
+                        <a asp-action="Index" asp-controller="Accounts" asp-route-userName="@comment.Author" 
+                            id="user-profile-link" class="d-block">@comment.Author</a>
+                        <div>
+                            <p class="text-break">@comment.Content</p>
+                            
+                            @if (comment.CommentPictures.Count() > 0)
+                            {
+                                @foreach (CommentPicture picture in comment.CommentPictures.OrderByDescending(pic => pic.UploadedTime))
+                                {
+                                    <img height="110" alt="comment_picture"
+                                         src="data:image/jpeg;base64,@(Convert.ToBase64String(picture.PictureData))" />
+                                }
+                            }
+
+                            <div class="mt-2">
+                                @if (Model.AuthenticatedUser != null)
+                            {
+                                <a asp-action="Like"
+                                    asp-controller="PostComments"
+                                    asp-route-Id="@comment.Id"
+                                    asp-route-UserId="@Model.AuthenticatedUser.Id"
+                                    asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
+                                    asp-route-ReturnAction="@Context.Request.Path"
+                                    class="btn btn-sm px-3 py-1 @(Model.AuthenticatedUser.LikedComments.FirstOrDefault(
+                                        p => p.CommentLiked.Id == comment.Id) != null ? "btn-primary" : "btn-outline-primary")">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" class="bi bi-heart align-middle" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                                    </svg>
+                                    <span class="comment-likes-count">@comment.Likes</span>
+                                </a>
+
+                                <span class="float-right">
+                                    <sub class="posted-time">@comment.CommentedTime.ToString("HH:mm:ss dd.MM.yyyy")</sub>
+                                    @if (comment.IsEdited)
+                                    {
+                                        <sub class="posted-time">(edited)</sub>
+                                    }
+
+                                    @if (Model.AuthenticatedUser.UserName == comment.Author 
+                                        || Model.AuthenticatedUserRoles.Contains("admin"))
+                                    {
+                                        <a asp-action="Edit" asp-controller="PostComments" 
+                                            asp-route-postCommentId="@comment.Id" 
+                                            asp-route-page="@Model.PageViewModel.CurrentPageNumber"
+                                            asp-route-calledFromAction="@Context.Request.Path" 
+                                            class="btn btn-sm btn-outline-secondary">
+                                            Edit
+                                        </a>
+
+                                        <a asp-action="Delete" asp-controller="PostComments" 
+                                            asp-route-CommentId="@comment.Id" 
+                                            asp-route-Page="@Model.PageViewModel.CurrentPageNumber" 
+                                            asp-route-ReturnUrl="@Context.Request.Path"
+                                            asp-route-CommentedPostUser="@post.User.UserName"
+                                            class="btn btn-sm btn-danger">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                            </svg>
+                                            Delete
+                                        </a>
+                                    }
+                                </span>
+                            }
+                            </div>
+                        </div>
+
+                        <hr class="my-2" />
+                    </div>
+                }
+            </div>
+
+            <div>
+                @if (Model.AuthenticatedUser != null)
+                {
+                    <form asp-action="Create" asp-controller="PostComments" asp-route-PostId="@post.Id" 
+                        asp-route-CommentAuthorName="@Model.AuthenticatedUser.UserName" 
+                        asp-route-Page="@Model.PageViewModel.CurrentPageNumber"
+                        asp-route-ReturnUrl="@Context.Request.Path"
+                        enctype="multipart/form-data">
+                        <textarea onfocus="showAddCommentPicturesButton('@post.Id')" name="CommentContent" 
+                            class="form-control mt-2 comment-content" rows="1" placeholder="Your comment..."></textarea>
+                        <div class="form-group custom-file mt-2 comment-pictures-btn" id="comment-pictures-btn-@post.Id">
+                            <label for="custom-file" class="custom-file-label">Choose pictures</label>
+                            <input type="file" name="CommentPictures" class="custom-file-input" id="post-picture" 
+                                accept="image/jpeg,image/png" multiple />
+                        </div>
+                        <input type="submit" class="btn btn-sm btn-primary mt-2" value="Submit" />
+                    </form>
+                }
+                else
+                {
+                    <textarea name="postContent" class="form-control mt-2" rows="1" placeholder="Your comment..."></textarea>
+                    <a asp-action="Login" asp-controller="Accounts" class="btn btn-sm btn-primary mt-2">Submit</a>
+                }
+            </div>
+        </div>
+    }
+}
+
+@if (Model.PageViewModel.HasPreviousPage)
+{
+    <a asp-action="Index" asp-route-userName="@Model.User.UserName"
+        asp-route-page="@(Model.PageViewModel.CurrentPageNumber - 1)" class="btn btn-outline-secondary">
+        <i class="glyphicon glyphicon-chevron-left"></i> 
+        Previous
+    </a>
+}
+
+@if (Model.Posts.Count() > 0)
+{
+    <input type="submit" value="@Model.PageViewModel.CurrentPageNumber" class="btn btn-outline-secondary" disabled />
+}
+
+@if (Model.PageViewModel.HasNextPage)
+{
+    <a asp-action="Index" asp-route-userName="@Model.User.UserName"
+        asp-route-page="@(Model.PageViewModel.CurrentPageNumber + 1)" class="btn btn-outline-secondary">
+        <i class="glyphicon glyphicon-chevron-right"></i>
+        Next
+    </a>
+}

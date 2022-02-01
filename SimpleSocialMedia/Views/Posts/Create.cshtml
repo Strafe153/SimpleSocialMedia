@@ -1,0 +1,29 @@
+﻿@model SimpleSocialMedia.ViewModels.CreatePostViewModel 
+
+@{
+    ViewData["Title"] = "Creating a post";
+}
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="validation alert alert-danger" role="alert"></div>
+
+    <input type="hidden" asp-for="User.UserName" value="@Model.User.UserName" />
+    <input type="hidden" asp-for="User.Id" value="@Model.User.Id" />
+    <input type="hidden" asp-for="Id" value="@System.Guid.NewGuid().ToString()" />
+
+    <div class="form-group">
+        <label asp-for="Content" class="control-label"></label><br />
+        <textarea asp-for="Content" placeholder="Your thoughts..." class="form-control" rows="6"></textarea>
+    </div>
+    <div class="form-group custom-file mb-3">
+        <label asp-for="PostPictures" for="custom-file" class="custom-file-label" >Choose pictures</label>
+        <input type="file" asp-for="PostPictures" class="custom-file-input" id="post-picture" 
+            accept="image/jpeg,image/png" multiple />
+        <span asp-validation-for="PostPictures"></span>
+    </div>
+    <div class="form-group">
+        <a asp-action="Index" asp-controller="Accounts" asp-route-userName="@Model.User.UserName" 
+            class="btn btn-outline-secondary">Cancel</a>
+        <input type="submit" value="Post" class="btn btn-primary" />
+    </div>
+</form>
