@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Identity 
+@model SimpleSocialMedia.ViewModels.ChangeRoleViewModel 
+
+@{ 
+    ViewData["Title"] = $"{Model.UserName} - roles";
+}
+
+<h2>Changing roles for @Model.UserName</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="UserId" value="@Model.UserId" />
+    <input type="hidden" asp-for="ReturnUrl" value="@Model.ReturnUrl" />
+
+    <div class="form-group">
+        @foreach (IdentityRole role in Model.AllRoles)
+        {
+            <input type="checkbox" name="NewRoles" value="@role.Name" 
+                @(Model.UserRoles.Contains(role.Name) ? "checked=\"checked\"" : "") />@role.Name<br />
+        }
+    </div>
+    <div class="form-group">
+        @if (Model.ReturnUrl.Contains("Account"))
+        {
+            <a asp-action="Index" asp-controller="Accounts" asp-route-userName="@Model.UserName"
+               class="btn btn-outline-secondary">Cancel</a>
+        }
+        else
+        {
+            <a asp-action="Index" asp-controller="Users" class="btn btn-outline-secondary">Cancel</a>
+        }
+
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>

@@ -1,0 +1,24 @@
+﻿@model SimpleSocialMedia.ViewModels.UserRelationsViewModel
+
+@{
+    ViewData["Title"] = $"{Model.UserName} - follows";
+}
+
+@if (Model.RelatedUsers.Count() == 0)
+{
+    <h2>Results: 0</h2>
+    <p>@Model.UserName doesn't follow anybody</p>
+}
+else
+{
+    <table>
+        <tr>
+            @foreach(User user in Model.RelatedUsers)
+            {
+                <td class="pr-5">
+                    <a asp-action="Index" asp-controller="Accounts" asp-route-userName="@user.UserName">@user.UserName</a>
+                </td>
+            }
+        </tr>
+    </table>
+}
