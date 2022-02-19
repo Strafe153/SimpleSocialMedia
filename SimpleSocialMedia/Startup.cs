@@ -24,6 +24,7 @@ namespace SimpleSocialMedia
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IUserValidator<User>, CustomUserValidator>();
+
             services.AddScoped<IAccountsControllable, AccountsRepository>();
             services.AddScoped<IHomeControllable, HomeRepository>();
             services.AddScoped<IRolesControllable, RolesRepository>();
@@ -32,8 +33,10 @@ namespace SimpleSocialMedia
             services.AddScoped<IPostCommentsControllable, PostCommentsRepository>();
             services.AddScoped<IPicturesControllable<PostPicture>, PostPicturesRepository>();
             services.AddScoped<IPicturesControllable<CommentPicture>, CommentPicturesRepository>();
+
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -45,6 +48,7 @@ namespace SimpleSocialMedia
                 options.User.AllowedUserNameCharacters = "1234567890abcdefghijklmnopqrstuvwxyz" +
                     @"ABCDEFGHIJKLMNOPQRSTUVWXYZ-_.?=+`~!#$;()[]{}*&^:%,\/<>@ ";
             }).AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.AddControllersWithViews();
         }
 
