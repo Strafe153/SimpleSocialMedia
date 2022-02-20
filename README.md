@@ -1,4 +1,4 @@
-# SimpleSocialMedia-MVC
+# SimpleSocialMedia
 
 ### Non-commercial project intended to create a not overloaded, but useful and relatively fast web application that can serve as a basis for larger and more complex social media.
 
